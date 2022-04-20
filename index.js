@@ -93,13 +93,6 @@ app.get("/api/movie", (req, res, next) => {
   });
 });
 
-app.all("*", (req, res) => {
-  res.status(401).json({
-    status: 401,
-    result: "End-point not found",
-  });
-});
-
 //Aanmaken van een gebruiker
 app.post("/api/user", (req, res)=>{
   let newUser = req.body;
@@ -162,6 +155,13 @@ app.get("/api/user", (req, res)=>{
     result: userDataBase,
   })
 })
+
+app.all("*", (req, res) => {
+  res.status(401).json({
+    status: 401,
+    result: "End-point not found",
+  });
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
