@@ -122,7 +122,7 @@ app.post("/api/user", (req, res)=>{
 app.get("/api/user/:userId",(req, res)=>{
   const userId = req.params.userId;
   console.log(`Movie met ID ${userId} gezocht`);
-  let user = userDataBase.filter((item)=> item.id == id);
+  let user = userDataBase.filter((item)=> item.id == userId);
   if(user.length > 0){
     console.log(user);
     res.status(200).json({
