@@ -14,30 +14,30 @@ let id = 0;
 //Voor gebruikers
 let userDataBase = [
   {
-  id: 97,
-  firstname: "Xin",
-  lastName: "Wang",
-  city: "Rotterdam",
-  street: "Moskouplein",
-  email: "Xin20Wang@outlook.com",
-  password: "NoPassword123"
-},{
-  id: 98,
-  firstname: "Wessel",
-  lastName: "Pijpers",
-  city: "Alphen aan de Rhijn",
-  street: "Alphen",
-  email: "Wessel@outlook.com",
-  password: "NoPassword456"
-},{
-  id: 99,
-  firstname: "Brian",
-  lastName: "Thomson",
-  city: "Rotterdam",
-  street: "Beurs",
-  email: "BrieThom@outlook.com",
-  password: "NoPassword789"
-},]
+    id: 97,
+    firstname: "Xin",
+    lastName: "Wang",
+    city: "Rotterdam",
+    street: "Moskouplein",
+    email: "Xin20Wang@outlook.com",
+    password: "NoPassword123"
+  }, {
+    id: 98,
+    firstname: "Wessel",
+    lastName: "Pijpers",
+    city: "Alphen aan de Rhijn",
+    street: "Alphen",
+    email: "Wessel@outlook.com",
+    password: "NoPassword456"
+  }, {
+    id: 99,
+    firstname: "Brian",
+    lastName: "Thomson",
+    city: "Rotterdam",
+    street: "Beurs",
+    email: "BrieThom@outlook.com",
+    password: "NoPassword789"
+  },]
 let UserId = 0;
 
 app.all("*", (req, res, next) => {
@@ -94,42 +94,42 @@ app.get("/api/movie", (req, res, next) => {
 });
 
 //Aanmaken van een gebruiker
-app.post("/api/user", (req, res)=>{
+app.post("/api/user", (req, res) => {
   let newUser = req.body;
   const newUserEmail = req.params.email;
-  let amount = userDataBase.filter((item)=> item.email == newUserEmail);
+  let amount = userDataBase.filter((item) => item.email == newUserEmail);
 
-  if(amount == 0){
+  if (amount == 0) {
     UserId++;
-    newUser ={UserId,...newUser,}
+    newUser = { UserId, ...newUser, }
     console.log(newUser);
     userDataBase.push(newUser);
     res.status(200).json({
       status: 200,
       result: "User registered"
     })
-  } else{
+  } else {
     console.log(newUser + "\nAlready exists");
     res.status(400).json({
       status: 400,
       result: `User with email: ${newUserEmail}, already registered`
     })
   }
-  
+
 })
 
 //Ophalen van een gebruiker op basis van een id
-app.get("/api/user/:userId",(req, res)=>{
+app.get("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
   console.log(`Movie met ID ${userId} gezocht`);
-  let user = userDataBase.filter((item)=> item.id == userId);
-  if(user.length > 0){
+  let user = userDataBase.filter((item) => item.id == userId);
+  if (user.length > 0) {
     console.log(user);
     res.status(200).json({
       status: 200,
       result: user
     })
-  } else{
+  } else {
     res.status(400).json({
       status: 400,
       result: `User with id: ${userId} does not exist`
@@ -138,17 +138,57 @@ app.get("/api/user/:userId",(req, res)=>{
 })
 
 //Wijzigen van een gebruiker op basis van een id
-app.put("/api/user/:userId", (req, res)=>{
+app.put("/api/user/:userId", (req, res) => {
+  const userId = req.params.userId;
+  const userBody = req.body;
+  console.log(`Id is ${userId}`);
+  let userIndex = userDataBase.filter((item) => item.id != userId);
+  console.log(userIndex);
+  if (userIndex.length > 0) {
+    const index = userDataBase.findIndex((item) => item.id = userId);
+    userDataBase[index].firstname = userBody.firstname;
+    userDataBase[index].lastName = userBody.lastName;
+    userDataBase[index].city = userBody.city;
+    userDataBase[index].street = userBody.street;
+    userDataBase[index].email = userBody.email;
+    userDataBase[index].password = userBody.password;
+    res.status(200).json({
+      status: 200,
+      result: userBody
+    })
+
+  } else {
+    res.status(400).json({
+      status: 400,
+      result: "User update has failed"
+    })
+  }
 
 })
 
 //Verwijderen van een gebruiker op basis van een id
-app.delete("/api/user/:userId", (req, res)=>{
+app.delete("/api/user/:userId", (req, res) => {
+  const iD = req.params.userId;
+  console.log(iD);
+  let nr = userDataBase.findIndex((usr) => usr.id == iD);
+  console.log(nr);
+  if (nr > 0) {
+    userDataBase.splice(nr, 1);
+    res.status(200).json({
+      status: 200,
+      result: userDataBase,
+    })
+  } else {
+    res.status(400).json({
+      status: 400,
+      result: "Removal failed"
+    })
+  }
 
 })
 
 //Haalt alle gebruikers op.
-app.get("/api/user", (req, res)=>{
+app.get("/api/user", (req, res) => {
   console.log(userDataBase);
   res.status(200).json({
     status: 200,
