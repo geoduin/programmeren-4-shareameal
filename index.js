@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 let userDataBase = [
   {
     id: 97,
-    firstname: "Xin",
+    firstName: "Xin",
     lastName: "Wang",
     city: "Rotterdam",
     street: "Moskouplein",
@@ -19,7 +19,7 @@ let userDataBase = [
     password: "NoPassword123"
   }, {
     id: 98,
-    firstname: "Wessel",
+    firstName: "Wessel",
     lastName: "Pijpers",
     city: "Alphen aan de Rhijn",
     street: "Alphen",
@@ -27,7 +27,7 @@ let userDataBase = [
     password: "NoPassword456"
   }, {
     id: 99,
-    firstname: "Brian",
+    firstName: "Brian",
     lastName: "Thomson",
     city: "Rotterdam",
     street: "Beurs",
@@ -52,12 +52,13 @@ app.get("/", (req, res) => {
 //Creates user.
 app.post("/api/user", (req, res) => {
   let newUser = req.body;
-  const newUserEmail = req.params.email;
+  const newUserEmail = req.body.email;
   let amount = userDataBase.filter((item) => item.email == newUserEmail);
-
-  if (amount == 0) {
+  console.log(newUserEmail);
+  console.log(amount.length);
+  if (amount.length == 0) {
     id++;
-    newUser = { UserId, ...newUser, }
+    newUser = { id, ...newUser, }
     console.log(newUser);
     userDataBase.push(newUser);
     res.status(200).json({
@@ -65,7 +66,7 @@ app.post("/api/user", (req, res) => {
       result: "User registered"
     })
   } else {
-    console.log(newUser + "\nAlready exists");
+    console.log(newUserEmail + " Already exists");
     res.status(400).json({
       status: 400,
       result: `User with email: ${newUserEmail}, already registered`
@@ -109,11 +110,14 @@ app.put("/api/user/:userId", (req, res) => {
     let oldUser = user.at(0);
     console.log("Old")
     console.log(oldUser);
-    oldUser.firstname = newUser.firstname;
+    oldUser.firstName = newUser.firstName;
     oldUser.lastName = newUser.lastName;
     oldUser.city = newUser.city;
     oldUser.street = newUser.street;
-    oldUser.email = newUser.email;
+    if(emailValidation(newUser.email) == 0){
+      oldUser.email = newUser.email;
+    }
+    
     oldUser.password = newUser.password;
 
     console.log("New")
@@ -149,7 +153,6 @@ app.delete("/api/user/:userId", (req, res) => {
       result: "Removal failed"
     })
   }
-
 })
 
 //Haalt alle gebruikers op.
@@ -171,3 +174,9 @@ app.all("*", (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+function emailValidation(email) {
+  const amount = userDataBase.filter((user)=> user.email == email);
+  console.log("amount is: " + amount.length);
+  return amount;
+}
