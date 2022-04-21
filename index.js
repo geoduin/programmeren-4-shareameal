@@ -4,17 +4,13 @@ const port = process.env.PORT || 3000;
 
 const bodyParser = require("body-parser");
 const { use } = require("express/lib/application");
+const { status } = require("express/lib/response");
 app.use(bodyParser.json());
 
-//Todo: Database connection
-//UC 301 to 306 development
-//UC expand UC 201 to 206
-//UC 101 development
-
-//Voor gebruikers
+//In-memory database for users
 let userDataBase = [
   {
-    id: 97,
+    id: 0,
     firstName: "Xin",
     lastName: "Wang",
     city: "Rotterdam",
@@ -24,7 +20,7 @@ let userDataBase = [
     isActive: true,
     phoneNumber: "06 12425475"
   }, {
-    id: 98,
+    id: 1,
     firstName: "Wessel",
     lastName: "Pijpers",
     city: "Alphen aan de Rhijn",
@@ -34,7 +30,7 @@ let userDataBase = [
     isActive: true,
     phoneNumber: "06 12425475"
   }, {
-    id: 99,
+    id: 2,
     firstName: "Brian",
     lastName: "Thomson",
     city: "Rotterdam",
@@ -44,15 +40,16 @@ let userDataBase = [
     isActive: true,
     phoneNumber: "06 12425475"
   },]
-let id = 0;
+//Note: Due to the dummydata present within the in-memory database(in case of testing), the id will start at 2 instead of 0.
+let id = 2;
 
-//Voor maaltijden
+//In-memory-database for meals - in process
 let mealDatabase = [];
 let mealId = 0;
+
 //Default values
-let isActive = true;
-let phoneNumber = null;
-let value = true;
+let defaultBoolean = true;
+let defaultPhoneNumber = null;
 
 app.all("*", (req, res, next) => {
   const method = req.method;
@@ -66,48 +63,51 @@ app.get("/", (req, res) => {
     result: "Hello World",
   });
 });
-//UC-203 Retrieve user profile, based on Token and userID
-app.get("/api/user/profile", (req, res) => {
-  //Token, still empty
 
-  if (value) {
-    value = false;
-    res.status(200).json({
-      status: 200,
-      result: "Profile retrieval succeeded"
-    })
-  } else {
-    value = true;
-    res.status(400).json({
-      status: 400,
-      result: "Failed profile retrieval"
-    })
-  }
-})
 //UC-201 Creates user.
 app.post("/api/user", (req, res) => {
   let newUser = req.body;
   const newUserEmail = req.body.email;
   let amount = userDataBase.filter((item) => item.email == newUserEmail);
-  console.log(newUserEmail);
-  console.log(amount.length);
+  console.log(`Email: ${newUserEmail}, has ${amount.length} results.`);
   if (amount.length == 0) {
     id++;
-    newUser = { id, ...newUser, isActive, phoneNumber }
+    //Creates new user object
+    newUser = {id, ...newUser, isActive, phoneNumber }
     console.log(newUser);
     userDataBase.push(newUser);
     res.status(200).json({
       status: 200,
-      result: "User registered"
+      result: `User with email: ${newUserEmail}, has been registered.`,
+      user: newUser
     })
   } else {
-    console.log(newUserEmail + " Already exists");
+    console.log(`User with email: ${newUserEmail}, has already been registered`);
     res.status(400).json({
       status: 400,
-      result: `User with email: ${newUserEmail}, already registered`
+      result: `User with email: ${newUserEmail}, has already been registered`
     })
   }
 
+})
+
+//UC-202 Retrieves all users
+app.get("/api/user", (req, res) => {
+  console.log(userDataBase);
+  res.status(200).json({
+    status: 200,
+    result: userDataBase,
+  })
+})
+
+//UC-203 Retrieve user profile, based on Token and userID
+app.get("/api/user/profile", (req, res) => {
+  //Token, still empty
+  res.status(400).json({
+    status: 400,
+    result: "Failed profile retrieval",
+    note: "Correct token functionality has not been implemented"
+  })
 })
 
 //UC-204 Retrieves user, based on userId
@@ -119,6 +119,7 @@ app.get("/api/user/:userId", (req, res) => {
     console.log(user);
     res.status(200).json({
       status: 200,
+      answer: `User with id: ${userId} found`,
       result: user
     })
   } else {
@@ -134,26 +135,29 @@ app.put("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
   const newUser = req.body;
   console.log(`UserID of ${newUser.firstName} is ${userId}. User in question is ${newUser}`)
-  //Filters the array, based on userId. If the input userId is found in the in-memory database, it will return 1. otherwise it will return 0
+  //Filters the array, based on userId. If the input userId is found in the in-memory database, 
+  //it will return 1. otherwise it will return 0
   let user = userDataBase.filter((users) => users.id == userId);
   console.log(`Amount of users are: ${user.length}`)
   if (user.length > 0) {
     let oldUser = user.at(0);
     console.log(`Old: ${oldUser}`)
+    //Assigns values to object
     oldUser.firstName = newUser.firstName;
     oldUser.lastName = newUser.lastName;
     oldUser.city = newUser.city;
     oldUser.street = newUser.street;
+    oldUser.password = newUser.password;
+    //If the new email has been taken, it will not change the emailaddress
     if (emailValidation(newUser.email) == 0) {
       oldUser.email = newUser.email;
     }
-    oldUser.password = newUser.password;
-    oldUser.isActive = newUser.isActive;
-    oldUser.phoneNumber = newUser.phoneNumber;
+    setDefaultIsActiveAndPhoneNumber(oldUser, newUser);
     console.log(`New: ${oldUser}.`)
     res.status(200).json({
       status: 200,
-      result: "Succesful transaction"
+      result: "Succesful transaction",
+      updatedUser: oldUser
     })
   } else {
     res.status(400).json({
@@ -167,15 +171,14 @@ app.put("/api/user/:userId", (req, res) => {
 //UC-206 Deletes user based on id
 app.delete("/api/user/:userId", (req, res) => {
   const iD = req.params.userId
-  console.log(iD);
   let nr = userDataBase.findIndex((usr) => usr.id == iD);
-  console.log(nr);
   console.log(`Index of UserID: ${iD} is ${nr}.`);
   if (nr != -1) {
     userDataBase.splice(nr, 1);
     res.status(200).json({
       status: 200,
-      result: `User with user with Id ${iD}, has been removed.` + userDataBase
+      result: `User with user with Id ${iD}, has been removed.`,
+      CurrentUsers: userDataBase 
     })
   } else {
     res.status(400).json({
@@ -185,16 +188,8 @@ app.delete("/api/user/:userId", (req, res) => {
   }
 })
 
-//UC-202 Retrieves all users
-app.get("/api/user", (req, res) => {
-  console.log(userDataBase);
-  res.status(200).json({
-    status: 200,
-    result: userDataBase,
-  })
-})
 
-//UC-101 Login functionality, returns user and token
+//UC-101 Login functionality, returns user and token - in process
 app.get("/api/auth/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassWord = req.body.password;
@@ -205,11 +200,9 @@ app.get("/api/auth/login", (req, res) => {
   if (userIndex != -1) {
     let User = userDataBase[userIndex];
     console.log(User);
+    //Placeholder function to generate token
     const token = generateToken();
-    User = {
-      User,
-      token
-    }
+    User = { User, token }
     res.status(200).json({
       status: 200,
       result: User
@@ -317,14 +310,14 @@ app.put("/api/meals/:mealid", (req, res) => {
   }
 })
 
-//Miscalanious code
+//Miscellaneous code
 app.all("*", (req, res) => {
   res.status(401).json({
     status: 401,
     result: "End-point not found",
   });
 });
-//Miscalanious code
+//Miscellaneous code
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
@@ -338,5 +331,23 @@ function emailValidation(email) {
 
 //Function to generate a token. Has yet to be developed. Currently has a placeholder return value - in process
 function generateToken() {
-  return "YouHaveAcces";
+  return "YouHaveAccessToken";
 }
+
+//Assigns values to the attributes isActive and or phoneNumber
+function setDefaultIsActiveAndPhoneNumber(oldUser, newUser) {
+  if(newUser.isActive == undefined && newUser.phoneNumber == undefined){
+    oldUser.isActive = defaultBoolean;
+    oldUser.phoneNumber = defaultPhoneNumber;
+  } else if(newUser.isActive == undefined){
+    oldUser.isActive = defaultBoolean;
+    oldUser.phoneNumber = newUser.phoneNumber;
+  } else if(newUser.phoneNumber == undefined){
+    oldUser.isActive = newUser.isActive;
+    oldUser.phoneNumber = defaultPhoneNumber;
+  } else{
+    oldUser.isActive = newUser.isActive;
+    oldUser.phoneNumber = newUser.phoneNumber;
+  }
+}
+
