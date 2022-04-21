@@ -48,8 +48,8 @@ let mealDatabase = [];
 let mealId = 0;
 
 //Default values
-let defaultBoolean = true;
-let defaultPhoneNumber = null;
+let defaultBoolean = "";
+let defaultPhoneNumber = "";
 
 app.all("*", (req, res, next) => {
   const method = req.method;
@@ -64,7 +64,9 @@ app.get("/", (req, res) => {
   });
 });
 
-//UC-201 Creates user.
+//UC-201 Creates user. 
+//Note: I assume the attributes firstname, lastname, city, street, email and password are mandetory.
+//Thus there are no default values for thes attributes
 app.post("/api/user", (req, res) => {
   let newUser = req.body;
   const newUserEmail = req.body.email;
@@ -72,7 +74,8 @@ app.post("/api/user", (req, res) => {
   console.log(`Email: ${newUserEmail}, has ${amount.length} results.`);
   if (amount.length == 0) {
     id++;
-    //Creates new user object
+    let isActive = assignDefaultValues(newUser.isActive);
+    let phoneNumber = assignDefaultValues(newUser.phoneNumber);
     newUser = {id, ...newUser, isActive, phoneNumber }
     console.log(newUser);
     userDataBase.push(newUser);
@@ -152,7 +155,8 @@ app.put("/api/user/:userId", (req, res) => {
     if (emailValidation(newUser.email) == 0) {
       oldUser.email = newUser.email;
     }
-    setDefaultIsActiveAndPhoneNumber(oldUser, newUser);
+    oldUser.isActive = assignDefaultValues(newUser.isActive);
+    oldUser.phoneNumber = assignDefaultValues(newUser.phoneNumber);
     console.log(`New: ${oldUser}.`)
     res.status(200).json({
       status: 200,
@@ -334,20 +338,12 @@ function generateToken() {
   return "YouHaveAccessToken";
 }
 
-//Assigns values to the attributes isActive and or phoneNumber
-function setDefaultIsActiveAndPhoneNumber(oldUser, newUser) {
-  if(newUser.isActive == undefined && newUser.phoneNumber == undefined){
-    oldUser.isActive = defaultBoolean;
-    oldUser.phoneNumber = defaultPhoneNumber;
-  } else if(newUser.isActive == undefined){
-    oldUser.isActive = defaultBoolean;
-    oldUser.phoneNumber = newUser.phoneNumber;
-  } else if(newUser.phoneNumber == undefined){
-    oldUser.isActive = newUser.isActive;
-    oldUser.phoneNumber = defaultPhoneNumber;
-  } else{
-    oldUser.isActive = newUser.isActive;
-    oldUser.phoneNumber = newUser.phoneNumber;
+//A function that will assign a default value, in case the newValue is undefined. Otherwise it will return the original value
+function assignDefaultValues(newValue){
+  if(newValue != undefined){
+    return newValue;
+  } else {
+    return "";
   }
 }
 
