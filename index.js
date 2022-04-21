@@ -6,6 +6,10 @@ const bodyParser = require("body-parser");
 const { use } = require("express/lib/application");
 app.use(bodyParser.json());
 
+//Todo: Database connection
+//UC 301 to 306 development
+//UC expand UC 201 to 206
+//UC 101 development
 
 //Voor gebruikers
 let userDataBase = [
@@ -218,7 +222,7 @@ app.get("/api/auth/login", (req, res) => {
   }
 })
 
-//UC-301 Register meal
+//UC-301 Register meal - in process
 app.post("/api/meals", (req, res) => {
   let newMeal = req.body;
   mealId++;
@@ -233,14 +237,14 @@ app.post("/api/meals", (req, res) => {
   })
 })
 
-//UC-302 Get all meals
+//UC-302 Get all meals - in process
 app.get("/api/meals", (req, res) => {
   res.status(200).json({
     status: 200,
     result: mealDatabase
   })
 })
-//UC-303 get meal based on id
+//UC-303 get meal based on id - in process
 app.get("/api/meals/:mealId", (req, res) => {
   const currentId = req.params.mealId;
   let mealIndex = mealDatabase.findIndex((meal) => meal.mealId == currentId);
@@ -257,7 +261,7 @@ app.get("/api/meals/:mealId", (req, res) => {
     })
   }
 })
-//UC-304 Update meal
+//UC-304 Update meal - in process
 app.put("/api/meals/:mealId", (req, res) => {
   const currentId = req.params.mealId;
   let mealIndex = mealDatabase.findIndex((meal) => meal.mealId == currentId);
@@ -274,7 +278,7 @@ app.put("/api/meals/:mealId", (req, res) => {
     })
   }
 })
-//UC-305 Delete meal
+//UC-305 Delete meal - in process
 app.delete("/api/meals/:mealId", (req, res) => {
   const currentId = req.params.mealId;
   let mealIndex = mealDatabase.findIndex((meal) => meal.mealId == currentId);
@@ -292,7 +296,7 @@ app.delete("/api/meals/:mealId", (req, res) => {
     })
   }
 })
-//UC-306 Participate in meal
+//UC-306 Participate in meal - in process
 app.put("/api/meals/:mealid", (req, res) => {
   const currentId = req.params.mealId;
   let mealIndex = mealDatabase.findIndex((meal) => meal.mealId == currentId);
@@ -312,23 +316,27 @@ app.put("/api/meals/:mealid", (req, res) => {
     })
   }
 })
+
+//Miscalanious code
 app.all("*", (req, res) => {
   res.status(401).json({
     status: 401,
     result: "End-point not found",
   });
 });
-
+//Miscalanious code
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
 
+//Method to check if email exists in in memory database - in process
 function emailValidation(email) {
   const amount = userDataBase.filter((user) => user.email == email);
   console.log(`amount is: ${amount.length}`);
   return amount;
 }
 
+//Function to generate a token. Has yet to be developed. Currently has a placeholder return value - in process
 function generateToken() {
   return "YouHaveAcces";
 }
