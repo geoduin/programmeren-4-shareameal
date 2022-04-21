@@ -129,7 +129,7 @@ app.get("/api/user/:userId", (req, res) => {
   } else {
     res.status(400).json({
       status: 400,
-      result: `User with id: ${userId} does not exist`
+      result: `User with id: ${userId} does not exist. Retrieval has failed.`
     })
   }
 })
@@ -152,7 +152,7 @@ app.put("/api/user/:userId", (req, res) => {
     oldUser.city = newUser.city;
     oldUser.street = newUser.street;
     oldUser.password = newUser.password;
-    //If the new email has been taken, it will not change the emailaddress
+    //If the new email has already been taken(and thus is not equal to 0), it will not change the emailaddress
     if (emailValidation(newUser.email) == 0) {
       oldUser.email = newUser.email;
     }
@@ -167,7 +167,7 @@ app.put("/api/user/:userId", (req, res) => {
   } else {
     res.status(400).json({
       status: 400,
-      result: "Update has failed"
+      result: `Update has failed. Id: ${userId} does not exist.`
     })
   }
 
@@ -188,7 +188,7 @@ app.delete("/api/user/:userId", (req, res) => {
   } else {
     res.status(400).json({
       status: 400,
-      result: "Removal failed"
+      result: `Removal has failed. Id ${iD} has either been removed or does not exist` 
     })
   }
 })
