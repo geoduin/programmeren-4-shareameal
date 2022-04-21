@@ -16,7 +16,9 @@ let userDataBase = [
     city: "Rotterdam",
     street: "Moskouplein",
     email: "Xin20Wang@outlook.com",
-    password: "NoPassword123"
+    password: "NoPassword123",
+    isActive: true,
+    phoneNumber: "06 12425475"
   }, {
     id: 98,
     firstName: "Wessel",
@@ -24,7 +26,9 @@ let userDataBase = [
     city: "Alphen aan de Rhijn",
     street: "Alphen",
     email: "Wessel@outlook.com",
-    password: "NoPassword456"
+    password: "NoPassword456",
+    isActive: true,
+    phoneNumber: "06 12425475"
   }, {
     id: 99,
     firstName: "Brian",
@@ -32,9 +36,19 @@ let userDataBase = [
     city: "Rotterdam",
     street: "Beurs",
     email: "BrieThom@outlook.com",
-    password: "NoPassword789"
+    password: "NoPassword789",
+    isActive: true,
+    phoneNumber: "06 12425475"
   },]
 let id = 0;
+
+//Voor maaltijden
+let mealDatabase = [];
+let mealId = 0;
+//Default values
+let isActive = true;
+let phoneNumber = null;
+let value = true;
 
 app.all("*", (req, res, next) => {
   const method = req.method;
@@ -48,8 +62,25 @@ app.get("/", (req, res) => {
     result: "Hello World",
   });
 });
+//UC-203 Retrieve user profile, based on Token and userID
+app.get("/api/user/profile", (req, res) => {
+  //Token, still empty
 
-//Creates user.
+  if (value) {
+    value = false;
+    res.status(200).json({
+      status: 200,
+      result: "Profile retrieval succeeded"
+    })
+  } else {
+    value = true;
+    res.status(400).json({
+      status: 400,
+      result: "Failed profile retrieval"
+    })
+  }
+})
+//UC-201 Creates user.
 app.post("/api/user", (req, res) => {
   let newUser = req.body;
   const newUserEmail = req.body.email;
@@ -58,7 +89,7 @@ app.post("/api/user", (req, res) => {
   console.log(amount.length);
   if (amount.length == 0) {
     id++;
-    newUser = { id, ...newUser, }
+    newUser = { id, ...newUser, isActive, phoneNumber }
     console.log(newUser);
     userDataBase.push(newUser);
     res.status(200).json({
@@ -75,7 +106,7 @@ app.post("/api/user", (req, res) => {
 
 })
 
-//Retrieves user, based on userId
+//UC-204 Retrieves user, based on userId
 app.get("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
   console.log(`Movie met ID ${userId} gezocht`);
@@ -94,34 +125,28 @@ app.get("/api/user/:userId", (req, res) => {
   }
 })
 
-//Edits user.
+//UC-205 Edits user.
 app.put("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
   const newUser = req.body;
-  console.log("Id")
-  console.log(userId);
-  console.log("User in question");
-  console.log(newUser);
+  console.log(`UserID of ${newUser.firstName} is ${userId}. User in question is ${newUser}`)
   //Filters the array, based on userId. If the input userId is found in the in-memory database, it will return 1. otherwise it will return 0
-  let user = userDataBase.filter((users)=> users.id == userId);
-  console.log("User result is: \n" + user.length)
-
+  let user = userDataBase.filter((users) => users.id == userId);
+  console.log(`Amount of users are: ${user.length}`)
   if (user.length > 0) {
     let oldUser = user.at(0);
-    console.log("Old")
-    console.log(oldUser);
+    console.log(`Old: ${oldUser}`)
     oldUser.firstName = newUser.firstName;
     oldUser.lastName = newUser.lastName;
     oldUser.city = newUser.city;
     oldUser.street = newUser.street;
-    if(emailValidation(newUser.email) == 0){
+    if (emailValidation(newUser.email) == 0) {
       oldUser.email = newUser.email;
     }
-    
     oldUser.password = newUser.password;
-
-    console.log("New")
-    console.log(oldUser);
+    oldUser.isActive = newUser.isActive;
+    oldUser.phoneNumber = newUser.phoneNumber;
+    console.log(`New: ${oldUser}.`)
     res.status(200).json({
       status: 200,
       result: "Succesful transaction"
@@ -129,23 +154,24 @@ app.put("/api/user/:userId", (req, res) => {
   } else {
     res.status(400).json({
       status: 400,
-      result: "User update has failed"
+      result: "Update has failed"
     })
   }
 
 })
 
-//Verwijderen van een gebruiker op basis van een id
+//UC-206 Deletes user based on id
 app.delete("/api/user/:userId", (req, res) => {
-  const iD = req.params.userId;
+  const iD = req.params.userId
   console.log(iD);
   let nr = userDataBase.findIndex((usr) => usr.id == iD);
   console.log(nr);
-  if (nr > 0) {
+  console.log(`Index of UserID: ${iD} is ${nr}.`);
+  if (nr != -1) {
     userDataBase.splice(nr, 1);
     res.status(200).json({
       status: 200,
-      result: userDataBase,
+      result: `User with user with Id ${iD}, has been removed.` + userDataBase
     })
   } else {
     res.status(400).json({
@@ -155,7 +181,7 @@ app.delete("/api/user/:userId", (req, res) => {
   }
 })
 
-//Haalt alle gebruikers op.
+//UC-202 Retrieves all users
 app.get("/api/user", (req, res) => {
   console.log(userDataBase);
   res.status(200).json({
@@ -164,6 +190,128 @@ app.get("/api/user", (req, res) => {
   })
 })
 
+//UC-101 Login functionality, returns user and token
+app.get("/api/auth/login", (req, res) => {
+  const userEmail = req.body.email;
+  const userPassWord = req.body.password;
+  console.log(`Email ${userEmail} and password ${userPassWord}`);
+  let userIndex = userDataBase.findIndex((user) => user.email == userEmail && user.password == userPassWord);
+  console.log(`Index of ${userEmail} is:  ${userIndex}`);
+
+  if (userIndex != -1) {
+    let User = userDataBase[userIndex];
+    console.log(User);
+    const token = generateToken();
+    User = {
+      User,
+      token
+    }
+    res.status(200).json({
+      status: 200,
+      result: User
+    })
+  } else {
+    res.status(400).json({
+      status: 400,
+      result: "Login failed"
+    })
+  }
+})
+
+//UC-301 Register meal
+app.post("/api/meals", (req, res) => {
+  let newMeal = req.body;
+  mealId++;
+  newMeal = {
+    mealId, ...newMeal
+  }
+  mealDatabase.push(newMeal);
+
+  res.status(200).json({
+    status: 200,
+    result: "Meal added to meal database"
+  })
+})
+
+//UC-302 Get all meals
+app.get("/api/meals", (req, res) => {
+  res.status(200).json({
+    status: 200,
+    result: mealDatabase
+  })
+})
+//UC-303 get meal based on id
+app.get("/api/meals/:mealId", (req, res) => {
+  const currentId = req.params.mealId;
+  let mealIndex = mealDatabase.findIndex((meal) => meal.mealId == currentId);
+
+  if (mealIndex != -1) {
+    res.status(200).json({
+      status: 200,
+      result: mealDatabase[mealIndex]
+    })
+  } else {
+    res.status(400).json({
+      status: 400,
+      result: "Meal retrieval failed"
+    })
+  }
+})
+//UC-304 Update meal
+app.put("/api/meals/:mealId", (req, res) => {
+  const currentId = req.params.mealId;
+  let mealIndex = mealDatabase.findIndex((meal) => meal.mealId == currentId);
+  if (mealIndex != -1) {
+    //Update code
+    res.status(200).json({
+      status: 200,
+      result: mealDatabase[mealIndex]
+    })
+  } else {
+    res.status(400).json({
+      status: 400,
+      result: "Meal update failed"
+    })
+  }
+})
+//UC-305 Delete meal
+app.delete("/api/meals/:mealId", (req, res) => {
+  const currentId = req.params.mealId;
+  let mealIndex = mealDatabase.findIndex((meal) => meal.mealId == currentId);
+  if (mealIndex != -1) {
+    //Delete code
+    mealDatabase.splice(mealIndex, 1);
+    res.status(200).json({
+      status: 200,
+      result: mealDatabase[mealIndex]
+    })
+  } else {
+    res.status(400).json({
+      status: 400,
+      result: "Meal update failed"
+    })
+  }
+})
+//UC-306 Participate in meal
+app.put("/api/meals/:mealid", (req, res) => {
+  const currentId = req.params.mealId;
+  let mealIndex = mealDatabase.findIndex((meal) => meal.mealId == currentId);
+  if (mealIndex != -1) {
+    //Participation code
+    let meal = mealDatabase[mealIndex]
+    //Code to participate has not been implemented
+
+    res.status(200).json({
+      status: 200,
+      result: "Participation completed"
+    })
+  } else {
+    res.status(400).json({
+      status: 400,
+      result: "Participation failed"
+    })
+  }
+})
 app.all("*", (req, res) => {
   res.status(401).json({
     status: 401,
@@ -176,7 +324,11 @@ app.listen(port, () => {
 });
 
 function emailValidation(email) {
-  const amount = userDataBase.filter((user)=> user.email == email);
-  console.log("amount is: " + amount.length);
+  const amount = userDataBase.filter((user) => user.email == email);
+  console.log(`amount is: ${amount.length}`);
   return amount;
+}
+
+function generateToken() {
+  return "YouHaveAcces";
 }
