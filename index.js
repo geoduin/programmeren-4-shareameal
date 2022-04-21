@@ -104,6 +104,7 @@ app.get("/api/user", (req, res) => {
 })
 
 //UC-203 Retrieve user profile, based on Token and userID
+//Token functionality has not been developed - in process
 app.get("/api/user/profile", (req, res) => {
   //Token, still empty
   res.status(400).json({
