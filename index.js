@@ -45,14 +45,14 @@ app.all("*", (req, res, next) => {
   console.log(`Method ${method} is aangeroepen`);
   next();
 });
-
+//Test command.
 app.get("/", (req, res) => {
   res.status(200).json({
     status: 200,
     result: "Hello World",
   });
 });
-
+//Creates movie to in memory database.
 app.post("/api/movie", (req, res) => {
   let movie = req.body;
   id++;
@@ -67,7 +67,7 @@ app.post("/api/movie", (req, res) => {
     result: database,
   });
 });
-
+//Example code used in the course; retrieves movie based on movieId
 app.get("/api/movie/:movieId", (req, res, next) => {
   const movieId = req.params.movieId
   console.log(`Movie met ID ${movieId} gezocht`);
@@ -85,7 +85,7 @@ app.get("/api/movie/:movieId", (req, res, next) => {
     });
   }
 });
-
+//Example code used in the course, retrieves all movies.
 app.get("/api/movie", (req, res, next) => {
   res.status(200).json({
     status: 200,
@@ -93,7 +93,7 @@ app.get("/api/movie", (req, res, next) => {
   });
 });
 
-//Aanmaken van een gebruiker
+//Creates user.
 app.post("/api/user", (req, res) => {
   let newUser = req.body;
   const newUserEmail = req.params.email;
@@ -118,7 +118,7 @@ app.post("/api/user", (req, res) => {
 
 })
 
-//Ophalen van een gebruiker op basis van een id
+//Retrieves user, based on userId
 app.get("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
   console.log(`Movie met ID ${userId} gezocht`);
@@ -137,26 +137,35 @@ app.get("/api/user/:userId", (req, res) => {
   }
 })
 
-//Wijzigen van een gebruiker op basis van een id
+//Edits user.
 app.put("/api/user/:userId", (req, res) => {
   const userId = req.params.userId;
-  const userBody = req.body;
-  console.log(`Id is ${userId}`);
-  let userIndex = userDataBase.filter((item) => item.id != userId);
-  console.log(userIndex);
-  if (userIndex.length > 0) {
-    const index = userDataBase.findIndex((item) => item.id = userId);
-    userDataBase[index].firstname = userBody.firstname;
-    userDataBase[index].lastName = userBody.lastName;
-    userDataBase[index].city = userBody.city;
-    userDataBase[index].street = userBody.street;
-    userDataBase[index].email = userBody.email;
-    userDataBase[index].password = userBody.password;
+  const newUser = req.body;
+  console.log("Id")
+  console.log(userId);
+  console.log("User in question");
+  console.log(newUser);
+  //Filters the array, based on userId. If the input userId is found in the in-memory database, it will return 1. otherwise it will return 0
+  let user = userDataBase.filter((users)=> users.id == userId);
+  console.log("User result is: \n" + user.length)
+
+  if (user.length > 0) {
+    let oldUser = user.at(0);
+    console.log("Old")
+    console.log(oldUser);
+    oldUser.firstname = newUser.firstname;
+    oldUser.lastName = newUser.lastName;
+    oldUser.city = newUser.city;
+    oldUser.street = newUser.street;
+    oldUser.email = newUser.email;
+    oldUser.password = newUser.password;
+
+    console.log("New")
+    console.log(oldUser);
     res.status(200).json({
       status: 200,
-      result: userBody
+      result: "Succesful transaction"
     })
-
   } else {
     res.status(400).json({
       status: 400,
