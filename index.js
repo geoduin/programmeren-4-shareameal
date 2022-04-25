@@ -79,15 +79,15 @@ app.post("/api/user", (req, res) => {
     newUser = {id, ...newUser, isActive, phoneNumber }
     console.log(newUser);
     userDataBase.push(newUser);
-    res.status(200).json({
-      status: 200,
+    res.status(201).json({
+      status: 201,
       result: `User with email: ${newUserEmail}, has been registered.`,
       user: newUser
     })
   } else {
     console.log(`User with email: ${newUserEmail}, has already been registered`);
-    res.status(400).json({
-      status: 400,
+    res.status(406).json({
+      status: 406,
       result: `User with email: ${newUserEmail}, has already been registered`
     })
   }
@@ -107,8 +107,8 @@ app.get("/api/user", (req, res) => {
 //Token functionality has not been developed - in process
 app.get("/api/user/profile", (req, res) => {
   //Token, still empty
-  res.status(400).json({
-    status: 400,
+  res.status(401).json({
+    status: 401,
     result: "Failed profile retrieval",
     note: "Correct token functionality has not been implemented"
   })
@@ -121,14 +121,14 @@ app.get("/api/user/:userId", (req, res) => {
   let user = userDataBase.filter((item) => item.id == userId);
   if (user.length > 0) {
     console.log(user);
-    res.status(200).json({
-      status: 200,
+    res.status(202).json({
+      status: 202,
       answer: `User with id: ${userId} found`,
       result: user
     })
   } else {
-    res.status(400).json({
-      status: 400,
+    res.status(404).json({
+      status: 404,
       result: `User with id: ${userId} does not exist. Retrieval has failed.`
     })
   }
@@ -165,8 +165,8 @@ app.put("/api/user/:userId", (req, res) => {
       updatedUser: oldUser
     })
   } else {
-    res.status(400).json({
-      status: 400,
+    res.status(404).json({
+      status: 404,
       result: `Update has failed. Id: ${userId} does not exist.`
     })
   }
@@ -186,8 +186,8 @@ app.delete("/api/user/:userId", (req, res) => {
       CurrentUsers: userDataBase 
     })
   } else {
-    res.status(400).json({
-      status: 400,
+    res.status(404).json({
+      status: 404,
       result: `Removal has failed. Id ${iD} has either been removed or does not exist` 
     })
   }
