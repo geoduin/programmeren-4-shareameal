@@ -49,12 +49,12 @@ let controller = {
             assert(typeof city == 'string','Foutmelding: City must be a string');
             assert(typeof street == 'string','Foutmelding: Street must be a string');
             next();
-        } catch (error) {
-            console.log(error);
-            res.status(400).json({
+        } catch (err) {
+            const error= {
                 status: 400,
-                result: error.toString()
-            })
+                result: err.toString()
+            };
+            next(error);
         }
     },
     //UC-201 Creates user. 

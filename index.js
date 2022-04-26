@@ -7,6 +7,7 @@ const { use } = require("express/lib/application");
 const { status } = require("express/lib/response");
 
 const UserRouter = require('./src/routes/user.routes');
+const res = require("express/lib/response");
 
 app.use(bodyParser.json());
 
@@ -97,6 +98,13 @@ app.get("/api/auth/login", (req, res) => {
 
 //Refactor
 app.use(UserRouter);
+
+
+//Error handling
+app.use((err,req, res, next)=>{
+  res.status(err.status).json(err);
+});
+
 
 //UC-301 Register meal - in process
 app.post("/api/meals", (req, res) => {
