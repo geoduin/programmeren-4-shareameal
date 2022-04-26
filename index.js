@@ -234,3 +234,4 @@ function assignDefaultValues(newValue){
   }
 }
 
+module.exports = app;
