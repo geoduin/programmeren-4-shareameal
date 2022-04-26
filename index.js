@@ -5,6 +5,9 @@ const port = process.env.PORT || 3000;
 const bodyParser = require("body-parser");
 const { use } = require("express/lib/application");
 const { status } = require("express/lib/response");
+
+const UserRouter = require('./src/routes/user.routes');
+
 app.use(bodyParser.json());
 
 //In-memory database for users
@@ -64,134 +67,6 @@ app.get("/", (req, res) => {
   });
 });
 
-//UC-201 Creates user. 
-//Note: I assume the attributes firstname, lastname, city, street, email and password are mandetory.
-//Thus there are no default values for thes attributes
-app.post("/api/user", (req, res) => {
-  let newUser = req.body;
-  const newUserEmail = req.body.email;
-  let amount = userDataBase.filter((item) => item.email == newUserEmail);
-  console.log(`Email: ${newUserEmail}, has ${amount.length} results.`);
-  if (amount.length == 0) {
-    id++;
-    let isActive = assignDefaultValues(newUser.isActive);
-    let phoneNumber = assignDefaultValues(newUser.phoneNumber);
-    newUser = {id, ...newUser, isActive, phoneNumber }
-    console.log(newUser);
-    userDataBase.push(newUser);
-    res.status(201).json({
-      status: 201,
-      result: `User with email: ${newUserEmail}, has been registered.`,
-      user: newUser
-    })
-  } else {
-    console.log(`User with email: ${newUserEmail}, has already been registered`);
-    res.status(406).json({
-      status: 406,
-      result: `User with email: ${newUserEmail}, has already been registered`
-    })
-  }
-
-})
-
-//UC-202 Retrieves all users
-app.get("/api/user", (req, res) => {
-  console.log(userDataBase);
-  res.status(200).json({
-    status: 200,
-    result: userDataBase,
-  })
-})
-
-//UC-203 Retrieve user profile, based on Token and userID
-//Token functionality has not been developed - in process
-app.get("/api/user/profile", (req, res) => {
-  //Token, still empty
-  res.status(401).json({
-    status: 401,
-    result: "Failed profile retrieval",
-    note: "Correct token functionality has not been implemented"
-  })
-})
-
-//UC-204 Retrieves user, based on userId
-app.get("/api/user/:userId", (req, res) => {
-  const userId = req.params.userId;
-  console.log(`Movie met ID ${userId} gezocht`);
-  let user = userDataBase.filter((item) => item.id == userId);
-  if (user.length > 0) {
-    console.log(user);
-    res.status(202).json({
-      status: 202,
-      answer: `User with id: ${userId} found`,
-      result: user
-    })
-  } else {
-    res.status(404).json({
-      status: 404,
-      result: `User with id: ${userId} does not exist. Retrieval has failed.`
-    })
-  }
-})
-
-//UC-205 Edits user.
-app.put("/api/user/:userId", (req, res) => {
-  const userId = req.params.userId;
-  const newUser = req.body;
-  console.log(`UserID of ${newUser.firstName} is ${userId}. User in question is ${newUser}`)
-  //Filters the array, based on userId. If the input userId is found in the in-memory database, 
-  //it will return 1. otherwise it will return 0
-  let user = userDataBase.filter((users) => users.id == userId);
-  console.log(`Amount of users are: ${user.length}`)
-  if (user.length > 0) {
-    let oldUser = user.at(0);
-    console.log(`Old: ${oldUser}`)
-    //Assigns values to object
-    oldUser.firstName = newUser.firstName;
-    oldUser.lastName = newUser.lastName;
-    oldUser.city = newUser.city;
-    oldUser.street = newUser.street;
-    oldUser.password = newUser.password;
-    //If the new email has already been taken(and thus is not equal to 0), it will not change the emailaddress
-    if (emailValidation(newUser.email) == 0) {
-      oldUser.email = newUser.email;
-    }
-    oldUser.isActive = assignDefaultValues(newUser.isActive);
-    oldUser.phoneNumber = assignDefaultValues(newUser.phoneNumber);
-    console.log(`New: ${oldUser}.`)
-    res.status(200).json({
-      status: 200,
-      result: "Succesful transaction",
-      updatedUser: oldUser
-    })
-  } else {
-    res.status(404).json({
-      status: 404,
-      result: `Update has failed. Id: ${userId} does not exist.`
-    })
-  }
-
-})
-
-//UC-206 Deletes user based on id
-app.delete("/api/user/:userId", (req, res) => {
-  const iD = req.params.userId
-  let nr = userDataBase.findIndex((usr) => usr.id == iD);
-  console.log(`Index of UserID: ${iD} is ${nr}.`);
-  if (nr != -1) {
-    userDataBase.splice(nr, 1);
-    res.status(200).json({
-      status: 200,
-      result: `User with user with Id ${iD}, has been removed.`,
-      CurrentUsers: userDataBase 
-    })
-  } else {
-    res.status(404).json({
-      status: 404,
-      result: `Removal has failed. Id ${iD} has either been removed or does not exist` 
-    })
-  }
-})
 
 
 //UC-101 Login functionality, returns user and token - in process
@@ -219,6 +94,9 @@ app.get("/api/auth/login", (req, res) => {
     })
   }
 })
+
+//Refactor
+app.use(UserRouter);
 
 //UC-301 Register meal - in process
 app.post("/api/meals", (req, res) => {
