@@ -1,3 +1,6 @@
+const req = require("express/lib/request");
+const assert = require('assert');
+
 let userDataBase = [
     {
         id: 0,
@@ -34,6 +37,26 @@ let userDataBase = [
 let id = 2;
 
 let controller = {
+    validateUserPost: (req, res, next)=>{
+        let User = req.body;
+        let {firstName, lastName, street, city, isActive, email, password, phoneNumber} = User;
+
+        //let {firstName,...other(Mag zelf bedacht worden) } = User;
+        //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
+        try {
+            assert(typeof firstName == 'string','Foutmelding: Title must be a string');
+            assert(typeof lastName == 'string','Foutmelding: LastName must be a string');
+            assert(typeof city == 'string','Foutmelding: City must be a string');
+            assert(typeof street == 'string','Foutmelding: Street must be a string');
+            next();
+        } catch (error) {
+            console.log(error);
+            res.status(400).json({
+                status: 400,
+                result: error.toString()
+            })
+        }
+    },
     //UC-201 Creates user. 
     addUser: (req, res) => {
         let newUser = req.body;
