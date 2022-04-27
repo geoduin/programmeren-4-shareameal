@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon index.js",
     "dev": "nodemon index.js",
-    "test": "mocha test/**/*.test.js --exit"
+    "test": "mocha Test/**/*.test.js --exit"
   },
   "author": "Robin",
   "license": "ISC",
