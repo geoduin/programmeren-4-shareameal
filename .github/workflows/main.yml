@@ -6,14 +6,31 @@ on:
       - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: Heroku # naam van mijn environment op GitHub
-    steps:
+    integrationtests:
+      runs-on: ubuntu-latest
+      steps:
       - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: share-meal-programmeren-4
-          heroku_email: xin20wang@outlook.com
+
+            # Install Node 16
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 17.9.0.
+
+            # Install dependencies
+            - run: npm install
+
+            # Run tests
+            - run: npm test
+  deploy:
+    needs: integrationtests
+      runs-on: ubuntu-latest
+      environment:
+        name: Heroku # naam van mijn environment op GitHub
+      steps:
+        - uses: actions/checkout@v2
+        - uses: akhileshns/heroku-deploy@v3.12.12
+          with:
+            heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+            heroku_app_name: share-meal-programmeren-4
+            heroku_email: xin20wang@outlook.com
