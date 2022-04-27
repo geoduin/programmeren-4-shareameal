@@ -1,38 +1,7 @@
 const req = require("express/lib/request");
 const assert = require('assert');
+const dataSet= require('../data/data.inMemory');
 
-let userDataBase = [
-    {
-        id: 0,
-        firstName: "Xin",
-        lastName: "Wang",
-        city: "Rotterdam",
-        street: "Moskouplein",
-        email: "Xin20Wang@outlook.com",
-        password: "NoPassword123",
-        isActive: true,
-        phoneNumber: "06 12425475"
-    }, {
-        id: 1,
-        firstName: "Wessel",
-        lastName: "Pijpers",
-        city: "Alphen aan de Rhijn",
-        street: "Alphen",
-        email: "Wessel@outlook.com",
-        password: "NoPassword456",
-        isActive: true,
-        phoneNumber: "06 12425475"
-    }, {
-        id: 2,
-        firstName: "Brian",
-        lastName: "Thomson",
-        city: "Rotterdam",
-        street: "Beurs",
-        email: "BrieThom@outlook.com",
-        password: "NoPassword789",
-        isActive: true,
-        phoneNumber: "06 12425475"
-    },]
 //Note: Due to the dummydata present within the in-memory database(in case of testing), the id will start at 2 instead of 0.
 let id = 2;
 
@@ -61,7 +30,7 @@ let controller = {
     addUser: (req, res) => {
         let newUser = req.body;
         const newUserEmail = req.body.email;
-        let amount = userDataBase.filter((item) => item.email == newUserEmail);
+        let amount = dataSet.userData.filter((item) => item.email == newUserEmail);
         console.log(`Email: ${newUserEmail}, has ${amount.length} results.`);
         if (amount.length == 0) {
             id++;
@@ -69,7 +38,7 @@ let controller = {
             let phoneNumber = assignDefaultValues(newUser.phoneNumber);
             newUser = { id, ...newUser, isActive, phoneNumber }
             console.log(newUser);
-            userDataBase.push(newUser);
+            dataSet.userData.push(newUser);
             res.status(201).json({
                 status: 201,
                 result: `User with email: ${newUserEmail}, has been registered.`,
@@ -88,10 +57,10 @@ let controller = {
     ,
     //UC-202 Retrieves all users
     getAllUsers: (req, res) => {
-        console.log(userDataBase);
+        console.log(dataSet.userData);
         res.status(200).json({
             status: 200,
-            result: userDataBase,
+            result: dataSet.userData,
         })
     }
     ,
@@ -110,7 +79,7 @@ let controller = {
     retrieveUserById: (req, res) => {
         const userId = req.params.userId;
         console.log(`Movie met ID ${userId} gezocht`);
-        let user = userDataBase.filter((item) => item.id == userId);
+        let user = dataSet.userData.filter((item) => item.id == userId);
         if (user.length > 0) {
             console.log(user);
             res.status(202).json({
@@ -133,7 +102,7 @@ let controller = {
         console.log(`UserID of ${newUser.firstName} is ${userId}. User in question is ${newUser}`)
         //Filters the array, based on userId. If the input userId is found in the in-memory database, 
         //it will return 1. otherwise it will return 0
-        let user = userDataBase.filter((users) => users.id == userId);
+        let user = dataSet.userData.filter((users) => users.id == userId);
         console.log(`Amount of users are: ${user.length}`)
         if (user.length > 0) {
             let oldUser = user.at(0);
@@ -167,14 +136,14 @@ let controller = {
     //UC-206 Deletes user based on id
     deleteUser: (req, res) => {
         const iD = req.params.userId
-        let nr = userDataBase.findIndex((usr) => usr.id == iD);
+        let nr = dataSet.userData.findIndex((usr) => usr.id == iD);
         console.log(`Index of UserID: ${iD} is ${nr}.`);
         if (nr != -1) {
-            userDataBase.splice(nr, 1);
+            dataSet.userData.splice(nr, 1);
             res.status(200).json({
                 status: 200,
                 result: `User with user with Id ${iD}, has been removed.`,
-                CurrentUsers: userDataBase
+                CurrentUsers: dataSet.userData
             })
         } else {
             res.status(404).json({
@@ -187,7 +156,7 @@ let controller = {
 
 
 function emailValidation(email) {
-    const amount = userDataBase.filter((user) => user.email == email);
+    const amount = dataSet.userData.filter((user) => user.email == email);
     console.log(`amount is: ${amount.length}`);
     return amount;
 }
@@ -200,11 +169,5 @@ function assignDefaultValues(newValue) {
         return "";
     }
 }
-
-//Function to generate a token. Has yet to be developed. Currently has a placeholder return value - in process
-function generateToken() {
-    return "YouHaveAccessToken";
-}
-
 
 module.exports = controller;
