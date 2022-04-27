@@ -10,7 +10,7 @@ const { status } = require("express/lib/response");
 const UserRouter = require('./src/routes/user.routes');
 const MealRouter = require('./src/routes/meal.routes');
 const LoginRouter = require('./src/routes/login.routes');
-
+const ParticipateRouter = require('./src/routes/participation.routes');
 const res = require("express/lib/response");
 
 app.use(bodyParser.json());
@@ -73,6 +73,9 @@ app.use(MealRouter);
 //Login Router
 app.use(LoginRouter);
 
+//Meal participation Router
+app.use(ParticipateRouter);
+
 //Error handling
 app.use((err,req, res, next)=>{
   res.status(err.status).json(err);
@@ -90,5 +93,6 @@ app.all("*", (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
 
 module.exports = app;
