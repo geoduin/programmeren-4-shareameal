@@ -17,6 +17,10 @@ let controller = {
             assert(typeof lastName == 'string','LastName must be a string');
             assert(typeof city == 'string','City must be a string');
             assert(typeof street == 'string','Street must be a string');
+            assert(typeof isActive == 'boolean','isActive must be a boolean');
+            assert(typeof email == 'string','email must be a string');
+            assert(typeof password == 'string','password must be a string');
+            assert(typeof phoneNumber == 'string','phoneNumber must be a string');
             next();
         } catch (err) {
             const error= {
@@ -41,14 +45,14 @@ let controller = {
             dataSet.userData.push(newUser);
             res.status(201).json({
                 status: 201,
-                result: `User with email: ${newUserEmail}, has been registered.`,
+                result: `User has been registered.`,
                 user: newUser
             })
         } else {
             console.log(`User with email: ${newUserEmail}, has already been registered`);
             res.status(406).json({
                 status: 406,
-                result: `User with email: ${newUserEmail}, has already been registered`
+                result: `Email has been taken`
             })
         }
 
