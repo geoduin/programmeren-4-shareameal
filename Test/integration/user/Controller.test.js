@@ -1,14 +1,14 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const server = require('../../integration/user');
+const server = require('../../../index');
 let database = [];
 
 chai.should();
 chai.use(chaiHttp);
 
-describe('UC-201 Manage movies POST /api/user',()=>{
+describe('UC-201 Manage movies POST /api/user',(done)=>{
     describe('UC-201 Add movies', ()=>{
-        beforeEach(()=>{
+        beforeEach((done)=>{
             database = [];
             done();
         });
@@ -28,7 +28,7 @@ describe('UC-201 Manage movies POST /api/user',()=>{
                 res.should.be.an('object');
                 let {status, result}= res.body;
                 status.should.be.equals(400);
-                result.should.be.a('string').that.equals('Foutmelding: Title must be a string');
+                result.should.be.a('string').that.equals('Title must be a string');
                 done();
             })  
             

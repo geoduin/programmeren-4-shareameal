@@ -44,15 +44,15 @@ let controller = {
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
         try {
-            assert(typeof firstName == 'string','Foutmelding: Title must be a string');
-            assert(typeof lastName == 'string','Foutmelding: LastName must be a string');
-            assert(typeof city == 'string','Foutmelding: City must be a string');
-            assert(typeof street == 'string','Foutmelding: Street must be a string');
+            assert(typeof firstName == 'string','Title must be a string');
+            assert(typeof lastName == 'string','LastName must be a string');
+            assert(typeof city == 'string','City must be a string');
+            assert(typeof street == 'string','Street must be a string');
             next();
         } catch (err) {
             const error= {
                 status: 400,
-                result: err.toString()
+                result: err.message
             };
             next(error);
         }
