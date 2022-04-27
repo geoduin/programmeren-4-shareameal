@@ -31,25 +31,4 @@ UserRouter.put("/api/user/:userId", UserController.updateUser);
 //UC-206 Deletes user based on id
 UserRouter.delete("/api/user/:userId", UserController.deleteUser);
 
-//Method to check if email exists in in memory database - in process
-function emailValidation(email) {
-    const amount = userDataBase.filter((user) => user.email == email);
-    console.log(`amount is: ${amount.length}`);
-    return amount;
-}
-
-//Function to generate a token. Has yet to be developed. Currently has a placeholder return value - in process
-function generateToken() {
-    return "YouHaveAccessToken";
-}
-
-//A function that will assign a default value, in case the newValue is undefined. Otherwise it will return the original value
-function assignDefaultValues(newValue) {
-    if (newValue != undefined) {
-        return newValue;
-    } else {
-        return "";
-    }
-}
-
 module.exports = UserRouter;
