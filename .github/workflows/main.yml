@@ -14,8 +14,7 @@ jobs:
             # Install Node 16
             - name: Setup Node
               uses: actions/setup-node@v1
-              with:
-                  node-version: 16
+              with:node-version: 18
 
             # Install dependencies
             - run: npm install
