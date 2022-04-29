@@ -36,6 +36,7 @@ let dataSet = {
     ],
     mealData: [
         {
+            id: 0,
             name: "Patat",
             description: "Gefrituurde aardappelen, gesneden in dunne kleine stukken.",
             isActive: true,
@@ -47,7 +48,6 @@ let dataSet = {
             allergenes: ["gluten", "noten", "lactose"],
             maxAmountOfParticipants: 6,
             price: 6.75,
-            id: 0,
             cook: 2,
             createDate: "2022-04-27T15:44:19.615Z",
             updateDate: "2022-04-27T15:44:19.615Z",

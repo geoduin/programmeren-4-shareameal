@@ -68,6 +68,17 @@ let controller = {
         })
     }
     ,
+    getUserBasedOnParameters:(req, res)=>{
+        const id = req.params.userId;
+        const active = req.query.active;
+        console.log(id);
+        console.log(active);
+        res.status(200).json({
+            status: id,
+            active: active
+        })
+    }   
+    ,
     //UC-203 Retrieve user profile, based on Token and userID
     //Token functionality has not been developed - in process
     getProfile: (req, res) => {
