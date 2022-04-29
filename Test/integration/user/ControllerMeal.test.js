@@ -249,17 +249,6 @@ describe('UC-302 update meal, PUT /api/meal/:mealId', (done) => {
             chai.request(server)
                 .put('/api/meal/0')
                 .send({
-                    user: {
-                        id: 1,
-                        firstName: "Wessel",
-                        lastName: "Pijpers",
-                        city: "Alphen aan de Rhijn",
-                        street: "Alphen",
-                        email: "Wessel@outlook.com",
-                        password: "NoPassword456",
-                        isActive: true,
-                        phoneNumber: "06 12425475"
-                    },
                     meal: {
                         id: 0,
                         name: "Patat",
