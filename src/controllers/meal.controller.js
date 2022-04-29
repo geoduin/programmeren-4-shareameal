@@ -69,6 +69,24 @@ let controller = {
         }
     },
 
+    //Ownership checking
+    checkMealStatus:(req, res, next)=>{
+        try {
+            let ajax = req.body;
+            let updateMealId = req.params.mealId;
+            let mealIndex = dataSet.mealData.findIndex((meal)=>meal.id == updateMealId);
+            assert(mealIndex != -1, 'Meal does not exist');
+            assert(dataSet.mealData[mealIndex].cook == req.body.user.id, 'The user did not own this meal');
+            next();
+        } catch (error) {
+            const err ={
+                status: 401,
+                result: error.message
+            }
+            next(err);
+        }
+    }
+    ,
     //UC-301
     createMeal: (req, res) => {
         //Creates date must be made
@@ -154,13 +172,14 @@ let controller = {
     //UC-305
     deleteMeal: (req, res) => {
         const currentId = req.params.mealId;
-        let mealIndex = dataSet.mealData.findIndex((meal) => meal.mealId == currentId);
+        let mealIndex = dataSet.mealData.findIndex((meal) => meal.id == currentId);
+        console.log(`Index of meal is ${mealIndex}`);
         if (mealIndex != -1) {
             //Delete code
             dataSet.mealData.splice(mealIndex, 1);
             res.status(200).json({
                 status: 200,
-                result: dataSet.mealData[mealIndex]
+                result: 'Meal removed'
             })
         } else {
             res.status(400).json({

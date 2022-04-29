@@ -80,7 +80,7 @@ describe('UC-101 Inlog functionality testing GET /api/auth/login', (done) => {
                     email: 'BrieThom@outlook.com',
                     password: 'NoPassword789',
                     isActive: true,
-                    phoneNumber: '06 12425475',
+                    phoneNumber: '06 1242547',
                     token: 'YouHaveAccessToken'
                 }, 'Result is completed');
                 done();

@@ -10,8 +10,8 @@ let dataSet = {
             street: "Moskouplein",
             email: "Xin20Wang@outlook.com",
             password: "NoPassword123",
-            isActive: true,
-            phoneNumber: "06 12425475"
+            isActive: false,
+            phoneNumber: "06 1242547"
         }, {
             id: 1,
             firstName: "Wessel",
@@ -21,7 +21,7 @@ let dataSet = {
             email: "Wessel@outlook.com",
             password: "NoPassword456",
             isActive: true,
-            phoneNumber: "06 12425475"
+            phoneNumber: "06 1242547"
         }, {
             id: 2,
             firstName: "Brian",
@@ -31,7 +31,7 @@ let dataSet = {
             email: "BrieThom@outlook.com",
             password: "NoPassword789",
             isActive: true,
-            phoneNumber: "06 12425475"
+            phoneNumber: "06 1242547"
         }
     ],
     mealData: [

@@ -1,30 +1,57 @@
 const req = require("express/lib/request");
 const assert = require('assert');
-const dataSet= require('../data/data.inMemory');
+const dataSet = require('../data/data.inMemory');
 const DBConnection = require("../data/dbConnection");
+const { json } = require("express/lib/response");
 
 //Note: Due to the dummydata present within the in-memory database(in case of testing), the id will start at 2 instead of 0.
 let id = 2;
 
 let controller = {
-    validateUserPost: (req, res, next)=>{
+    checkLogin:(req, res, next)=>{
+        try {
+            
+            next();
+        } catch (error) {
+            const err ={
+                status: 401,
+                result: 'User has not been logged in'
+            }
+            next(err);
+        }
+    },
+    checkOwnershipUser:(req, res, next)=>{
+        try {
+            
+            next();
+        } catch (error) {
+            const err ={
+                status: 401,
+                result: 'Has not been the owner of this user'
+            }
+            next(err);
+        }
+    }
+    ,
+    validateUserPost: (req, res, next) => {
         let User = req.body;
-        let {firstName, lastName, street, city, isActive, email, password, phoneNumber} = User;
+        let { firstName, lastName, street, city, isActive, email, password, phoneNumber } = User;
 
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
         try {
-            assert(typeof firstName == 'string','Title must be a string');
-            assert(typeof lastName == 'string','LastName must be a string');
-            assert(typeof city == 'string','City must be a string');
-            assert(typeof street == 'string','Street must be a string');
-            assert(typeof isActive == 'boolean','isActive must be a boolean');
-            assert(typeof email == 'string','email must be a string');
-            assert(typeof password == 'string','password must be a string');
-            assert(typeof phoneNumber == 'string','phoneNumber must be a string');
+            assert(typeof firstName == 'string', 'Title must be a string');
+            assert(typeof lastName == 'string', 'LastName must be a string');
+            assert(typeof city == 'string', 'City must be a string');
+            assert(typeof street == 'string', 'Street must be a string');
+            assert(typeof isActive == 'boolean', 'isActive must be a boolean');
+            assert(typeof email == 'string', 'email must be a string');
+            assert(typeof password == 'string', 'password must be a string');
+            assert(typeof phoneNumber == 'string', 'phoneNumber must be a string');
+            assert(phoneNumber.length > 8, 'Phonenumber must be 9 characters long');
             next();
         } catch (err) {
-            const error= {
+            const error = {
                 status: 400,
                 result: err.message
             };
@@ -61,11 +88,43 @@ let controller = {
     }
     ,
     //UC-202 Retrieves all users
+    //amount=? query parameters
+    //active or inactive query parameters
     getAllUsers: (req, res) => {
-        console.log(dataSet.userData);
+        let active = req.query.isActive;
+        let booleanValue = (active != undefined && active == 'true');
+        let searchTerm = req.query.searchTerm;
+        let limit = req.query.amount;
+        console.log(booleanValue);
+        
+        let list = dataSet.userData;
+
+        console.log(`Active is ${active}`);
+        console.log(`Searchterm is ${searchTerm}`)
+        console.log(`Limit is ${limit}`)
+        if (active != undefined && searchTerm != undefined) {
+            list = list.filter((users) => users.isActive == active && users.firstName.startsWith(searchTerm));
+            console.log('Filter both values succeeded');
+        } else if (active != undefined) {
+            list = list.filter((users)=> users.isActive == booleanValue);
+            console.log('Filter active values succeeded');
+        } else if (searchTerm != undefined) {
+            list= list.filter((users) => users.firstName.startsWith(searchTerm));
+            console.log('Filter searchTerm succeeded');
+        }
+        console.log(`Size of list is ${list.length}`);
+        if (limit != undefined) {
+            if (list.length > limit) {
+                for (let i = list.length; i > limit; i--) {
+                    list.pop();
+                }
+            }
+        }
+        console.log(`Size of list is now: ${list.length}`);
         res.status(200).json({
             status: 200,
-            result: dataSet.userData,
+            amount: list.length,
+            result: list,
         })
     },
 
@@ -73,15 +132,15 @@ let controller = {
     getAllUsersDB: (req, res) => {
         DBConnection.getConnection(function (err, connection) {
             if (err) throw err; // not connected!
-        
+
             // Use the connection
             connection.query('SELECT id, firstName FROM user;', function (error, results, fields) {
                 // When done with the connection, release it.
                 connection.release();
-        
+
                 // Handle error after the release.
                 if (error) throw error;
-        
+
                 // Don't use the connection here, it has been returned to the pool.
                 console.log('results = ', results);
 
@@ -96,7 +155,7 @@ let controller = {
         });
     }
     ,
-    getUserBasedOnParameters:(req, res)=>{
+    getUserBasedOnParameters: (req, res) => {
         const id = req.params.userId;
         const active = req.query.active;
         console.log(id);
@@ -105,7 +164,7 @@ let controller = {
             status: id,
             active: active
         })
-    }   
+    }
     ,
     //UC-203 Retrieve user profile, based on Token and userID
     //Token functionality has not been developed - in process
@@ -127,8 +186,8 @@ let controller = {
             console.log(user);
             res.status(202).json({
                 status: 202,
-                answer: `User with id: ${userId} found`,
-                result: user
+                result: `User with id: ${userId} found`,
+                list: user
             })
         } else {
             res.status(404).json({
