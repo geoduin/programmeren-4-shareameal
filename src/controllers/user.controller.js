@@ -1,6 +1,7 @@
 const req = require("express/lib/request");
 const assert = require('assert');
 const dataSet= require('../data/data.inMemory');
+const DBConnection = require("../data/dbConnection");
 
 //Note: Due to the dummydata present within the in-memory database(in case of testing), the id will start at 2 instead of 0.
 let id = 2;
@@ -66,6 +67,33 @@ let controller = {
             status: 200,
             result: dataSet.userData,
         })
+    },
+
+    //UC-202-DB Retrieves all users
+    getAllUsersDB: (req, res) => {
+        DBConnection.getConnection(function (err, connection) {
+            if (err) throw err; // not connected!
+        
+            // Use the connection
+            connection.query('SELECT id, firstName FROM user;', function (error, results, fields) {
+                // When done with the connection, release it.
+                connection.release();
+        
+                // Handle error after the release.
+                if (error) throw error;
+        
+                // Don't use the connection here, it has been returned to the pool.
+                console.log('results = ', results);
+
+                res.status(202).json({
+                    status: 202,
+                    answer: results
+                })
+                // pool.end((err) => {
+                //     console.log('Pool was closed');
+                // });
+            });
+        });
     }
     ,
     getUserBasedOnParameters:(req, res)=>{

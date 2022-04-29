@@ -16,7 +16,7 @@ UserRouter.get("/", (req, res) => {
 UserRouter.post("/api/user",UserController.validateUserPost, UserController.addUser);
 
 //UC-202 Retrieves all users
-UserRouter.get("/api/user", UserController.getAllUsers);
+UserRouter.get("/api/user", UserController.getAllUsersDB);
 //UC-202 Retrieve users based on parameters
 UserRouter.get("/api/useria/:userId", UserController.getUserBasedOnParameters);
 
