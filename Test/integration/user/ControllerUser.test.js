@@ -216,7 +216,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
             done();
         })
     })
-    it('TC-202-2 show two users', (done) => {
+    it.skip('TC-202-2 show two users', (done) => {
         chai.request(server).get('/api/user').send({
 
         }).end((req, res) => {
