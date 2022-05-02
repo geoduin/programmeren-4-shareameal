@@ -2,8 +2,8 @@ const { assert, use } = require('chai');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const { it } = require('mocha');
-const server = require('../../../index');
-const DB = require('../../../src/data/dbConnection');
+const server = require('../../index');
+const DB = require('../../src/data/dbConnection');
 
 describe('UC-201 Create new User POST /api/user', (done) => {
     describe('UC-201 set up users', () => {

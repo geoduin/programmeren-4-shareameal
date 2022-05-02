@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const { it } = require('mocha');
-const server = require('../../../index');
+const server = require('../../index');
 
 //Testcases UC-301 to UC-305
 describe('UC-301 add meal to database POST /api/meal', (done) => {

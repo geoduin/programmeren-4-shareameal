@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const { it } = require('mocha');
-const server = require('../../../index');
+const server = require('../../index');
 let database = [];
 
 chai.should();
