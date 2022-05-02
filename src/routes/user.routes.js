@@ -18,9 +18,6 @@ UserRouter.post("/api/user", UserController.validateUserRegistration, UserContro
 //UC-202 Retrieves all users
 UserRouter.get("/api/user", UserController.getAllUsers);
 
-//UC-202 Retrieve users based on parameters
-UserRouter.get("/api/useria/:userId", UserController.getUserBasedOnParameters);
-
 //UC-203 Retrieve user profile, based on Token and userID
 //Token functionality has not been developed - in process
 UserRouter.get("/api/user/profile",  UserController.checkLogin, UserController.getProfile);
