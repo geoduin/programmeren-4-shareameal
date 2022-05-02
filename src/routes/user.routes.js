@@ -13,7 +13,7 @@ UserRouter.get("/", (req, res) => {
 //UC-201 Creates user. 
 //Note: I assume the attributes firstname, lastname, city, street, email and password are mandetory.
 //Thus there are no default values for thes attributes
-UserRouter.post("/api/user", UserController.checkLogin, UserController.validateUserPost, UserController.addUser);
+UserRouter.post("/api/user", UserController.validateUserRegistration, UserController.createUser);
 
 //UC-202 Retrieves all users
 UserRouter.get("/api/user", UserController.getAllUsers);

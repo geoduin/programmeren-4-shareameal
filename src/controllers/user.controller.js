@@ -8,24 +8,24 @@ const { json } = require("express/lib/response");
 let id = 2;
 
 let controller = {
-    checkLogin:(req, res, next)=>{
+    checkLogin: (req, res, next) => {
         try {
-            
+
             next();
         } catch (error) {
-            const err ={
+            const err = {
                 status: 401,
                 result: 'User has not been logged in'
             }
             next(err);
         }
     },
-    checkOwnershipUser:(req, res, next)=>{
+    checkOwnershipUser: (req, res, next) => {
         try {
-            
+
             next();
         } catch (error) {
-            const err ={
+            const err = {
                 status: 401,
                 result: 'Has not been the owner of this user'
             }
@@ -33,6 +33,28 @@ let controller = {
         }
     }
     ,
+    validateUserRegistration: (req, res, next) => {
+        let User = req.body;
+        let { firstName, lastName, street, city, isActive, email, password, phoneNumber } = User;
+
+        //let {firstName,...other(Mag zelf bedacht worden) } = User;
+        //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
+        try {
+            assert(typeof firstName == 'string', 'Title must be a string');
+            assert(typeof lastName == 'string', 'LastName must be a string');
+            assert(typeof city == 'string', 'City must be a string');
+            assert(typeof street == 'string', 'Street must be a string');
+            assert(typeof email == 'string', 'email must be a string');
+            assert(typeof password == 'string', 'password must be a string');
+            next();
+        } catch (err) {
+            const error = {
+                status: 400,
+                result: err.message
+            };
+            next(error);
+        }
+    },
     validateUserPost: (req, res, next) => {
         let User = req.body;
         let { firstName, lastName, street, city, isActive, email, password, phoneNumber } = User;
@@ -44,7 +66,6 @@ let controller = {
             assert(typeof lastName == 'string', 'LastName must be a string');
             assert(typeof city == 'string', 'City must be a string');
             assert(typeof street == 'string', 'Street must be a string');
-            assert(typeof isActive == 'boolean', 'isActive must be a boolean');
             assert(typeof email == 'string', 'email must be a string');
             assert(typeof password == 'string', 'password must be a string');
             assert(typeof phoneNumber == 'string', 'phoneNumber must be a string');
@@ -59,32 +80,36 @@ let controller = {
         }
     },
     //UC-201 Creates user. 
-    addUser: (req, res) => {
-        let newUser = req.body;
-        const newUserEmail = req.body.email;
-        let amount = dataSet.userData.filter((item) => item.email == newUserEmail);
-        console.log(`Email: ${newUserEmail}, has ${amount.length} results.`);
-        if (amount.length == 0) {
-            id++;
-            let isActive = assignDefaultValues(newUser.isActive);
-            let phoneNumber = assignDefaultValues(newUser.phoneNumber);
-            newUser = { id, ...newUser, isActive, phoneNumber }
-            console.log(newUser);
-            dataSet.userData.push(newUser);
-            res.status(201).json({
-                status: 201,
-                result: `User has been registered.`,
-                user: newUser
-            })
-        } else {
-            console.log(`User with email: ${newUserEmail}, has already been registered`);
-            res.status(406).json({
-                status: 406,
-                result: `Email has been taken`
-            })
-        }
+    createUser: (req, res) => {
+        let user = req.body;
+        console.log(user);
+        DBConnection.getConnection((err, connection) => {
+            if (err) { throw err };
+            console.log('Connection with database');
+            connection.query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress) VALUES(?, ?, ?, ?, ?, ?)', [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.email], (error, results, fields) => {
+                if (error) {
+                    res.status(401).json({
+                        status: 401,
+                        result: "Email has been taken"
+                    })
+                    connection.release();
+                } else {
+                    connection.query('SELECT * FROM user WHERE emailAdress = ?', [user.email], (err, results, fields) => {
+                        connection.release();
+                        console.log(`User with ${user.email} has been found.`);
+                        //Token generation in development
+                        console.log(results[0]);
+                        res.status(200).json({
+                            status: 200,
+                            result: `User has been registered.`,
+                            user: results[0]
+                        })
+                    })
+                }
 
+            })
 
+        })
     }
     ,
     //UC-202 Retrieves all users
@@ -96,7 +121,7 @@ let controller = {
         let searchTerm = req.query.searchTerm;
         let limit = req.query.amount;
         console.log(booleanValue);
-        
+
         let list = dataSet.userData;
 
         console.log(`Active is ${active}`);
@@ -106,10 +131,10 @@ let controller = {
             list = list.filter((users) => users.isActive == active && users.firstName.startsWith(searchTerm));
             console.log('Filter both values succeeded');
         } else if (active != undefined) {
-            list = list.filter((users)=> users.isActive == booleanValue);
+            list = list.filter((users) => users.isActive == booleanValue);
             console.log('Filter active values succeeded');
         } else if (searchTerm != undefined) {
-            list= list.filter((users) => users.firstName.startsWith(searchTerm));
+            list = list.filter((users) => users.firstName.startsWith(searchTerm));
             console.log('Filter searchTerm succeeded');
         }
         console.log(`Size of list is ${list.length}`);
