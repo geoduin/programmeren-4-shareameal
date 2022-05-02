@@ -1,4 +1,4 @@
-const { assert } = require('chai');
+const { assert, use } = require('chai');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const { it } = require('mocha');
@@ -125,11 +125,11 @@ describe('UC-201 Create new User POST /api/user', (done) => {
         //Fixes need to be made
         it('TC-201-3 tot -5 When email has already been registered, it will return a error message and does not persist within the database', (done) => {
             chai.request(server).post('/api/user').send({
-                firstName: "Matias",
-                lastName: "Arezo",
-                city: "Montevideo",
-                street: "Straat",
-                email: "j.doe@server.com",
+                firstName: "Alphonso",
+                lastName: "Davies",
+                city: "Ottawa",
+                street: "Cardin avenue",
+                email: "m.vandullemen@server.nl",
                 password: "qweqweqweq",
                 isActive: true,
                 phoneNumber: "08 789032909"
@@ -144,11 +144,11 @@ describe('UC-201 Create new User POST /api/user', (done) => {
 
         it('TC-201-5 Successful registration', (done) => {
             chai.request(server).post('/api/user').send({
-                firstName: "Matias",
-                lastName: "Arezo",
-                city: "Montevideo",
-                street: "Straat",
-                email: "Aroujo@outlook.com",
+                firstName: "James",
+                lastName: "Almada",
+                city: "Buenos Aires",
+                street: "Pluebo district uno",
+                email: "ArezoStanistan@outlook.com",
                 password: "qweqweqweq",
             }).end((err, res) => {
                 res.should.be.an('object');
@@ -158,6 +158,20 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 //Token test will be tested in the future
                 done();
             })
+        })
+
+        after((done) => {
+            DB.getConnection((err, con) => {
+                if (err) { throw err };
+                con.query("DELETE FROM user WHERE emailAdress = 'Wessel@outlook.com';", (error, result, field) => {
+                    con.query("DELETE FROM user WHERE emailAdress = 'ArezoStanistan@outlook.com';", (error, result, field) => {
+                        con.query("ALTER TABLE user AUTO_INCREMENT = 8;", (error, result, field) => {
+                            con.release();
+                        })
+                    })
+                })
+            })
+            done();
         })
         //it('TC-201 When a required inut is missing, a valid error should be'){}
     })
@@ -232,19 +246,24 @@ describe('UC-202 Get all users Get /api/user', (done) => {
 });
 
 describe('UC-203 Token GET  /api/user/profile', (done) => {
-    it.skip('TC-203-1 Invalid token', (done) => {
+    it('TC-203-1 Invalid token', (done) => {
         chai.request(server)
             .get('/api/user/profile')
             .end((req, res) => {
+                let { result, status } = res.body;
+                status.should.be.equal(401);
+                result.should.be.equal('Correct token functionality has not been implemented');
                 done();
             })
     })
-    it.skip('TC-203-2 valid token and existing users', (done) => {
-        chai.request(server).delete('/api/user').send({
-
-        }).end((req, res) => {
-            done();
-        })
+    it('TC-203-2 valid token and existing users', (done) => {
+        chai.request(server).get('/api/user/profile')
+            .end((req, res) => {
+                let { result, status } = res.body;
+                status.should.be.equal(401);
+                result.should.be.equal('Correct token functionality has not been implemented');
+                done();
+            })
     })
 });
 
@@ -272,26 +291,49 @@ describe('UC-204 User details checker', (done) => {
             })
     })
     it('TC-204 user exist', (done) => {
-        let id = 0;
+        let userid = 1;
         chai.request(server)
-            .get('/api/user/' + id)
+            .get('/api/user/' + userid)
             .end((err, res) => {
                 res.should.be.a('object');
-                let { status, result } = res.body;
+                let { status, result, user } = res.body;
                 status.should.be.equal(202);
-                result.should.be.equal(`User with id: ${id} found`);
+                result.should.be.equal(`User with id: ${userid} found`);
+                let {id, firstName, lastName, isActive, emailAdress, password, phoneNumber, roles, street, city} = user;
+                assert.deepEqual(res.body.user, {
+                    id: 1,
+                    firstName: 'Mariëtte',
+                    lastName: 'van den Dullemen',
+                    isActive: 1,
+                    emailAdress: 'm.vandullemen@server.nl',
+                    password: 'secret',
+                    phoneNumber: '',
+                    roles: '',
+                    street: '',
+                    city: ''
+                  });
                 done();
             })
     })
 });
 
 describe('UC-205 Update User PUT /api/user/:userId', (done) => {
+    before((done)=>{
+        DB.getConnection((err, con)=>{
+            con.query('INSERT INTO user VALUES(199, "Xilo", "Phone", 1, "Moomoo@gmail.com", "Secrid", "0612345678", "editor,guest", "XiaXiaStan", "Harbin");', (err, result)=>{
+                con.release();
+                console.log(result);
+            })
+        })
+        done();
+    })
+    
     it('TC-205-1 required field missing', (done) => {
-        let id = 0;
+        let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
             .send({
-                id: 0,
+                id: 199,
                 firstName: "Xon",
                 lastName: "Wong",
                 city: "Rotterdam",
@@ -309,11 +351,11 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
     })
 
     it('TC-205-3 invalid phonenumber', (done) => {
-        let id = 0;
+        let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
             .send({
-                id: 0,
+                id: 199,
                 firstName: "Xon",
                 lastName: "Wong",
                 city: "Rotterdam",
@@ -357,7 +399,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
     })
 
     it.skip('TC-205-5 User has not logged in', (done) => {
-        let id = 0;
+        let id =199;
         chai.request(server)
             .put('/api/user/' + id)
             .send({
@@ -381,11 +423,11 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
     })
 
     it('TC-205-6 User successfully updated', (done) => {
-        let id = 0;
+        let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
             .send({
-                id: 0,
+                id: 199,
                 firstName: "Xon",
                 lastName: "Wong",
                 city: "Rotterdam",
@@ -401,7 +443,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                 status.should.be.equal(200);
                 result.should.be.equal("Succesful transaction");
                 assert.deepEqual(updatedUser, {
-                    id: 0,
+                    id: 199,
                     firstName: "Xon",
                     lastName: "Wong",
                     city: "Rotterdam",
@@ -414,10 +456,29 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                 done();
             })
     })
-
+    after((done)=>{
+        DB.getConnection((err, con)=>{
+            con.query('DELETE FROM user WHERE id = 199;', (err, result)=>{
+                con.query('ALTER TABLE user AUTO_INCREMENT = 8');
+                console.log(result);
+            })
+        })
+        done();
+    })
 });
 
 describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
+    before((done)=>{
+        DB.getConnection((err, con)=>{
+            con.query('INSERT INTO user VALUES(200, "Jessie", "Kessier", 0, "Jessie@hotmail.com", "Secrid", "0612345678", "editor,guest", "La ", "Marseille");', (err, result)=>{
+                con.release();
+                console.log(result);
+            })
+        })
+        done();
+    })
+
+
     it('TC-206-1 User does not exist', (done) => {
         let id = 99999;
         chai.request(server)
@@ -438,7 +499,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
             })
     })
     it.skip('TC-206-3 User not the owner of user', (done) => {
-        let id = 0;
+        let id = 200;
         chai.request(server)
             .delete('/api/user/' + id)
             .end((req, res) => {
@@ -446,7 +507,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
             })
     })
     it('TC-206-4 User succesfully deleted', (done) => {
-        let id = 0;
+        let id = 200;
         chai.request(server)
             .delete('/api/user/' + id)
             .end((req, res) => {
@@ -456,17 +517,14 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
                 done();
             })
     })
-})
-after((done) => {
-    DB.getConnection((err, con) => {
-        if (err) { throw err };
-        con.query("DELETE FROM user WHERE emailAdress = 'Wessel@outlook.com';", (error, result, field) => {
-            con.query("DELETE FROM user WHERE emailAdress = 'Aroujo@outlook.com';", (error, result, field) => {
-                con.query("ALTER TABLE user AUTO_INCREMENT = 5;", (error, result, field) => {
-                    con.release();
-                })
+
+    after((done)=>{
+        DB.getConnection((err, con)=>{
+            con.query('DELETE FROM user WHERE id = 200;', (err, result)=>{
+                con.query('ALTER TABLE user AUTO_INCREMENT = 8');
+                console.log(result);
             })
         })
+        done();
     })
-    done();
 })
