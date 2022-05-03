@@ -25,10 +25,10 @@ UserRouter.get("/api/user/profile",  UserController.checkLogin, UserController.g
 //UC-204 Retrieves user, based on userId
 UserRouter.get("/api/user/:userId", UserController.retrieveUserById);
 
-//UC-205 Edits user.
-UserRouter.put("/api/user/:userId",  UserController.checkLogin, UserController.checkOwnershipUser, UserController.validateUserPost, UserController.updateUser);
+//UC-205 Edits user. client will send user(validateUserPost) and id(checkOwnerShip) object to api
+UserRouter.put("/api/user/:userId",  UserController.checkLogin, UserController.validateUserPost, UserController.checkOwnershipUser,  UserController.updateUser);
 
-//UC-206 Deletes user based on id
+//UC-206 Deletes user based on id, client will send id - (checkOwnerShip method) object to api
 UserRouter.delete("/api/user/:userId", UserController.checkLogin, UserController.checkOwnershipUser, UserController.deleteUser);
 
 module.exports = UserRouter;

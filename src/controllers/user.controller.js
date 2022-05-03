@@ -21,16 +21,40 @@ let controller = {
         }
     },
     checkOwnershipUser: (req, res, next) => {
-        try {
+        const userId = parseInt(req.params.userId);
+        const inputUserId = req.body.id;
+        console.log(`ID of user is ${userId}.`);
 
-            next();
-        } catch (error) {
-            const err = {
-                status: 401,
-                result: 'Has not been the owner of this user'
-            }
-            next(err);
-        }
+        DBConnection.getConnection((err2, Connection) => {
+            if (err2) { throw err2 }
+            Connection.query('SELECT * FROM user WHERE id = ?;', [userId], (err3, result) => {
+                if (err3) { throw err3 }
+                Connection.release();
+                let aa = result.length;
+                //assert(aa != 0, 'User is not found')
+                try {
+                    console.log(aa);
+                    assert(aa > 0, 'User does not exist');
+                    assert(result[0].id == inputUserId, `This user does not own user with ID ${userId}`)
+                    next();
+                } catch (error) {
+                    let err = null;
+                    if (error.message == 'User does not exist') {
+                        err = {
+                            status: 404,
+                            result: error.message
+                        }
+                    } else {
+                        err = {
+                            status: 401,
+                            result: error.message
+                        }
+                    }
+                    next(err);
+                }
+            })
+        })
+
     }
     ,
     validateUserRegistration: (req, res, next) => {
@@ -56,7 +80,8 @@ let controller = {
         }
     },
     validateUserPost: (req, res, next) => {
-        let User = req.body;
+        let User = req.body.user;
+        console.log(User);
         let { firstName, lastName, street, city, isActive, email, password, phoneNumber } = User;
 
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
@@ -206,7 +231,7 @@ let controller = {
     //UC-205 Edits user.
     updateUser: (req, res) => {
         const id = req.params.userId;
-        let newUser = req.body;
+        let newUser = req.body.user;
         let activeValue = 0;
         if (newUser.isActive) {
             activeValue = 1;
@@ -260,11 +285,6 @@ let controller = {
                 conn.release();
             })
         })
-        // res.status(404).json({
-        //     status: 404,
-        //     result: `Removal has failed. Id ${iD} has either been removed or does not exist`
-        // })
-
     }
 }
 
