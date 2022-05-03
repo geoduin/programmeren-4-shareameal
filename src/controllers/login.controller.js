@@ -1,7 +1,7 @@
 const req = require("express/lib/request");
 const data = require('../data/data.inMemory');
 const assert = require('assert');
-
+const DataConnection = require('../data/dbConnection');
 let controller = {
     inputValidation: (req, res, next) => {
         let loginData = req.body;
@@ -25,39 +25,44 @@ let controller = {
         const userEmail = req.body.email;
         const userPassWord = req.body.password;
         console.log(`Email ${userEmail} and password ${userPassWord}`);
-
-        //Vervangen worden door database handelingen
-        let userIndex = data.userData.findIndex((user) => user.email == userEmail);
-        let passWordIndex = data.userData.findIndex((user) => user.password == userPassWord);
-        //-------------------------------------------
-        console.log(`Index of ${userEmail} is:  ${userIndex}`);
-        console.log(`Index of ${userPassWord} is:  ${passWordIndex}`);
-        let error = null;
-        if (userIndex != -1) {
-            if (passWordIndex != -1) {
-                let User = data.userData[userIndex];
-                console.log(User);
-                //Placeholder function to generate token
-                const token = generateToken();
-                User = { ...User, token }
-                res.status(200).json({
-                    status: 200,
-                    result: User
-                })
-            } else {
-                error = {
-                    status: 400,
-                    result: "Password is incorrect"
+        let err = null;
+        DataConnection.getConnection((error, connect) => {
+            connect.query('SELECT * FROM user WHERE emailAdress = ?;', [userEmail], (error, result) => {
+                connect.release();
+                if(error){ 
+                    console.log("Error?: ----------------");
+                    console.log(error)
+                };
+                let User = result[0];
+                console.log(`User = ${User}`);
+                console.log(`Length of user result = ${result.length}`);
+                if (User == undefined) {
+                    err = {
+                        status: 400,
+                        result: "User does not exist"
+                    }
+                    next(err);
+                }else if(User.password != userPassWord){
+                    //Moest volgens TC-101-2 en TC-102-3
+                    console.log('Incorrect password')
+                    err = {
+                        status: 400,
+                        result: "Not the right password of this email"
+                    }
+                    next(err);
+                } else{
+                    console.log(User);
+                    const token = generateToken();
+                    User = { ...User, token }
+                    User.isActive = convertIntToBoolean(User.isActive);
+                    console.log(User);
+                    res.status(200).json({
+                        status: 200,
+                        result: User
+                    })
                 }
-                next(error);
-            }
-        } else {
-            error = {
-                status: 400,
-                result: "User not found"
-            }
-            next(error);
-        }
+            })
+        })
     }
 }
 
@@ -65,5 +70,9 @@ let controller = {
 //Function to generate a token. Has yet to be developed. Currently has a placeholder return value - in process
 function generateToken() {
     return "YouHaveAccessToken";
+}
+
+function convertIntToBoolean(int) {
+    return (int == 1);
 }
 module.exports = controller;
