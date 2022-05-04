@@ -91,10 +91,4 @@ describe('UC-101 Inlog functionality testing GET /api/auth/login', (done) => {
 })
 
 
-//describe('UC-304 get meal details.', (done) =>{});
-//describe('UC-305 delete meal test',(done) =>{});
-//describe('UC-401 sign on participation, (done) =>{});
-//describe('UC-402 sign off participation, (done) =>{});
-//describe('UC-403 get all participants of that meal, (done) =>{});
-//describe('UC-404 get detail of the participant at that meal, (done) =>{});
-//Testcases UC-401 to UC-404
+
