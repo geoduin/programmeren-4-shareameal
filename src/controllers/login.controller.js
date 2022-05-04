@@ -61,8 +61,8 @@ let controller = {
                         result: User
                     })
                 }
-            })
-        })
+            });
+        });
     }
 }
 

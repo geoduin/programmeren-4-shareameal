@@ -137,7 +137,7 @@ describe('UC-301 add meal to database POST /api/meal', (done) => {
                 city: ""
             },
             meal: {
-                name: "Hello wereld natuur fonds",
+                name: "Olijven",
                 description: "Test beschrijving",
                 isActive: true,
                 isVega: true,
@@ -159,8 +159,8 @@ describe('UC-301 add meal to database POST /api/meal', (done) => {
 
     after((done) => {
         DB.getConnection((error, con) => {
-            con.query('DELETE FROM meal WHERE id >= 36', (error, result) => {
-                con.query('ALTER TABLE meal AUTO_INCREMENT = 36', (err, res, field) => {
+            con.query('DELETE FROM meal WHERE id >= 30', (error, result) => {
+                con.query('ALTER TABLE meal AUTO_INCREMENT = 30', (err, res, field) => {
                     con.release();
                 })
             })
@@ -427,7 +427,7 @@ describe('UC-302 update meal, PUT /api/meal/:mealId', (done) => {
     })
     after((done) => {
         DB.getConnection((error, con) => {
-            con.query('DELETE FROM meal WHERE id >= 36', (error, result) => {
+            con.query('DELETE FROM meal WHERE id >= 30', (error, result) => {
                 con.query('UPDATE meal SET name = "Spaghetti met tapenadekip uit de oven en frisse sa..." WHERE id = 3', (err, res, field) => {
                     con.release();
                 })
@@ -601,7 +601,7 @@ describe('UC-305 delete meal test', (done) => {
 
     after((done) => {
         DB.getConnection((err, con) => {
-            con.query('ALTER TABLE meal AUTO_INCREMENT = 5;', (er, res) => {
+            con.query('ALTER TABLE meal AUTO_INCREMENT = 30;', (er, res) => {
                 con.release();
                 done();
             })

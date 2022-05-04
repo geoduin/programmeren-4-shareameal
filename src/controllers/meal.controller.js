@@ -138,11 +138,11 @@ let controller = {
                             results: 'Meal has been added to the database',
                             meal: meal
                         })
-                    })
+                    });
 
 
-                })
-        })
+                });
+        });
     },
 
     //UC-302 Receives a user and meal object
@@ -174,8 +174,8 @@ let controller = {
                         result: 'Update completed'
                     })
 
-                })
-        })
+                });
+        });
     },
 
     //UC-303
