@@ -111,8 +111,9 @@ let controller = {
         DBConnection.getConnection((err, connection) => {
             if (err) { throw err };
             console.log('Connection with database');
-            connection.query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress) VALUES(?, ?, ?, ?, ?, ?)', [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.email], (error, results, fields) => {
+            connection.query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress) VALUES(?, ?, ?, ?, ?, ?);', [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.email], (error, result, fields) => {
                 if (error) {
+                    console.log(error);
                     res.status(401).json({
                         status: 401,
                         result: "Email has been taken"
