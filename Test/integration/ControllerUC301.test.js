@@ -464,13 +464,15 @@ describe('UC-304 get meal details.', (done) => {
                 done();
             })
     })
-
+ //LET OP op de github-action integratietesten voldoet alleen deze test als de createDate, updateDate en datetime 1 uur later vermeld staat. 
+                //De test slaagt dus op localhost niet.
     it('TC-304-2 Meal exist, returns meal', (done) => {
         let id = 5;
         chai.request(server)
             .get('/api/meal/' + id)
             .end((req, res) => {
                 res.body.status.should.be.equal(200);
+               
                 assert.deepEqual(res.body.result, {
                     id: 5,
                     isActive: 1,
