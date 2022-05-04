@@ -472,35 +472,33 @@ describe('UC-304 get meal details.', (done) => {
             .end((req, res) => {
                 res.body.status.should.be.equal(200);
                 assert.deepEqual(res.body.result, {
-                    "id": 5,
-                    "isActive": 1,
-                    "isVega": 1,
-                    "isVegan": 0,
-                    "isToTakeHome": 1,
-                    "dateTime": "2022-03-26T21:24:46.000Z",
-                    "maxAmountOfParticipants": 6,
-                    "price": "6.75",
-                    "imageUrl": "https://www.kikkoman.nl/fileadmin/_processed_/5/7/csm_WEB_Bonte_groenteschotel_6851203953.jpg",
-                    "createDate": "2022-03-06T21:26:33.048Z",
-                    "updateDate": "2022-03-12T19:50:13.000Z",
-                    "name": "Groentenschotel uit de oven",
-                    "description": "Misschien wel de lekkerste schotel uit de oven! En vol vitaminen! Dat wordt smikkelen. Als je van groenten houdt ben je van harte welkom. Wel eerst even aanmelden.",
-                    "allergenes": [
-                        ""
-                    ],
-                    "cook": {
-                        "id": 3,
-                        "firstName": "Herman",
-                        "lastName": "Huizinga",
-                        "isActive": 1,
-                        "emailAdress": "h.huizinga@server.nl",
-                        "password": "secret",
-                        "phoneNumber": "06-12345678",
-                        "roles": "editor,guest",
-                        "street": "",
-                        "city": ""
+                    id: 5,
+                    isActive: 1,
+                    isVega: 1,
+                    isVegan: 0,
+                    isToTakeHome: 1,
+                    dateTime: "2022-03-26T20:24:46.000Z",
+                    maxAmountOfParticipants: 6,
+                    price: '6.75',
+                    imageUrl: 'https://www.kikkoman.nl/fileadmin/_processed_/5/7/csm_WEB_Bonte_groenteschotel_6851203953.jpg',
+                    createDate: "2022-03-06T20:26:33.048Z",
+                    updateDate: "2022-03-12T18:50:13.000Z",
+                    name: 'Groentenschotel uit de oven',
+                    description: 'Misschien wel de lekkerste schotel uit de oven! En vol vitaminen! Dat wordt smikkelen. Als je van groenten houdt ben je van harte welkom. Wel eerst even aanmelden.',
+                    allergenes: [ '' ],
+                    cook: {
+                      id: 3,
+                      firstName: 'Herman',
+                      lastName: 'Huizinga',
+                      isActive: 1,
+                      emailAdress: 'h.huizinga@server.nl',
+                      password: 'secret',
+                      phoneNumber: '06-12345678',
+                      roles: 'editor,guest',
+                      street: '',
+                      city: ''
                     }
-                })
+                  })
                 done();
             })
     })
@@ -510,7 +508,7 @@ describe('UC-305 delete meal test', (done) => {
     before((done) => {
         //Insert query, to test delete function
         DB.getConnection((error, conn) => {
-            conn.query('INSERT INTO meal VALUES(999, 1, 1, 1, 1, "2022-03-22 17:35:00", 3, 19.99, "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg", 4, "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg", "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg", "Fioria", "Onbekend", "");',
+            conn.query('INSERT INTO meal VALUES(999,1,0,0,1,"2022-03-22 17:35:00",4,12.75,"https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",1,"2022-02-26 18:12:40.048998","2022-04-26 12:33:51.000000","Pasta Bolognese met tomaat, spekjes en kaas","Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!","gluten,lactose");',
                 (err, rslt) => {
                     if (err) { throw err };
                     done();
@@ -584,7 +582,7 @@ describe('UC-305 delete meal test', (done) => {
             .delete('/api/meal/' + id)
             .send({
                 user: {
-                    id: 4,
+                    id: 1,
                     firstName: "Brian",
                     lastName: "Thomson",
                     city: "Rotterdam",
