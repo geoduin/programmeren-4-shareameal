@@ -15,9 +15,17 @@ controller.checkExistenceMeal,
 controller.checkSignUp,
 controller.signOfMeal);
 
-//UC-403 get participants list
-ParticipationRouter.get('/api/meal/:mealId/participants', controller.getAllParticipants);
-//UC-404 get detail participant
-ParticipationRouter.get('/api/meal/:mealId/particpants/:userId', controller.getParticipantsDetail);
+//UC-403 get participants list - In the future, the token will determine if the meal is owned. For now, a object will be send object {id: (id)}
+ParticipationRouter.get('/api/meal/:mealId/participants', 
+controller.tokenValidation,
+controller.checkExistenceMeal, 
+controller.checkOwnerShipMeal,
+controller.getAllParticipants);
+
+//UC-404 get detail participant - In the future, the token will determine if the meal is owned. For now, a object will be send object {id: (id)}
+ParticipationRouter.get('/api/meal/:mealId/particpants/:userId', 
+controller.tokenValidation,
+controller.checkSignUp, 
+controller.getParticipantsDetail);
 
 module.exports = ParticipationRouter;
