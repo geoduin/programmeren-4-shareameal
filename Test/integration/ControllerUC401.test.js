@@ -1,3 +1,5 @@
+process.env.DB_DATABASE = process.env.DB_DATABASE || 'share-a-meal-testdb'
+
 const { assert } = require('chai');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -7,6 +9,12 @@ const DB = require('../../src/data/dbConnection')
 
 describe('UC-401 sign on participation', (done) => {
     before((done) => {
+        DB.getConnection((err, connecting)=>{
+            if(err){ throw err};
+            connecting.query('INSERT INTO user VALUES(6, "Xino", "Wong", 1, "Xino@gmail.com", "Secrid", "0612345678", "editor,guest", "China", "Harbin");',(err, results)=>{
+                connecting.release();
+            })
+        })
         done();
     })
 
@@ -34,6 +42,7 @@ describe('UC-401 sign on participation', (done) => {
         chai.request(server)
             .post('/api/user/6/meal/2/signup')
             .end((err, res) => {
+                let aa = res.body;
                 res.body.status.should.be.equal(200);
                 res.body.currentlyParticipating.should.be.equal(true);
                 done();
@@ -117,12 +126,12 @@ describe('UC-403 get all participants of that meal', (done) => {
                 res.body.status.should.be.equal(200);
                 assert.deepEqual(res.body.result, [
                     {
-                        "firstName": "Donaaald",
-                        "lastName": "Trump",
-                        "emailAdress": "Dooo@outlook.com",
-                        "phoneNumber": "31918273645",
-                        "street": "Jalapeno plaza",
-                        "city": "New york",
+                        "firstName": "John",
+                        "lastName": "Doe",
+                        "emailAdress": "j.doe@server.com",
+                        "phoneNumber": "06 12425475",
+                        "street": "",
+                        "city": "",
                         "roles": [
                             "editor",
                             "guest"
@@ -164,12 +173,12 @@ describe('UC-404 get detail of the participant at that meal', (done) =>{
             .end((err, res) => {
                 res.body.status.should.be.equal(200);
                 assert.deepEqual(res.body.result, {
-                    "firstName": "Donaaald",
-                    "lastName": "Trump",
-                    "emailAdress": "Dooo@outlook.com",
-                    "phoneNumber": "31918273645",
-                    "street": "Jalapeno plaza",
-                    "city": "New york"
+                    "firstName": "John",
+                    "lastName": "Doe",
+                    "emailAdress": "j.doe@server.com",
+                    "phoneNumber": "06 12425475",
+                    "street": "",
+                    "city": ""
                 })
                 done();
             })
