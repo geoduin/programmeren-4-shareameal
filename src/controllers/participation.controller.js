@@ -110,6 +110,7 @@ let controller = {
                     if (amountParticipants < maxAmountOfParticipants) {
                         con.query('INSERT INTO meal_participants_user VALUES (?,?);',
                             [mealId, UserID], (error, result, fields) => {
+                                //FK/PK error message
                                 if (error) {
                                     con.release();
                                     const err2 = {
@@ -123,7 +124,8 @@ let controller = {
                                     res.status(200).json({
                                         status: 200,
                                         result: { mealId: mealId, userId: UserID },
-                                        amount: amountParticipants
+                                        amount: amountParticipants,
+                                        currentlyParticipating: true
                                     })
 
                                 }
@@ -153,7 +155,8 @@ let controller = {
                     connection.release();
                     res.status(200).json({
                         status: 200,
-                        result: `Participation of USERID => ${userId} with MEALID => ${mealId} has been removed.`
+                        result: `Participation of USERID => ${userId} with MEALID => ${mealId} has been removed.`,
+                        currentlyParticipating: false
                     })
                 })
         })
@@ -167,7 +170,7 @@ let controller = {
         console.log(`User ID => ${userId}`);
 
         DBConnection.getConnection((err, con) => {
-            con.query('SELECT * FROM user WHERE user.id IN (SELECT userId FROM meal_participants_user WHERE meal_participants_user.mealId = ?);',
+            con.query('SELECT firstName, lastName, emailAdress, phoneNumber, street, city, roles FROM user WHERE user.id IN (SELECT userId FROM meal_participants_user WHERE meal_participants_user.mealId = ?);',
                 [mealId], (error, userResults, field) => {
                     con.release();
                     userResults.forEach(user => {
@@ -177,6 +180,7 @@ let controller = {
                         status: 200,
                         amount: userResults.length,
                         result: userResults
+
                     })
                 })
         })
