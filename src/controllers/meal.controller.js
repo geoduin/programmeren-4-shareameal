@@ -227,7 +227,7 @@ let controller = {
                         meal.cook = cook;
                         //Removes cookId attribute with cook object
                         delete meal.cookId;
-
+                        console.log('=================Meal below ==================')
                         console.log(meal);
                         res.status(200).json({
                             status: 200,
