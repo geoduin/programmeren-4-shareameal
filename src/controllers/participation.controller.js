@@ -36,8 +36,8 @@ let controller = {
                     }
                     next(err2);
                 }
-            })
-        })
+            });
+        });
     }
     ,
 
@@ -62,7 +62,7 @@ let controller = {
                         next(err2);
                     }
                 })
-        })
+        });
     }
     ,
 
