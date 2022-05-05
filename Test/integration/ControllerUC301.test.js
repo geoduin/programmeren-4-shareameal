@@ -472,7 +472,7 @@ describe('UC-304 get meal details.', (done) => {
             .get('/api/meal/' + id)
             .end((req, res) => {
                 res.body.status.should.be.equal(200);
-               
+        
                 assert.deepEqual(res.body.result, {
                     id: 5,
                     isActive: 1,

@@ -206,6 +206,18 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                 done();
             })
     })
+
+    it('TC-202-3 Search on non-existent name in the database', (done) => {
+        chai.request(server)
+            .get('/api/user')
+            .query({ searchTerm: 'xqk2' })
+            .end((req, res) => {
+                res.should.be.a('object');
+                let { status } = res.body;
+                assert.equal(status, 200);
+                done();
+            })
+    })
     it('TC-202-4 show users with active=false', (done) => {
         chai.request(server)
             .get('/api/user')
@@ -251,6 +263,7 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
     it('TC-203-1 Invalid token', (done) => {
         chai.request(server)
             .get('/api/user/profile')
+            .send({id: 0})
             .end((req, res) => {
                 let { result, status } = res.body;
                 status.should.be.equal(401);
@@ -259,7 +272,9 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
             })
     })
     it('TC-203-2 valid token and existing users', (done) => {
-        chai.request(server).get('/api/user/profile')
+        chai.request(server)
+            .get('/api/user/profile')
+            .send({id: 0})
             .end((req, res) => {
                 let { result, status } = res.body;
                 status.should.be.equal(401);
@@ -270,20 +285,24 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
 });
 
 describe('UC-204 User details checker', (done) => {
-    it.skip('TC-204-2 Invalid token', (done) => {
-        chai.request(server).delete('/api/user').send({
-
-        }).end((req, res) => {
+    it('TC-204-1 Invalid token', (done) => {
+        let id = 99;
+        chai.request(server).get('/api/user/' + id)
+        .end((req, res) => {
             res.should.be.a('object');
-            let { status, result } = res.body;
+            let { status, result, note } = res.body;
             status.should.be.equal(404);
+            result.should.be.equal('Invalid token');
+            note.should.be.equal('Token implementation has not been implemented. It is in process');
             done();
         })
     })
-    it('TC-204-1 User does not exist', (done) => {
+
+    it('TC-204-2 User does not exist', (done) => {
         let id = 99;
         chai.request(server)
             .get('/api/user/' + id)
+            .send({id:1})
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, result } = res.body;
@@ -292,16 +311,16 @@ describe('UC-204 User details checker', (done) => {
                 done();
             })
     })
-    it('TC-204 user exist', (done) => {
+    it('TC-204-3 user exist', (done) => {
         let userid = 1;
         chai.request(server)
             .get('/api/user/' + userid)
+            .send({id:1})
             .end((err, res) => {
                 res.should.be.a('object');
                 let { status, result, user } = res.body;
                 status.should.be.equal(202);
                 result.should.be.equal(`User with id: ${userid} found`);
-                let { id, firstName, lastName, isActive, emailAdress, password, phoneNumber, roles, street, city } = user;
                 assert.deepEqual(res.body.user, {
                     id: 1,
                     firstName: 'Mariëtte',
@@ -336,6 +355,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             .put('/api/user/' + id)
             .send(
                 {
+                    id: 199,
                     user: {
                         id: 199,
                         firstName: "Xon",
@@ -360,6 +380,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
         chai.request(server)
             .put('/api/user/' + id)
             .send({
+                id:199,
                 user: {
                     id: 199,
                     firstName: "Xon",
@@ -403,26 +424,28 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, result } = res.body;
-                status.should.be.equal(404);
-                result.should.be.equal(`User does not exist`);
+                status.should.be.equal(400);
+                result.should.be.equal(`User does not exist.`);
                 done();
             })
     })
 
-    it.skip('TC-205-5 User has not logged in', (done) => {
+    it('TC-205-5 User has not logged in', (done) => {
         let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
             .send({
-                id: 0,
-                firstName: "Xon",
-                lastName: "Wong",
-                city: "Rotterdam",
-                street: "Maskauplein",
-                email: "Xin20Wang@outlook.com",
-                password: "Password111",
-                isActive: true,
-                phoneNumber: "06 123456789"
+                user: {
+                    id: 0,
+                    firstName: "Xon",
+                    lastName: "Wong",
+                    city: "Rotterdam",
+                    street: "Maskauplein",
+                    email: "Xin20Wang@outlook.com",
+                    password: "Password111",
+                    isActive: true,
+                    phoneNumber: "06 123456789"
+                }
             })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -462,9 +485,10 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     lastName: "Wong",
                     city: "Rotterdam",
                     street: "Maskauplein",
-                    email: "Xin20Wang@outlook.com",
+                    emailAdress: "Xin20Wang@outlook.com",
                     password: "Password111",
                     isActive: true,
+                    roles:["editor","guest"],
                     phoneNumber: "06 123456789"
                 })
                 done();
@@ -473,7 +497,9 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
     after((done) => {
         DB.getConnection((err, con) => {
             con.query('DELETE FROM user WHERE id = 199;', (err, result) => {
-                con.query('ALTER TABLE user AUTO_INCREMENT = 8');
+                con.query('ALTER TABLE user AUTO_INCREMENT = 6;', (err, result)=>{
+                    con.release();
+                });
                 console.log(result);
             })
         })
@@ -505,12 +531,13 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
             })
     })
     //Either token or user object will be send to
-    it.skip('TC-206-2 User not logged in', (done) => {
-        let id = 0;
+    it('TC-206-2 User not logged in', (done) => {
+        let id = 200;
         chai.request(server)
             .delete('/api/user/' + id)
-            .send({ id: 200 })
             .end((req, res) => {
+                res.body.status.should.be.equal(401);
+                res.body.result.should.be.equal('User has not been logged in');
                 done();
             })
     })

@@ -8,18 +8,66 @@ const { json } = require("express/lib/response");
 let id = 2;
 
 let controller = {
-    checkLogin: (req, res, next) => {
+    //As placeholder for the token, will the object with the id function as the Id, Object{id:(id)}
+    checkToken:(req, res, next)=>{
+        const userObject = req.body.id;
         try {
-
+            assert(typeof userObject == 'number', 'Invalid token')
+            next();
+        } catch (error) {
+            const err = {
+                status: 404,
+                result: error.message,
+                note: 'Token implementation has not been implemented. It is in process'
+            }
+            next(err);
+        }
+    }
+    ,
+    checkLogin: (req, res, next) => {
+        const userObject = req.body.id;
+        try {
+            assert(typeof userObject == 'number', 'User has not been logged in')
             next();
         } catch (error) {
             const err = {
                 status: 401,
-                result: 'User has not been logged in'
+                result: error.message
             }
             next(err);
         }
     },
+
+    //Assists UC-205, Note: The functional design document has stated that the response code for non-existent users when updating a user is 400. 
+    //Unlike that of the response code for non-existent users of UC-206, which is 404. That is why their is two similiar methods of validating user existence
+    checkUserExistenceAndOwnership: (req, res, next) => {
+        const userId = parseInt(req.params.userId);
+        //Id of user performing the update
+        const inputUserId = req.body.id;
+        console.log(`UserId stated in the path parameters: ${userId}, by Current user ID: ${inputUserId}.`);
+
+        DBConnection.getConnection((error1, Connection) => {
+            Connection.query('SELECT id FROM user WHERE id = ?;', [userId], (err1, result, fields) => {
+                const userResult = result.length;
+                Connection.release();
+                try {
+                    assert(userResult != 0, 'User does not exist.');
+                    assert(result[0].id == inputUserId, 'Cannot edit user, it is not owned by the performing user.');
+                    next();
+                } catch (error) {
+                    const err = {
+                        status: 400,
+                        result: error.message,
+                        error_Specific: error
+                    }
+                    next(err);
+                }
+            })
+        })
+
+    }
+    ,
+    //Assists UC-206
     checkOwnershipUser: (req, res, next) => {
         const userId = parseInt(req.params.userId);
         const inputUserId = req.body.id;
@@ -231,7 +279,7 @@ let controller = {
     ,
     //UC-205 Edits user.
     updateUser: (req, res) => {
-        const id = req.params.userId;
+        const id = parseInt(req.params.userId);
         let newUser = req.body.user;
         let activeValue = 0;
         if (newUser.isActive) {
@@ -244,20 +292,30 @@ let controller = {
             connection.query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
                 [newUser.firstName, newUser.lastName, newUser.city, newUser.street, newUser.password, newUser.email, activeValue, newUser.phoneNumber, id],
                 (error, result, field) => {
+                    if (error) { throw error };
                     console.log(`Affected rows UPDATE: ${result.affectedRows}`);
-                    connection.release();
                     if (result.affectedRows == 0) {
+                        connection.release();
                         res.status(404).json({
                             status: 404,
                             result: `Update has failed. Id: ${id} does not exist.`
                         })
                     } else {
                         newUser = { id, ...newUser };
-                        res.status(200).json({
-                            status: 200,
-                            result: "Succesful transaction",
-                            updatedUser: newUser
+                        console.log(newUser);
+                        connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
+                            if(err4){ throw err4}
+                            connection.release();
+                            console.log(result2);
+                            result2[0].isActive = (result2[0].isActive == 1);
+                            result2[0].roles = result2[0].roles.split(",")
+                            res.status(200).json({
+                                status: 200,
+                                result: "Succesful transaction",
+                                updatedUser: result2[0]
+                            })
                         })
+
                     }
 
                 })
