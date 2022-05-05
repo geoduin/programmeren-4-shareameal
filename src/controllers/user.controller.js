@@ -6,10 +6,16 @@ const { json } = require("express/lib/response");
 
 //Note: Due to the dummydata present within the in-memory database(in case of testing), the id will start at 2 instead of 0. 
 let id = 2;
+//Regex for email
+const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+//Regex for phones - every phonenumber must start with 06
+const phoneRegex = /06|31( {1}|-{1})\d{9}/;
+//Regex for passwords - at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
 
 let controller = {
     //As placeholder for the token, will the object with the id function as the Id, Object{id:(id)}
-    checkToken:(req, res, next)=>{
+    checkToken: (req, res, next) => {
         const userObject = req.body.id;
         try {
             assert(typeof userObject == 'number', 'Invalid token')
@@ -22,6 +28,47 @@ let controller = {
             }
             next(err);
         }
+    }
+    ,
+    testRegex: (req, res) => {
+        let value = phoneRegex.test(req.params.input);
+        let value2 = passwordRegex.test(req.params.input2);
+        let d = new Date(1443567600000);
+        d.setTime(d.getTime() - new Date().getTimezoneOffset() * 60 * 1000);
+
+        res.status(200).json({
+            status: 200,
+            phoneResult: d,
+            passwordResult: value2
+        })
+    }
+    ,
+    testDateDB: (req, res) => {
+        DBConnection.getConnection((err, con) => {
+            con.query('SELECT id, dateTime FROM meal;', (err, uitslag, fields) => {
+                if (err) { throw err };
+                con.release();
+
+                uitslag.forEach(e => {
+                    console.log('===============OLD==================')
+                    console.log(e);
+                    let d = new Date(e.dateTime);
+                    d.setTime(d.getTime() - new Date().getTimezoneOffset() * 60 * 1000);
+                    console.log('===============NEW==================')
+                    console.log(d)
+                    console.log('===============SECTION==================')
+                });
+
+                res.status(200).json({
+                    status: 200,
+                    result: uitslag
+                })
+            })
+        })
+
+
+
+
     }
     ,
     checkLogin: (req, res, next) => {
@@ -107,8 +154,9 @@ let controller = {
     ,
     validateUserRegistration: (req, res, next) => {
         let User = req.body;
-        let { firstName, lastName, street, city, isActive, email, password, phoneNumber } = User;
-
+        let { firstName, lastName, street, city, email, password, phoneNumber } = User;
+        let emailValid = emailRegex.test(email);
+        let passwordValid = passwordRegex.test(password);
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
         try {
@@ -118,6 +166,8 @@ let controller = {
             assert(typeof street == 'string', 'Street must be a string');
             assert(typeof email == 'string', 'email must be a string');
             assert(typeof password == 'string', 'password must be a string');
+            assert(emailValid, 'Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
+            assert(passwordValid, 'at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
             next();
         } catch (err) {
             const error = {
@@ -304,7 +354,7 @@ let controller = {
                         newUser = { id, ...newUser };
                         console.log(newUser);
                         connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
-                            if(err4){ throw err4}
+                            if (err4) { throw err4 }
                             connection.release();
                             console.log(result2);
                             result2[0].isActive = (result2[0].isActive == 1);

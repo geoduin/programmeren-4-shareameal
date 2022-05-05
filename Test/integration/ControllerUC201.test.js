@@ -123,18 +123,54 @@ describe('UC-201 Create new User POST /api/user', (done) => {
             })
         })
 
+        it('TC-201-2 Invalid email format', (done) => {
+            chai.request(server).post('/api/user').send({
+                firstName: "James",
+                lastName: "Almada",
+                city: "Buenos Aires",
+                street: "Pluebo district uno",
+                email: "@outlook.com",
+                password: "qweqweqweq",
+            }).end((err, res) => {
+                res.should.be.an('object');
+                let { status, result, user } = res.body;
+                status.should.be.equals(400);
+                result.should.be.a('string').that.equals('Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
+                //Token test will be tested in the future
+                done();
+            })
+        })
 
-        //Fixes need to be made
-        it('TC-201-3 tot -5 When email has already been registered, it will return a error message and does not persist within the database', (done) => {
+        it('TC-201-3 Invalid password format', (done) => {
             chai.request(server).post('/api/user').send({
                 firstName: "Alphonso",
                 lastName: "Davies",
                 city: "Ottawa",
                 street: "Cardin avenue",
                 email: "m.vandullemen@server.nl",
-                password: "qweqweqweq",
+                password: "oooooooo",
                 isActive: true,
-                phoneNumber: "08 789032909"
+                phoneNumber: "06 789032909"
+            }).end((err, res) => {
+                res.should.be.an('object');
+                let { status, result } = res.body;
+                result.should.be.equals('at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
+                status.should.be.equals(400);
+                done();
+            })
+        })
+
+        //Fixes need to be made
+        it('TC-201-4 When email has already been registered, it will return a error message and does not persist within the database', (done) => {
+            chai.request(server).post('/api/user').send({
+                firstName: "Alphonso",
+                lastName: "Davies",
+                city: "Ottawa",
+                street: "Cardin avenue",
+                email: "m.vandullemen@server.nl",
+                password: "Erika!23Opa",
+                isActive: true,
+                phoneNumber: "06 789032909"
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, result } = res.body;
@@ -151,7 +187,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 city: "Buenos Aires",
                 street: "Pluebo district uno",
                 email: "ArezoStanistan@outlook.com",
-                password: "qweqweqweq",
+                password: "Erika!23Opa",
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, result, user } = res.body;

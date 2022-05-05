@@ -45,4 +45,7 @@ UserController.checkLogin,
 UserController.checkOwnershipUser, 
 UserController.deleteUser);
 
+//Test
+UserRouter.get('/api/test/:input/:input2', UserController.testRegex);
+UserRouter.get('/api/test/db', UserController.testDateDB);
 module.exports = UserRouter;
