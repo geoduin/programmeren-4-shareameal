@@ -50,4 +50,5 @@ UserRouter.delete("/api/user/:userId",
 UserController.checkOwnershipUser, 
 UserController.deleteUser);
 
+UserRouter.get('/api/test/:id', UserController.testDateDB)
 module.exports = UserRouter;

@@ -44,27 +44,35 @@ let controller = {
     }
     ,
     testDateDB: (req, res) => {
-        DBConnection.getConnection((err, con) => {
-            con
-                .promise()
-                .query('SELECT * FROM user;', [req.params.id])
-                .then(([rows, fields]) => {
-                    console.log(rows);
+        console.log('Start');
+        DBConnection.getConnection((error, connect) => {
+            connect.promise().query('SELECT * FROM user WHERE id = ?;', [req.params.id])
+                .then(([result, fields]) => {
+                    console.log(result[0]);
+                }).then(connect.promise().query('SELECT * FROM meal WHERE cookId = ?;', [req.params.id]).then(([result2]) => {
+                    console.log(result2);
                 }).then(() => {
-                    con
-                        .promise()
-                        .query('SELECT * FROM meal')
-                        .then(([rows2, fields2]) => {
-                            console.log(rows2[0]);
-                            res.status(200).json({
-                                status: 200,
-                                phoneResult: 'Yes'
-                            })
-                        })
-                }).finally(() => {
-                    con.release();
-                })
+                    connect.release();
+                }))
         })
+        // DBConnection.getConnection((err, con) => {
+        //     con.promise()
+        //         .query('SELECT * FROM user;', [req.params.id])
+        //         .then(([rows, fields]) => {
+        //             console.log(rows);
+        //         })
+        //         .then(con.promise().query('SELECT * FROM meal')
+        //                 .then(([rows2, fields2]) => {
+        //                     console.log(rows2[0]);
+        //                     res.status(200).json({
+        //                         status: 200,
+        //                         phoneResult: 'Yes'
+        //                     })
+        //                 }).then(()=>{
+        //                     con.release();
+        //                 })
+        //         )
+        // })
     }
     ,
     checkLogin: (req, res, next) => {
@@ -219,7 +227,7 @@ let controller = {
                                 result: `User has been registered.`,
                                 user: results[0]
                             })
-                        }).finally(()=>{
+                        }).finally(() => {
                             connect.release();
                         })
                 }).catch(err => {
@@ -313,26 +321,51 @@ let controller = {
         const userId = req.params.userId;
         console.log(`User met ID ${userId} gezocht`);
         DBConnection.getConnection((err, connection) => {
-            connection.promise()
-                .query('SELECT * FROM user WHERE id = ?', [userId])
+            connection.promise().query('SELECT * FROM user WHERE id = ?', [userId])
                 .then(([result]) => {
                     console.log(`Length of result is ${result.length}`);
                     console.log(result[0])
                     if (result.length != 0) {
-                        res.status(202).json({
-                            status: 202,
-                            result: `User with id: ${userId} found`,
-                            user: result[0]
-                        })
+                        
                     } else {
-                        res.status(404).json({
-                            status: 404,
-                            result: `User with id: ${userId} does not exist. Retrieval has failed.`
-                        })
+                        
                     }
                 }).finally(() => {
                     connection.release();
                 })
+        })
+
+        let user = null;
+        let results = null;
+        DBConnection.getConnection((error, connect) => {
+            connect.promise().query('SELECT * FROM user WHERE id = ?;', [userId])
+                .then(([result, fields]) => {
+                    console.log(`Length of result is ${result.length}`);
+                    console.log(result[0]);
+                    results = result;
+                }).then(connect.promise()
+                    .query('SELECT * FROM meal WHERE cookId = ?;', [userId])
+                    .then(([result2]) => {
+                        if(results.length > 0){
+                            user = results[0];  
+                            user.isActive = (user.isActive == 1);
+                            user.roles = user.roles.split(",");
+                            user.Own_meals = result2;
+                            console.log(user);
+                            res.status(202).json({
+                                status: 202,
+                                result: `User with id: ${userId} found`,
+                                user: user
+                            })
+                        } else {
+                            res.status(404).json({
+                                status: 404,
+                                result: `User with id: ${userId} does not exist. Retrieval has failed.`
+                            })
+                        }
+                    }).then(() => {
+                        connect.release();
+                    }))
         })
     }
     ,

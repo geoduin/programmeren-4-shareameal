@@ -361,13 +361,32 @@ describe('UC-204 User details checker', (done) => {
                     id: 1,
                     firstName: 'Mariëtte',
                     lastName: 'van den Dullemen',
-                    isActive: 1,
+                    isActive: true,
                     emailAdress: 'm.vandullemen@server.nl',
                     password: 'secret',
                     phoneNumber: '',
-                    roles: '',
+                    roles: [""],
                     street: '',
-                    city: ''
+                    city: '',
+                    Own_meals: [
+                        {
+                          id: 1,
+                          isActive: 1,
+                          isVega: 0,
+                          isVegan: 0,
+                          isToTakeHome: 1,
+                          dateTime: "2022-03-22T16:35:00.000Z",
+                          maxAmountOfParticipants: 4,
+                          price: '12.75',
+                          imageUrl: 'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
+                          cookId: 1,
+                          createDate: "2022-02-26T17:12:40.048Z",
+                          updateDate: "2022-04-26T10:33:51.000Z",
+                          name: 'Pasta Bolognese met tomaat, spekjes en kaas',
+                          description: 'Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!',
+                          allergenes: 'gluten,lactose'
+                        }
+                      ]
                 });
                 done();
             })
