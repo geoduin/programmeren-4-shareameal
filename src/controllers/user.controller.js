@@ -310,29 +310,37 @@ let controller = {
     ,
     //UC-204 Retrieves user, based on userId
     retrieveUserById: (req, res) => {
-        const userId = req.params.userId;
-        console.log(`User met ID ${userId} gezocht`);
-        DBConnection.getConnection((err, connection) => {
-            connection.promise()
-                .query('SELECT * FROM user WHERE id = ?', [userId])
-                .then(([result]) => {
+        let user = null;
+        let results = null;
+        DBConnection.getConnection((error, connect) => {
+            connect.promise().query('SELECT * FROM user WHERE id = ?;', [userId])
+                .then(([result, fields]) => {
                     console.log(`Length of result is ${result.length}`);
-                    console.log(result[0])
-                    if (result.length != 0) {
-                        res.status(202).json({
-                            status: 202,
-                            result: `User with id: ${userId} found`,
-                            user: result[0]
-                        })
-                    } else {
-                        res.status(404).json({
-                            status: 404,
-                            result: `User with id: ${userId} does not exist. Retrieval has failed.`
-                        })
-                    }
-                }).finally(() => {
-                    connection.release();
-                })
+                    console.log(result[0]);
+                    results = result;
+                }).then(connect.promise()
+                    .query('SELECT * FROM meal WHERE cookId = ?;', [userId])
+                    .then(([result2]) => {
+                        if(results.length > 0){
+                            user = results[0];  
+                            user.isActive = (user.isActive == 1);
+                            user.roles = user.roles.split(",");
+                            user.Own_meals = result2;
+                            console.log(user);
+                            res.status(202).json({
+                                status: 202,
+                                result: `User with id: ${userId} found`,
+                                user: user
+                            })
+                        } else {
+                            res.status(404).json({
+                                status: 404,
+                                result: `User with id: ${userId} does not exist. Retrieval has failed.`
+                            })
+                        }
+                    }).then(() => {
+                        connect.release();
+                    }))
         })
     }
     ,
