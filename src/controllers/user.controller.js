@@ -2,7 +2,7 @@ const req = require("express/lib/request");
 const assert = require('assert');
 const dataSet = require('../data/data.inMemory');
 const DBConnection = require("../data/dbConnection");
-const { json } = require("express/lib/response");
+
 
 //Note: Due to the dummydata present within the in-memory database(in case of testing), the id will start at 2 instead of 0. 
 let id = 2;
@@ -45,30 +45,26 @@ let controller = {
     ,
     testDateDB: (req, res) => {
         DBConnection.getConnection((err, con) => {
-            con.query('SELECT id, dateTime FROM meal;', (err, uitslag, fields) => {
-                if (err) { throw err };
-                con.release();
-
-                uitslag.forEach(e => {
-                    console.log('===============OLD==================')
-                    console.log(e);
-                    let d = new Date(e.dateTime);
-                    d.setTime(d.getTime() - new Date().getTimezoneOffset() * 60 * 1000);
-                    console.log('===============NEW==================')
-                    console.log(d)
-                    console.log('===============SECTION==================')
-                });
-
-                res.status(200).json({
-                    status: 200,
-                    result: uitslag
+            con
+                .promise()
+                .query('SELECT * FROM user;', [req.params.id])
+                .then(([rows, fields]) => {
+                    console.log(rows);
+                }).then(() => {
+                    con
+                        .promise()
+                        .query('SELECT * FROM meal')
+                        .then(([rows2, fields2]) => {
+                            console.log(rows2[0]);
+                            res.status(200).json({
+                                status: 200,
+                                phoneResult: 'Yes'
+                            })
+                        })
+                }).finally(() => {
+                    con.release();
                 })
-            })
         })
-
-
-
-
     }
     ,
     checkLogin: (req, res, next) => {
@@ -206,33 +202,34 @@ let controller = {
     createUser: (req, res) => {
         let user = req.body;
         console.log(user);
-        DBConnection.getConnection((err, connection) => {
-            if (err) { throw err };
-            console.log('Connection with database');
-            connection.query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);', [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.email, user.password], (error, result, fields) => {
-                if (error) {
-                    console.log(error);
+        DBConnection.getConnection((err, connect) => {
+            connect.promise()
+                .query(
+                    'INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
+                    [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.email, user.password])
+                .then(() => {
+                    connect.promise()
+                        .query('SELECT * FROM user WHERE emailAdress = ?', [user.email])
+                        .then(([results]) => {
+                            console.log(`User with ${user.email} has been found.`);
+                            //Token generation in development
+                            console.log(results[0]);
+                            res.status(200).json({
+                                status: 200,
+                                result: `User has been registered.`,
+                                user: results[0]
+                            })
+                        }).finally(()=>{
+                            connect.release();
+                        })
+                }).catch(err => {
+                    console.log(err);
+                    connect.release();
                     res.status(401).json({
                         status: 401,
                         result: "Email has been taken"
                     })
-                    connection.release();
-                } else {
-                    connection.query('SELECT * FROM user WHERE emailAdress = ?', [user.email], (err, results, fields) => {
-                        connection.release();
-                        console.log(`User with ${user.email} has been found.`);
-                        //Token generation in development
-                        console.log(results[0]);
-                        res.status(200).json({
-                            status: 200,
-                            result: `User has been registered.`,
-                            user: results[0]
-                        })
-                    })
-                }
-
-            })
-
+                })
         })
     }
     ,
@@ -240,56 +237,65 @@ let controller = {
     //amount=? query parameters
     //active or inactive query parameters
     getAllUsers: (req, res) => {
-        let active = req.query.isActive;
-
+        const active = req.query.isActive;
+        const searchTerm = req.query.searchTerm;
+        const limit = req.query.amount;
         let booleanValue = 0;
         if (active != undefined && active == 'true') {
             booleanValue = 1;
         }
         console.log(booleanValue)
-        let searchTerm = req.query.searchTerm;
-        let limit = req.query.amount;
-        let query = "SELECT * FROM user";
 
+        let query = "SELECT * FROM user";
+        let inserts = [];
         console.log(`Active is ${active}`);
         console.log(`Searchterm is ${searchTerm}`)
         console.log(`Limit is ${limit}`)
 
         if (active != undefined && searchTerm != undefined && limit != undefined) {
-            query = `SELECT * FROM user WHERE isActive = ${booleanValue} AND firstName LIKE %${searchTerm}% OR lastName LIKE %${searchTerm}% LIMIT ${limit};`
+            query += (` WHERE isActive = ? AND firstName LIKE %?% OR lastName LIKE %?% LIMIT ?;`)
+            inserts = [booleanValue, searchTerm, searchTerm, limit];
+            query = mysql.format(query, inserts);
             console.log(query);
         } else if (active != undefined && searchTerm != undefined) {
-            query = `SELECT * FROM user WHERE isActive = ${booleanValue} AND firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%';`
+            query += ` WHERE isActive = ? AND firstName LIKE '%?%' OR lastName LIKE '%?%';`
+            inserts = [booleanValue, searchTerm, searchTerm];
+            query = mysql.format(query, inserts);
             console.log(query);
         } else if (searchTerm != undefined && limit != undefined) {
-            query = `SELECT * FROM user WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%' LIMIT ${limit};`
+            query += ` WHERE firstName LIKE '%?%' OR lastName LIKE '%?%' LIMIT ?;`
+            inserts = [searchTerm, searchTerm, limit];
+            query = mysql.format(query, inserts);
             console.log(query);
         } else if (limit != undefined) {
-            query = `SELECT * FROM user LIMIT ${limit};`
+            query += ` LIMIT ${limit};`
             console.log(query);
         } else if (active != undefined) {
-            query = `SELECT * FROM user WHERE isActive = ${booleanValue};`
+            query += ` WHERE isActive = ${booleanValue};`
             console.log(query);
         } else if (searchTerm != undefined) {
-            query = `SELECT * FROM user WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%';`
+            query += ` WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%';`
             console.log(query);
         }
         DBConnection.getConnection((error, connection) => {
-            connection.query(query, (error, result, fields) => {
-                connection.release();
-                if (error) { throw error }
-                let roles = [];
-                result.forEach(user => {
-                    roles = user.roles.split(",");
-                    user.roles = roles;
-                    user.isActive = (user.isActive == 1);
-                });
-                res.status(200).json({
-                    status: 200,
-                    amount: result.length,
-                    result: result,
+            connection
+                .promise()
+                .query(query)
+                .then(([result, fields]) => {
+                    let roles = [];
+                    result.forEach(user => {
+                        roles = user.roles.split(",");
+                        user.roles = roles;
+                        user.isActive = (user.isActive == 1);
+                    });
+                    res.status(200).json({
+                        status: 200,
+                        amount: result.length,
+                        result: result,
+                    })
+                }).finally(() => {
+                    connection.release();
                 })
-            })
         })
     },
     //UC-203 Retrieve user profile, based on Token and userID
@@ -307,23 +313,26 @@ let controller = {
         const userId = req.params.userId;
         console.log(`User met ID ${userId} gezocht`);
         DBConnection.getConnection((err, connection) => {
-            connection.query('SELECT * FROM user WHERE id = ?', [userId], (error, result, field) => {
-                connection.release();
-                console.log(`Length of result is ${result.length}`);
-                console.log(result[0])
-                if (result.length != 0) {
-                    res.status(202).json({
-                        status: 202,
-                        result: `User with id: ${userId} found`,
-                        user: result[0]
-                    })
-                } else {
-                    res.status(404).json({
-                        status: 404,
-                        result: `User with id: ${userId} does not exist. Retrieval has failed.`
-                    })
-                }
-            })
+            connection.promise()
+                .query('SELECT * FROM user WHERE id = ?', [userId])
+                .then(([result]) => {
+                    console.log(`Length of result is ${result.length}`);
+                    console.log(result[0])
+                    if (result.length != 0) {
+                        res.status(202).json({
+                            status: 202,
+                            result: `User with id: ${userId} found`,
+                            user: result[0]
+                        })
+                    } else {
+                        res.status(404).json({
+                            status: 404,
+                            result: `User with id: ${userId} does not exist. Retrieval has failed.`
+                        })
+                    }
+                }).finally(() => {
+                    connection.release();
+                })
         })
     }
     ,
@@ -336,26 +345,20 @@ let controller = {
             activeValue = 1;
         }
         console.log(`UserID of ${newUser.firstName} is ${id}.`)
-        //Filters the array, based on userId. If the input userId is found in the in-memory database, 
-        //it will return 1. otherwise it will return 0
         DBConnection.getConnection((error, connection) => {
-            connection.query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
-                [newUser.firstName, newUser.lastName, newUser.city, newUser.street, newUser.password, newUser.email, activeValue, newUser.phoneNumber, id],
-                (error, result, field) => {
-                    if (error) { throw error };
+            connection.promise()
+                .query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
+                    [newUser.firstName, newUser.lastName, newUser.city, newUser.street, newUser.password, newUser.email, activeValue, newUser.phoneNumber, id])
+                .then(([result]) => {
                     console.log(`Affected rows UPDATE: ${result.affectedRows}`);
                     if (result.affectedRows == 0) {
-                        connection.release();
                         res.status(404).json({
                             status: 404,
                             result: `Update has failed. Id: ${id} does not exist.`
                         })
                     } else {
-                        newUser = { id, ...newUser };
-                        console.log(newUser);
                         connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
                             if (err4) { throw err4 }
-                            connection.release();
                             console.log(result2);
                             result2[0].isActive = (result2[0].isActive == 1);
                             result2[0].roles = result2[0].roles.split(",")
@@ -365,9 +368,9 @@ let controller = {
                                 updatedUser: result2[0]
                             })
                         })
-
                     }
-
+                }).finally(() => {
+                    connection.release();
                 })
         })
     }
@@ -376,23 +379,26 @@ let controller = {
     deleteUser: (req, res) => {
         const iD = req.params.userId
         DBConnection.getConnection((error, conn) => {
-            conn.query('DELETE FROM user  WHERE id = ?;', [iD], (error, result) => {
-                console.log('Ronde deletion');
-                console.log(result.affectedRows);
-                if (result.affectedRows > 0) {
-                    res.status(200).json({
-                        status: 200,
-                        result: `User with user with Id ${iD}, has been removed.`,
-                        CurrentUsers: dataSet.userData
-                    })
-                } else {
-                    res.status(404).json({
-                        status: 404,
-                        result: `Removal has failed. Id ${iD} has either been removed or does not exist`
-                    })
-                }
-                conn.release();
-            })
+            conn.promise()
+                .query('DELETE FROM user  WHERE id = ?;', [iD])
+                .then(([result]) => {
+                    console.log('Ronde deletion');
+                    console.log(result.affectedRows);
+                    if (result.affectedRows > 0) {
+                        res.status(200).json({
+                            status: 200,
+                            result: `User with user with Id ${iD}, has been removed.`,
+                            CurrentUsers: dataSet.userData
+                        })
+                    } else {
+                        res.status(404).json({
+                            status: 404,
+                            result: `Removal has failed. Id ${iD} has either been removed or does not exist`
+                        })
+                    }
+                }).finally(() => {
+                    conn.release();
+                })
         })
     }
 }
