@@ -191,9 +191,8 @@ describe('UC-201 Create new User POST /api/user', (done) => {
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, result, user } = res.body;
-                result.should.be.a('string').that.equals('User has been registered.');
                 status.should.be.equals(200);
-                
+                result.should.be.a('string').that.equals('User has been registered.');
                 //Token test will be tested in the future
                 done();
             })
@@ -202,9 +201,11 @@ describe('UC-201 Create new User POST /api/user', (done) => {
         after((done) => {
             DB.getConnection((err, con) => {
                 if (err) { throw err };
-                con.query("DELETE FROM user WHERE emailAdress = 'Wessel@outlook.com' OR emailAdress = 'ArezoStanistan@outlook.com';", (error, result, field) => {
-                    con.query("ALTER TABLE user AUTO_INCREMENT = 8;", (error, result, field) => {
-                        con.release();
+                con.query("DELETE FROM user WHERE emailAdress = 'Wessel@outlook.com';", (error, result, field) => {
+                    con.query("DELETE FROM user WHERE emailAdress = 'ArezoStanistan@outlook.com';", (error, result, field) => {
+                        con.query("ALTER TABLE user AUTO_INCREMENT = 8;", (error, result, field) => {
+                            con.release();
+                        })
                     })
                 })
             })
@@ -224,8 +225,10 @@ describe('UC-202 Get all users Get /api/user', (done) => {
             .query({ searchTerm: 'xqk2' })
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status } = res.body;
+                let { status, amount, result } = res.body;
                 assert.equal(status, 200);
+                assert.equal(amount, 0);
+                assert.deepEqual(result, []);
                 done();
             })
     })
@@ -235,9 +238,40 @@ describe('UC-202 Get all users Get /api/user', (done) => {
             .query({ amount: 2 })
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status, amount } = res.body;
+                let { status, amount, result } = res.body;
                 assert.equal(status, 200);
                 assert.equal(amount, 2);
+                assert.deepEqual(result, [
+                    {
+                        "id": 1,
+                        "firstName": "Mariëtte",
+                        "lastName": "van den Dullemen",
+                        "isActive": true,
+                        "emailAdress": "m.vandullemen@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "",
+                        "roles": [
+                            ""
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 2,
+                        "firstName": "John",
+                        "lastName": "Doe",
+                        "isActive": true,
+                        "emailAdress": "j.doe@server.com",
+                        "password": "secret",
+                        "phoneNumber": "06 12425475",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    }
+                ])
                 done();
             })
     })
@@ -248,8 +282,10 @@ describe('UC-202 Get all users Get /api/user', (done) => {
             .query({ searchTerm: 'xqk2' })
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status } = res.body;
+                let { status, amount, result } = res.body;
                 assert.equal(status, 200);
+                assert.equal(amount, 0);
+                assert.deepEqual(result, []);
                 done();
             })
     })
@@ -261,6 +297,24 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                 res.should.be.a('object');
                 let { status, amount, result } = res.body;
                 assert.equal(status, 200);
+                assert.equal(amount, 1);
+                assert.deepEqual(result,[
+                    {
+                        "id": 4,
+                        "firstName": "Marieke",
+                        "lastName": "Van Dam",
+                        "isActive": false,
+                        "emailAdress": "m.vandam@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "06-12345678",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    }
+                ] )
                 result.forEach((item) => {
                     assert.isFalse(item.isActive);
                 })
@@ -276,6 +330,68 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                 res.should.be.a('object');
                 let { status, amount, result } = res.body;
                 assert.equal(status, 200);
+                assert.equal(amount, 4);
+                assert.deepEqual(result, [
+                    {
+                        "id": 1,
+                        "firstName": "Mariëtte",
+                        "lastName": "van den Dullemen",
+                        "isActive": true,
+                        "emailAdress": "m.vandullemen@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "",
+                        "roles": [
+                            ""
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 2,
+                        "firstName": "John",
+                        "lastName": "Doe",
+                        "isActive": true,
+                        "emailAdress": "j.doe@server.com",
+                        "password": "secret",
+                        "phoneNumber": "06 12425475",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 3,
+                        "firstName": "Herman",
+                        "lastName": "Huizinga",
+                        "isActive": true,
+                        "emailAdress": "h.huizinga@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "06-12345678",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 5,
+                        "firstName": "Henk",
+                        "lastName": "Tank",
+                        "isActive": true,
+                        "emailAdress": "h.tank@server.com",
+                        "password": "secret",
+                        "phoneNumber": "06 12425495",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    }
+                ])
                 result.forEach((item) => {
                     assert.isTrue(item.isActive);
                 })
@@ -289,6 +405,52 @@ describe('UC-202 Get all users Get /api/user', (done) => {
             .end((req, res) => {
                 res.should.be.a('object');
                 res.status.should.be.equal(200);
+                assert(res.body.result, [
+                    {
+                        "id": 1,
+                        "firstName": "Mariëtte",
+                        "lastName": "van den Dullemen",
+                        "isActive": true,
+                        "emailAdress": "m.vandullemen@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "",
+                        "roles": [
+                            ""
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 3,
+                        "firstName": "Herman",
+                        "lastName": "Huizinga",
+                        "isActive": true,
+                        "emailAdress": "h.huizinga@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "06-12345678",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 4,
+                        "firstName": "Marieke",
+                        "lastName": "Van Dam",
+                        "isActive": false,
+                        "emailAdress": "m.vandam@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "06-12345678",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    }
+                ])
                 done();
             })
     })
@@ -320,7 +482,7 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
 });
 
 describe('UC-204 User details checker', (done) => {
-    it('TC-204-1 Invalid token', (done) => {
+    it.skip('TC-204-1 Invalid token', (done) => {
         let id = 99;
         chai.request(server).get('/api/user/' + id)
             .end((req, res) => {
@@ -337,7 +499,7 @@ describe('UC-204 User details checker', (done) => {
         let id = 99;
         chai.request(server)
             .get('/api/user/' + id)
-            .send({ id: 1 })
+            .send({id:1})
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, result } = res.body;
@@ -364,26 +526,29 @@ describe('UC-204 User details checker', (done) => {
                     emailAdress: 'm.vandullemen@server.nl',
                     password: 'secret',
                     phoneNumber: '',
-                    roles: [''],
+                    roles: [""],
                     street: '',
                     city: '',
                     Own_meals: [
                         {
-                            allergenes: ["gluten", "lactose"],
-                            cookId: 1,
-                            createDate: "2022-02-26T18:12:40.048Z",
-                            dateTime: "2022-03-22T17:35:00.000Z",
-                            description: "Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!",
                             id: 1,
-                            imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
                             isActive: true,
-                            isToTakeHome: true,
                             isVega: false,
                             isVegan: false,
+                            isToTakeHome: true,
+                            dateTime: "2022-03-22T17:35:00.000Z",
+                            //   dateTime: "2022-03-22T16:35:00.000Z",
                             maxAmountOfParticipants: 4,
-                            name: "Pasta Bolognese met tomaat, spekjes en kaas",
-                            price: "12.75",
-                            updateDate: "2022-04-26T12:33:51.000Z"
+                            price: '12.75',
+                            imageUrl: 'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
+                            cookId: 1,
+                            createDate: "2022-02-26T18:12:40.048Z",
+                            updateDate: "2022-04-26T12:33:51.000Z",
+                            //   createDate: "2022-02-26T17:12:40.048Z",
+                            //   updateDate: "2022-04-26T10:33:51.000Z",
+                            name: 'Pasta Bolognese met tomaat, spekjes en kaas',
+                            description: 'Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!',
+                            allergenes: ['gluten','lactose']
                         }
                     ]
                 });
@@ -484,11 +649,13 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             })
     })
 
-    it('TC-205-5 User has not logged in', (done) => {
+    it.skip('TC-205-5 User has not logged in', (done) => {
         let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
             .send({
+                //It lacks a id attribute above the user object.
+                //Will be replaced by a token
                 user: {
                     id: 0,
                     firstName: "Xon",
@@ -515,6 +682,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
         chai.request(server)
             .put('/api/user/' + id)
             .send({
+                //Placeholder object
                 id: 199,
                 user: {
                     id: 199,
@@ -550,7 +718,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
     })
     after((done) => {
         DB.getConnection((err, con) => {
-            con.query("DELETE FROM user WHERE emailAdress = 'Xin20Wang@outlook.com';", (err, result) => {
+            con.query('DELETE FROM user WHERE emailAdress = "Xin20Wang@outlook.com";', (err, result) => {
                 con.query('ALTER TABLE user AUTO_INCREMENT = 6;', (err, result) => {
                     con.release();
                 });
@@ -585,10 +753,11 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
             })
     })
     //Either token or user object will be send to
-    it('TC-206-2 User not logged in', (done) => {
+    it.skip('TC-206-2 User not logged in', (done) => {
         let id = 200;
         chai.request(server)
             .delete('/api/user/' + id)
+            //No object send
             .end((req, res) => {
                 res.body.status.should.be.equal(401);
                 res.body.result.should.be.equal('User has not been logged in');
@@ -609,9 +778,8 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
         let id = 200;
         chai.request(server)
             .delete('/api/user/' + id)
-            .send({
-                id: 200
-            })
+            //Placeholder method
+            .send({ id: 200 })
             .end((req, res) => {
                 let { status, result } = res.body;
                 status.should.be.equal(200);
