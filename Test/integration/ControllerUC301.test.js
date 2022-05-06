@@ -526,6 +526,7 @@ describe('UC-305 delete meal test', (done) => {
         let id = 0;
         chai.request(server)
             .delete('/api/meal/' + id)
+            //No login send
             .end((req, res) => {
                 res.body.status.should.be.equal(401);
                 res.body.result.should.be.equal('Must send a user or login required')
@@ -538,6 +539,7 @@ describe('UC-305 delete meal test', (done) => {
         chai.request(server)
             .delete('/api/meal/' + id)
             .send({
+                //User and login body
                 user: {
                     id: 1,
                     firstName: 'Mariëtte',
@@ -563,6 +565,7 @@ describe('UC-305 delete meal test', (done) => {
         chai.request(server)
             .delete('/api/meal/' + id)
             .send({
+                //User and login body
                 user: {
                     id: 1,
                     firstName: 'Mariëtte',

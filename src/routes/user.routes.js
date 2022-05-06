@@ -23,29 +23,31 @@ UserController.getAllUsers);
 
 //UC-203 Retrieve user profile, based on Token and userID
 //Token functionality has not been developed - in process
+//Client will send (Later replaced by tokens) => object = { id:(id)}
 UserRouter.get("/api/user/profile",  
-UserController.checkToken, 
+//UserController.checkToken, 
 UserController.getProfile);
 
-//UC-204 Retrieves user, based on userId
+//UC-204 Retrieves user, based on userId. 
+//Client will send (Later replaced by tokens) 
+//object => { id:(UserId)}
 UserRouter.get("/api/user/:userId",
-UserController.checkToken, 
+//UserController.checkToken, 
 UserController.retrieveUserById);
 
-//UC-205 Edits user. client will send object to api => sendObject {id:(id), newUserData:{attributes}}
+//UC-205 Edits user. client will send object to api 
+//=> sendObject {id:(UserId), newUserData:{attributes}}
 UserRouter.put("/api/user/:userId",  
-UserController.checkLogin, 
+//UserController.checkLogin, 
 UserController.validateUserPost, 
 UserController.checkUserExistenceAndOwnership,  
 UserController.updateUser);
 
 //UC-206 Deletes user based on id, client will send id - (checkOwnerShip method) object to api
+// => Object = { id:(id)}
 UserRouter.delete("/api/user/:userId", 
-UserController.checkLogin, 
+//UserController.checkLogin, 
 UserController.checkOwnershipUser, 
 UserController.deleteUser);
 
-//Test
-UserRouter.get('/api/test/:input/:input2', UserController.testRegex);
-UserRouter.get('/api/test/db', UserController.testDateDB);
 module.exports = UserRouter;

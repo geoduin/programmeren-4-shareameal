@@ -21,6 +21,7 @@ describe('UC-401 sign on participation', (done) => {
     it.skip('TC-401-1 Not logged in system', (done) => {
         chai.request(server)
             .post('/api/user/6/meal/2/signup')
+            //Token method placeholder
             .end((err, res) => {
                 res.body.status.should.be.equal(401);
                 res.body.result.should.be.equal('Token is invalid, you cannot sign up.')
@@ -31,6 +32,7 @@ describe('UC-401 sign on participation', (done) => {
     it('TC-401-2 Meal does not exist', (done) => {
         chai.request(server)
             .post('/api/user/6/meal/99999/signup')
+            //Token method placeholder
             .end((err, res) => {
                 res.body.status.should.be.equal(404);
                 res.body.result.should.be.equal('Meal does not exist!')
@@ -41,6 +43,7 @@ describe('UC-401 sign on participation', (done) => {
     it('TC-401-3 Successfully particpated in meal', (done) => {
         chai.request(server)
             .post('/api/user/6/meal/2/signup')
+            //Token method placeholder
             .end((err, res) => {
                 let aa = res.body;
                 res.body.status.should.be.equal(200);
@@ -53,6 +56,7 @@ describe('UC-402 sign off participation', (done) => {
     it.skip('TC-402-1 Not logged in system', (done) => {
         chai.request(server)
             .put('/api/user/6/meal/2/signOff')
+            //Token method placeholder
             .end((err, res) => {
                 res.body.status.should.be.equal(401);
                 res.body.result.should.be.equal('Token is invalid, you cannot sign up.')
@@ -63,6 +67,7 @@ describe('UC-402 sign off participation', (done) => {
     it('TC-402-2 meal does not exist', (done) => {
         chai.request(server)
             .put('/api/user/6/meal/100000/signOff')
+            //Token method placeholder
             .end((err, res) => {
                 res.body.status.should.be.equal(404);
                 res.body.result.should.be.equal('Meal does not exist!')
@@ -75,6 +80,7 @@ describe('UC-402 sign off participation', (done) => {
         let mealId = 2;
         chai.request(server)
             .put('/api/user/' + userId + '/meal/' + mealId + '/signOff')
+            //Token method placeholder
             .end((err, res) => {
                 res.body.status.should.be.equal(404);
                 res.body.result.should.be.equal(`Participant with userID: ${userId}, does not exist in meal with mealID: ${mealId}.`)
@@ -87,6 +93,7 @@ describe('UC-402 sign off participation', (done) => {
         let mealId = 2;
         chai.request(server)
             .put('/api/user/' + userId + '/meal/' + mealId + '/signOff')
+            //Token method placeholder
             .end((err, res) => {
                 res.body.status.should.be.equal(200);
                 res.body.result.should.be.equal(`Participation of USERID => ${userId} with MEALID => ${mealId} has been removed.`);
@@ -99,6 +106,7 @@ describe('UC-403 get all participants of that meal', (done) => {
     it.skip('TC-403-1 Not logged in system', (done) => {
         chai.request(server)
             .get('/api/meal/1/participants')
+            //Token method placeholder
             .send({ id: 1 })
             .end((err, res) => {
                 res.body.status.should.be.equal(401);
@@ -110,6 +118,7 @@ describe('UC-403 get all participants of that meal', (done) => {
     it('TC-403-2 participant does not exist in meal', (done) => {
         chai.request(server)
             .get('/api/meal/8567/participants')
+            //Token method placeholder
             .send({ id: 1 })
             .end((err, res) => {
                 res.body.status.should.be.equal(404);
@@ -121,6 +130,7 @@ describe('UC-403 get all participants of that meal', (done) => {
     it('TC-403-3 get list of participants', (done) => {
         chai.request(server)
             .get('/api/meal/4/participants')
+            //Token method placeholder
             .send({ id: 3 })
             .end((err, res) => {
                 res.body.status.should.be.equal(200);
@@ -147,6 +157,7 @@ describe('UC-404 get detail of the participant at that meal', (done) =>{
     it.skip('TC-404-1 Not logged in system', (done) => {
         chai.request(server)
             .get('/api/meal/4/participants/2')
+            //Token method placeholder
             .send({ id: 3 })
             .end((err, res) => {
                 res.body.status.should.be.equal(401);
@@ -158,6 +169,7 @@ describe('UC-404 get detail of the participant at that meal', (done) =>{
     it('TC-404-2 participant does not exist in meal', (done) => {
         chai.request(server)
             .get('/api/meal/4/participants/5963')
+            //Token method placeholder
             .send({ id: 3 })
             .end((err, res) => {
                 res.body.status.should.be.equal(404);
@@ -169,6 +181,7 @@ describe('UC-404 get detail of the participant at that meal', (done) =>{
     it('TC-404-3 get details participant', (done) => {
         chai.request(server)
             .get('/api/meal/4/participants/2')
+            //Token method placeholder
             .send({ id: 3 })
             .end((err, res) => {
                 res.body.status.should.be.equal(200);
@@ -184,4 +197,3 @@ describe('UC-404 get detail of the participant at that meal', (done) =>{
             })
     })
 });
-//Testcases UC-401 to UC-404
