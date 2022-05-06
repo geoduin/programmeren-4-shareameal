@@ -225,8 +225,10 @@ describe('UC-202 Get all users Get /api/user', (done) => {
             .query({ searchTerm: 'xqk2' })
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status } = res.body;
+                let { status, amount, result } = res.body;
                 assert.equal(status, 200);
+                assert.equal(amount, 0);
+                assert.deepEqual(result, []);
                 done();
             })
     })
@@ -236,9 +238,40 @@ describe('UC-202 Get all users Get /api/user', (done) => {
             .query({ amount: 2 })
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status, amount } = res.body;
+                let { status, amount, result } = res.body;
                 assert.equal(status, 200);
                 assert.equal(amount, 2);
+                assert.deepEqual(result, [
+                    {
+                        "id": 1,
+                        "firstName": "Mariëtte",
+                        "lastName": "van den Dullemen",
+                        "isActive": true,
+                        "emailAdress": "m.vandullemen@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "",
+                        "roles": [
+                            ""
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 2,
+                        "firstName": "John",
+                        "lastName": "Doe",
+                        "isActive": true,
+                        "emailAdress": "j.doe@server.com",
+                        "password": "secret",
+                        "phoneNumber": "06 12425475",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    }
+                ])
                 done();
             })
     })
@@ -249,8 +282,10 @@ describe('UC-202 Get all users Get /api/user', (done) => {
             .query({ searchTerm: 'xqk2' })
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status } = res.body;
+                let { status, amount, result } = res.body;
                 assert.equal(status, 200);
+                assert.equal(amount, 0);
+                assert.deepEqual(result, []);
                 done();
             })
     })
@@ -262,6 +297,24 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                 res.should.be.a('object');
                 let { status, amount, result } = res.body;
                 assert.equal(status, 200);
+                assert.equal(amount, 1);
+                assert.deepEqual(result,[
+                    {
+                        "id": 4,
+                        "firstName": "Marieke",
+                        "lastName": "Van Dam",
+                        "isActive": false,
+                        "emailAdress": "m.vandam@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "06-12345678",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    }
+                ] )
                 result.forEach((item) => {
                     assert.isFalse(item.isActive);
                 })
@@ -277,6 +330,68 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                 res.should.be.a('object');
                 let { status, amount, result } = res.body;
                 assert.equal(status, 200);
+                assert.equal(amount, 4);
+                assert.deepEqual(result, [
+                    {
+                        "id": 1,
+                        "firstName": "Mariëtte",
+                        "lastName": "van den Dullemen",
+                        "isActive": true,
+                        "emailAdress": "m.vandullemen@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "",
+                        "roles": [
+                            ""
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 2,
+                        "firstName": "John",
+                        "lastName": "Doe",
+                        "isActive": true,
+                        "emailAdress": "j.doe@server.com",
+                        "password": "secret",
+                        "phoneNumber": "06 12425475",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 3,
+                        "firstName": "Herman",
+                        "lastName": "Huizinga",
+                        "isActive": true,
+                        "emailAdress": "h.huizinga@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "06-12345678",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 5,
+                        "firstName": "Henk",
+                        "lastName": "Tank",
+                        "isActive": true,
+                        "emailAdress": "h.tank@server.com",
+                        "password": "secret",
+                        "phoneNumber": "06 12425495",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    }
+                ])
                 result.forEach((item) => {
                     assert.isTrue(item.isActive);
                 })
@@ -290,6 +405,52 @@ describe('UC-202 Get all users Get /api/user', (done) => {
             .end((req, res) => {
                 res.should.be.a('object');
                 res.status.should.be.equal(200);
+                assert(res.body.result, [
+                    {
+                        "id": 1,
+                        "firstName": "Mariëtte",
+                        "lastName": "van den Dullemen",
+                        "isActive": true,
+                        "emailAdress": "m.vandullemen@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "",
+                        "roles": [
+                            ""
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 3,
+                        "firstName": "Herman",
+                        "lastName": "Huizinga",
+                        "isActive": true,
+                        "emailAdress": "h.huizinga@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "06-12345678",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    },
+                    {
+                        "id": 4,
+                        "firstName": "Marieke",
+                        "lastName": "Van Dam",
+                        "isActive": false,
+                        "emailAdress": "m.vandam@server.nl",
+                        "password": "secret",
+                        "phoneNumber": "06-12345678",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": "",
+                        "city": ""
+                    }
+                ])
                 done();
             })
     })
@@ -371,10 +532,10 @@ describe('UC-204 User details checker', (done) => {
                     Own_meals: [
                         {
                             id: 1,
-                            isActive: 1,
-                            isVega: 0,
-                            isVegan: 0,
-                            isToTakeHome: 1,
+                            isActive: true,
+                            isVega: false,
+                            isVegan: false,
+                            isToTakeHome: true,
                             dateTime: "2022-03-22T17:35:00.000Z",
                             //   dateTime: "2022-03-22T16:35:00.000Z",
                             maxAmountOfParticipants: 4,
@@ -387,7 +548,7 @@ describe('UC-204 User details checker', (done) => {
                             //   updateDate: "2022-04-26T10:33:51.000Z",
                             name: 'Pasta Bolognese met tomaat, spekjes en kaas',
                             description: 'Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!',
-                            allergenes: 'gluten,lactose'
+                            allergenes: ['gluten','lactose']
                         }
                     ]
                 });
@@ -557,7 +718,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
     })
     after((done) => {
         DB.getConnection((err, con) => {
-            con.query('DELETE FROM user WHERE id = 199;', (err, result) => {
+            con.query('DELETE FROM user WHERE emailAdress = "Xin20Wang@outlook.com";', (err, result) => {
                 con.query('ALTER TABLE user AUTO_INCREMENT = 6;', (err, result) => {
                     con.release();
                 });

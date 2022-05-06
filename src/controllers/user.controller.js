@@ -329,12 +329,19 @@ let controller = {
                     results = result;
                 }).then(connect.promise()
                     .query('SELECT * FROM meal WHERE cookId = ?;', [userId])
-                    .then(([result2]) => {
-                        if(results.length > 0){
-                            user = results[0];  
-                            user.isActive = (user.isActive == 1);
+                    .then(([meal]) => {
+                        if (results.length > 0) {
+                            user = results[0];
+                            user.isActive = intToBoolean(user.isActive);
                             user.roles = user.roles.split(",");
-                            user.Own_meals = result2;
+                            meal.forEach(meal => {
+                                meal.isActive = intToBoolean(meal.isActive);
+                                meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
+                                meal.isVega = intToBoolean(meal.isVega);
+                                meal.isVegan = intToBoolean(meal.isVegan);
+                                meal.allergenes = meal.allergenes.split(",");
+                            });
+                            user.Own_meals = meal;
                             console.log(user);
                             res.status(202).json({
                                 status: 202,
@@ -420,4 +427,7 @@ let controller = {
     }
 }
 
+function intToBoolean(int){
+    return (int == 1);
+}
 module.exports = controller;
