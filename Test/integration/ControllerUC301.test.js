@@ -466,7 +466,7 @@ describe('UC-304 get meal details.', (done) => {
     })
  //LET OP op de github-action integratietesten voldoet alleen deze test als de createDate, updateDate en datetime 1 uur later vermeld staat. 
                 //De test slaagt dus op localhost niet.
-    it.skip('TC-304-2 Meal exist, returns meal', (done) => {
+    it('TC-304-2 Meal exist, returns meal', (done) => {
         let id = 5;
         chai.request(server)
             .get('/api/meal/' + id)
@@ -475,10 +475,10 @@ describe('UC-304 get meal details.', (done) => {
         
                 assert.deepEqual(res.body.result, {
                     id: 5,
-                    isActive: 1,
-                    isVega: 1,
-                    isVegan: 0,
-                    isToTakeHome: 1,
+                    isActive: true,
+                    isVega: true,
+                    isVegan: false,
+                    isToTakeHome: true,
                     //Slaagt in integratie testen github action, maar niet op localhost3030
                     //dateTime: "2022-03-26T20:24:46.000Z",
                     dateTime: "2022-03-26T21:24:46.000Z",
@@ -497,14 +497,31 @@ describe('UC-304 get meal details.', (done) => {
                       id: 3,
                       firstName: 'Herman',
                       lastName: 'Huizinga',
-                      isActive: 1,
+                      isActive: true,
                       emailAdress: 'h.huizinga@server.nl',
                       password: 'secret',
                       phoneNumber: '06-12345678',
-                      roles: 'editor,guest',
+                      roles: ['editor','guest'],
                       street: '',
                       city: ''
-                    }
+                    },
+                    participants: [
+                            {
+                              city: "",
+                              emailAdress: "m.vandam@server.nl",
+                              firstName: "Marieke",
+                              id: 4,
+                              isActive: false,
+                              lastName: "Van Dam",
+                              password: "secret",
+                              phoneNumber: "06-12345678",
+                              roles: [
+                                "editor",
+                                "guest"
+                              ],
+                              street: ""
+                            }
+                          ]
                   })
                 done();
             })

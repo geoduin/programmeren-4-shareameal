@@ -43,28 +43,93 @@ let controller = {
         })
     }
     ,
-    testDateDB: (req, res) => {
-        DBConnection.getConnection((err, con) => {
-            con
-                .promise()
-                .query('SELECT * FROM user;', [req.params.id])
-                .then(([rows, fields]) => {
-                    console.log(rows);
-                }).then(() => {
-                    con
+    testDateDB: (req, res, next) => {
+        const currentId = parseInt(req.params.mealId);
+        let meal = null;
+        let participants = null;
+        let cook = null;
+        let hasMeals = null;
+        DBConnection.getConnection((err, connect) => {
+            connect.promise()
+                .query('SELECT * FROM user WHERE id IN (SELECT userId FROM meal_participants_user WHERE mealId = ?);', [currentId])
+                .then(([ParticipantResults]) => {
+                    console.log('Participants')
+                    console.log(ParticipantResults);
+                    //Assign participants to participant attribute
+                    participants = ParticipantResults;
+                    participants.forEach(user => {
+                        user.roles = user.roles.split(",");
+                        user.isActive = (user.isActive == 1);
+                    });
+                }).then(connect
+                    .promise()
+                    .query('SELECT * FROM meal WHERE id = ?;', [currentId])
+                    .then(([mealResult]) => {
+                        console.log('Meal=')
+                        console.log(mealResult);
+                        //Assign meal object to meal
+                        meal = mealResult[0];
+                        hasMeals = (mealResult.length > 0);
+                    }).then(connect
                         .promise()
-                        .query('SELECT * FROM meal')
-                        .then(([rows2, fields2]) => {
-                            console.log(rows2[0]);
-                            res.status(200).json({
-                                status: 200,
-                                phoneResult: 'Yes'
-                            })
-                        })
-                }).finally(() => {
-                    con.release();
-                })
+                        .query('SELECT * FROM user WHERE id IN (SELECT cookId FROM meal WHERE id = ?);', [currentId])
+                        .then(([cookResult]) => {
+                            console.log('Cook==')
+                            console.log(cookResult[0])
+                            cook = cookResult[0];
+                            if(hasMeals){
+                                meal.isActive = (meal.isActive == 1);
+                                meal.isVega = (meal.isVega == 1);
+                                meal.isVegan = (meal.isVegan == 1);
+                                meal.isToTakeHome =(meal.isToTakeHome == 1);
+                                meal.allergenes = meal.allergenes.split(",");
+                                cook.roles = cook.roles.split(",");
+                                cook.isActive = (cook.isActive == 1);
+                                delete meal.cookId;
+                                meal.cook = cook;
+                                meal.participants = participants;
+                            
+                                res.status(200).json({
+                                    status: 200,
+                                    result: meal
+                                })
+                            } else{
+                                const err = {
+                                    status: 404,
+                                    result: "Meal does not exist"
+                                }
+                                
+                                next(err);
+                            }
+                        }).finally(()=>{
+                            connect.release();
+                            console.log('Einde')
+                        })))
         })
+        
+        
+        
+        // DBConnection.getConnection((err, con) => {
+        //     con
+        //         .promise()
+        //         .query('SELECT * FROM user;', [req.params.id])
+        //         .then(([rows, fields]) => {
+        //             console.log(rows);
+        //         }).then(() => {
+        //             con
+        //                 .promise()
+        //                 .query('SELECT * FROM meal')
+        //                 .then(([rows2, fields2]) => {
+        //                     console.log(rows2[0]);
+        //                     res.status(200).json({
+        //                         status: 200,
+        //                         phoneResult: 'Yes'
+        //                     })
+        //                 })
+        //         }).finally(() => {
+        //             con.release();
+        //         })
+        // })
     }
     ,
     checkLogin: (req, res, next) => {
@@ -321,12 +386,19 @@ let controller = {
                     results = result;
                 }).then(connect.promise()
                     .query('SELECT * FROM meal WHERE cookId = ?;', [userId])
-                    .then(([result2]) => {
+                    .then(([meal]) => {
                         if(results.length > 0){
                             user = results[0];  
-                            user.isActive = (user.isActive == 1);
+                            user.isActive = intToBoolean(user.isActive);
                             user.roles = user.roles.split(",");
-                            user.Own_meals = result2;
+                            meal.forEach(meal => {
+                                meal.isActive = intToBoolean(meal.isActive);
+                                meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
+                                meal.isVega = intToBoolean(meal.isVega);
+                                meal.isVegan = intToBoolean(meal.isVegan);
+                                meal.allergenes = meal.allergenes.split(",");
+                            });
+                            user.Own_meals = meal;
                             console.log(user);
                             res.status(202).json({
                                 status: 202,
@@ -412,4 +484,7 @@ let controller = {
     }
 }
 
+function intToBoolean(int){
+    return (int == 1);
+}
 module.exports = controller;

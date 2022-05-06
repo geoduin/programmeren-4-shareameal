@@ -191,8 +191,9 @@ describe('UC-201 Create new User POST /api/user', (done) => {
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, result, user } = res.body;
-                status.should.be.equals(200);
                 result.should.be.a('string').that.equals('User has been registered.');
+                status.should.be.equals(200);
+                
                 //Token test will be tested in the future
                 done();
             })
@@ -201,11 +202,9 @@ describe('UC-201 Create new User POST /api/user', (done) => {
         after((done) => {
             DB.getConnection((err, con) => {
                 if (err) { throw err };
-                con.query("DELETE FROM user WHERE emailAdress = 'Wessel@outlook.com';", (error, result, field) => {
-                    con.query("DELETE FROM user WHERE emailAdress = 'ArezoStanistan@outlook.com';", (error, result, field) => {
-                        con.query("ALTER TABLE user AUTO_INCREMENT = 8;", (error, result, field) => {
-                            con.release();
-                        })
+                con.query("DELETE FROM user WHERE emailAdress = 'Wessel@outlook.com' OR emailAdress = 'ArezoStanistan@outlook.com';", (error, result, field) => {
+                    con.query("ALTER TABLE user AUTO_INCREMENT = 8;", (error, result, field) => {
+                        con.release();
                     })
                 })
             })
@@ -299,7 +298,7 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
     it('TC-203-1 Invalid token', (done) => {
         chai.request(server)
             .get('/api/user/profile')
-            .send({id: 0})
+            .send({ id: 0 })
             .end((req, res) => {
                 let { result, status } = res.body;
                 status.should.be.equal(401);
@@ -310,7 +309,7 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
     it('TC-203-2 valid token and existing users', (done) => {
         chai.request(server)
             .get('/api/user/profile')
-            .send({id: 0})
+            .send({ id: 0 })
             .end((req, res) => {
                 let { result, status } = res.body;
                 status.should.be.equal(401);
@@ -324,21 +323,21 @@ describe('UC-204 User details checker', (done) => {
     it('TC-204-1 Invalid token', (done) => {
         let id = 99;
         chai.request(server).get('/api/user/' + id)
-        .end((req, res) => {
-            res.should.be.a('object');
-            let { status, result, note } = res.body;
-            status.should.be.equal(404);
-            result.should.be.equal('Invalid token');
-            note.should.be.equal('Token implementation has not been implemented. It is in process');
-            done();
-        })
+            .end((req, res) => {
+                res.should.be.a('object');
+                let { status, result, note } = res.body;
+                status.should.be.equal(404);
+                result.should.be.equal('Invalid token');
+                note.should.be.equal('Token implementation has not been implemented. It is in process');
+                done();
+            })
     })
 
     it('TC-204-2 User does not exist', (done) => {
         let id = 99;
         chai.request(server)
             .get('/api/user/' + id)
-            .send({id:1})
+            .send({ id: 1 })
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, result } = res.body;
@@ -351,7 +350,7 @@ describe('UC-204 User details checker', (done) => {
         let userid = 1;
         chai.request(server)
             .get('/api/user/' + userid)
-            .send({id:1})
+            .send({ id: 1 })
             .end((err, res) => {
                 res.should.be.a('object');
                 let { status, result, user } = res.body;
@@ -361,13 +360,32 @@ describe('UC-204 User details checker', (done) => {
                     id: 1,
                     firstName: 'Mariëtte',
                     lastName: 'van den Dullemen',
-                    isActive: 1,
+                    isActive: true,
                     emailAdress: 'm.vandullemen@server.nl',
                     password: 'secret',
                     phoneNumber: '',
-                    roles: '',
+                    roles: [''],
                     street: '',
-                    city: ''
+                    city: '',
+                    Own_meals: [
+                        {
+                            allergenes: ["gluten", "lactose"],
+                            cookId: 1,
+                            createDate: "2022-02-26T18:12:40.048Z",
+                            dateTime: "2022-03-22T17:35:00.000Z",
+                            description: "Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!",
+                            id: 1,
+                            imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
+                            isActive: true,
+                            isToTakeHome: true,
+                            isVega: false,
+                            isVegan: false,
+                            maxAmountOfParticipants: 4,
+                            name: "Pasta Bolognese met tomaat, spekjes en kaas",
+                            price: "12.75",
+                            updateDate: "2022-04-26T12:33:51.000Z"
+                        }
+                    ]
                 });
                 done();
             })
@@ -416,7 +434,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
         chai.request(server)
             .put('/api/user/' + id)
             .send({
-                id:199,
+                id: 199,
                 user: {
                     id: 199,
                     firstName: "Xon",
@@ -524,7 +542,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     emailAdress: "Xin20Wang@outlook.com",
                     password: "Password111",
                     isActive: true,
-                    roles:["editor","guest"],
+                    roles: ["editor", "guest"],
                     phoneNumber: "06 123456789"
                 })
                 done();
@@ -532,8 +550,8 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
     })
     after((done) => {
         DB.getConnection((err, con) => {
-            con.query('DELETE FROM user WHERE id = 199;', (err, result) => {
-                con.query('ALTER TABLE user AUTO_INCREMENT = 6;', (err, result)=>{
+            con.query("DELETE FROM user WHERE emailAdress = 'Xin20Wang@outlook.com';", (err, result) => {
+                con.query('ALTER TABLE user AUTO_INCREMENT = 6;', (err, result) => {
                     con.release();
                 });
                 console.log(result);
