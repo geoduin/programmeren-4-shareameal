@@ -299,7 +299,7 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
     it('TC-203-1 Invalid token', (done) => {
         chai.request(server)
             .get('/api/user/profile')
-            .send({id: 0})
+            .send({ id: 0 })
             .end((req, res) => {
                 let { result, status } = res.body;
                 status.should.be.equal(401);
@@ -310,7 +310,7 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
     it('TC-203-2 valid token and existing users', (done) => {
         chai.request(server)
             .get('/api/user/profile')
-            .send({id: 0})
+            .send({ id: 0 })
             .end((req, res) => {
                 let { result, status } = res.body;
                 status.should.be.equal(401);
@@ -324,14 +324,14 @@ describe('UC-204 User details checker', (done) => {
     it.skip('TC-204-1 Invalid token', (done) => {
         let id = 99;
         chai.request(server).get('/api/user/' + id)
-        .end((req, res) => {
-            res.should.be.a('object');
-            let { status, result, note } = res.body;
-            status.should.be.equal(404);
-            result.should.be.equal('Invalid token');
-            note.should.be.equal('Token implementation has not been implemented. It is in process');
-            done();
-        })
+            .end((req, res) => {
+                res.should.be.a('object');
+                let { status, result, note } = res.body;
+                status.should.be.equal(404);
+                result.should.be.equal('Invalid token');
+                note.should.be.equal('Token implementation has not been implemented. It is in process');
+                done();
+            })
     })
 
     it('TC-204-2 User does not exist', (done) => {
@@ -351,7 +351,7 @@ describe('UC-204 User details checker', (done) => {
         let userid = 1;
         chai.request(server)
             .get('/api/user/' + userid)
-            .send({id:1})
+            .send({ id: 1 })
             .end((err, res) => {
                 res.should.be.a('object');
                 let { status, result, user } = res.body;
@@ -370,23 +370,26 @@ describe('UC-204 User details checker', (done) => {
                     city: '',
                     Own_meals: [
                         {
-                          id: 1,
-                          isActive: 1,
-                          isVega: 0,
-                          isVegan: 0,
-                          isToTakeHome: 1,
-                          dateTime: "2022-03-22T16:35:00.000Z",
-                          maxAmountOfParticipants: 4,
-                          price: '12.75',
-                          imageUrl: 'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
-                          cookId: 1,
-                          createDate: "2022-02-26T17:12:40.048Z",
-                          updateDate: "2022-04-26T10:33:51.000Z",
-                          name: 'Pasta Bolognese met tomaat, spekjes en kaas',
-                          description: 'Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!',
-                          allergenes: 'gluten,lactose'
+                            id: 1,
+                            isActive: 1,
+                            isVega: 0,
+                            isVegan: 0,
+                            isToTakeHome: 1,
+                            dateTime: "2022-03-22T17:35:00.000Z",
+                            //   dateTime: "2022-03-22T16:35:00.000Z",
+                            maxAmountOfParticipants: 4,
+                            price: '12.75',
+                            imageUrl: 'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
+                            cookId: 1,
+                            createDate: "2022-02-26T18:12:40.048Z",
+                            updateDate: "2022-04-26T12:33:51.000Z",
+                            //   createDate: "2022-02-26T17:12:40.048Z",
+                            //   updateDate: "2022-04-26T10:33:51.000Z",
+                            name: 'Pasta Bolognese met tomaat, spekjes en kaas',
+                            description: 'Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!',
+                            allergenes: 'gluten,lactose'
                         }
-                      ]
+                    ]
                 });
                 done();
             })
@@ -435,7 +438,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
         chai.request(server)
             .put('/api/user/' + id)
             .send({
-                id:199,
+                id: 199,
                 user: {
                     id: 199,
                     firstName: "Xon",
@@ -546,7 +549,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     emailAdress: "Xin20Wang@outlook.com",
                     password: "Password111",
                     isActive: true,
-                    roles:["editor","guest"],
+                    roles: ["editor", "guest"],
                     phoneNumber: "06 123456789"
                 })
                 done();
@@ -555,7 +558,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
     after((done) => {
         DB.getConnection((err, con) => {
             con.query('DELETE FROM user WHERE id = 199;', (err, result) => {
-                con.query('ALTER TABLE user AUTO_INCREMENT = 6;', (err, result)=>{
+                con.query('ALTER TABLE user AUTO_INCREMENT = 6;', (err, result) => {
                     con.release();
                 });
                 console.log(result);
@@ -615,7 +618,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
         chai.request(server)
             .delete('/api/user/' + id)
             //Placeholder method
-            .send({id: 200})
+            .send({ id: 200 })
             .end((req, res) => {
                 let { status, result } = res.body;
                 status.should.be.equal(200);

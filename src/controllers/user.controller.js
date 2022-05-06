@@ -318,23 +318,6 @@ let controller = {
     ,
     //UC-204 Retrieves user, based on userId
     retrieveUserById: (req, res) => {
-        const userId = req.params.userId;
-        console.log(`User met ID ${userId} gezocht`);
-        DBConnection.getConnection((err, connection) => {
-            connection.promise().query('SELECT * FROM user WHERE id = ?', [userId])
-                .then(([result]) => {
-                    console.log(`Length of result is ${result.length}`);
-                    console.log(result[0])
-                    if (result.length != 0) {
-                        
-                    } else {
-                        
-                    }
-                }).finally(() => {
-                    connection.release();
-                })
-        })
-
         let user = null;
         let results = null;
         DBConnection.getConnection((error, connect) => {
