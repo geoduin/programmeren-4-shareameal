@@ -318,6 +318,7 @@ let controller = {
     ,
     //UC-204 Retrieves user, based on userId
     retrieveUserById: (req, res) => {
+        const userId = req.params.userId;
         let user = null;
         let results = null;
         DBConnection.getConnection((error, connect) => {
