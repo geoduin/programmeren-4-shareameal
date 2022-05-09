@@ -14,7 +14,8 @@ UserRouter.get("/", (req, res) => {
 //Note: I assume the attributes firstname, lastname, city, street, email and password are mandetory.
 //Thus there are no default values for thes attributes
 UserRouter.post("/api/user", 
-UserController.validateUserRegistration, 
+UserController.validateUserRegistration,
+UserController.checkUserExistence, 
 UserController.createUser);
 
 //UC-202 Retrieves all users

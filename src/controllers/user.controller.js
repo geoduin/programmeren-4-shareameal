@@ -213,6 +213,26 @@ let controller = {
 
     }
     ,
+    checkUserExistence:(req, res, next) => {
+        const userEmail = req.body.email;
+        DBConnection.getConnection((err, con)=>{
+            con.promise()
+            .query('SELECT COUNT(*) AS amount FROM user WHERE emailAdress = ?;', [userEmail])
+            .then(([result]) => {
+                if(result[0].amount == 0){
+                    next();
+                } else {
+                    res.status(401).json({
+                        status: 401,
+                        result: "Email has been taken"
+                    })
+                }
+            }).finally(()=>{
+                con.release();
+            })
+        })
+    }
+    ,
     validateUserRegistration: (req, res, next) => {
         let User = req.body;
         let { firstName, lastName, street, city, email, password, phoneNumber } = User;
@@ -272,9 +292,8 @@ let controller = {
                 .query(
                     'INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
                     [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.email, user.password])
-                .then(() => {
-                    connect.promise()
-                        .query('SELECT * FROM user WHERE emailAdress = ?', [user.email])
+                .then(connect.promise()
+                        .query('SELECT * FROM user WHERE emailAdress = ?;', [user.email])
                         .then(([results]) => {
                             console.log(`User with ${user.email} has been found.`);
                             //Token generation in development
@@ -287,14 +306,7 @@ let controller = {
                         }).finally(()=>{
                             connect.release();
                         })
-                }).catch(err => {
-                    console.log(err);
-                    connect.release();
-                    res.status(401).json({
-                        status: 401,
-                        result: "Email has been taken"
-                    })
-                })
+                )
         })
     }
     ,
