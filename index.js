@@ -62,7 +62,7 @@ app.all("*", (req, res, next) => {
 app.get("/", (req, res) => {
   res.status(200).json({
     status: 200,
-    result: "Hello World",
+    result: "API van Xin X. Wang 2154458, 9 mei 2022",
   });
 });
 
