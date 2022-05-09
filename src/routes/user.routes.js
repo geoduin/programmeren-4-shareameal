@@ -7,7 +7,7 @@ const UserController = require('../controllers/user.controller');
 UserRouter.get("/", (req, res) => {
     res.status(200).json({
         status: 200,
-        result: "Hello World",
+        result: "API van Xin X. Wang 2154458",
     });
 });
 //UC-201 Creates user. 
