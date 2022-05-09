@@ -75,7 +75,7 @@ let controller = {
         console.log(req.params.mealId);
         let id = parseInt(req.params.mealId);
         DB.getConnection((err, con) => {
-            if(err){ throw err};
+            if (err) { throw err };
             con.query('SELECT cookId FROM meal WHERE id = ?;', [id], (error, result, field) => {
                 console.log('Result is:')
                 console.log(result);
@@ -182,29 +182,51 @@ let controller = {
     //UC-303
     getAllMeals: (req, res) => {
         //Query to collect all meals from database.
+        let meals = null;
+        let mealOne = null;
         DB.getConnection((error, connection) => {
             if (error) { throw error };
             const query = "SELECT * FROM meal;"
-            connection.query(query, (err, result, fields) => {
-                if (err) { throw err };
-
-                for (const element of result) {
-                    let meal = element;
-                    if (meal.allergenes != null) {
-                        if (meal.allergenes.length > 0) {
-                            meal.allergenes = meal.allergenes.split(",");
+            connection.promise()
+                .query(query)
+                .then(([rows]) => {
+                    mealOne = rows;
+                    for (const element of mealOne) {
+                        let meal = element;
+                        if (meal.allergenes != null) {
+                            if (meal.allergenes.length > 0) {
+                                meal.allergenes = meal.allergenes.split(",");
+                            }
                         }
                     }
-                }
-                connection.release();
-                //How to get participants
-                //How to get cook?
-                res.status(200).json({
-                    status: 200,
-                    amount: result.length,
-                    result: result
-                })
-            })
+                }).then(connection.promise()
+                    .query('SELECT * FROM meal_participants_user INNER JOIN user ON meal_participants_user.userId = user.id ORDER BY meal_participants_user.mealId ASC;')
+                    .then(([result]) => {
+                        console.log('SELECT * FROM meal_participants_user INNER JOIN user ON meal_participants_user.userId = user.id ORDER BY meal_participants_user.mealId ASC;');
+                        console.log(result)
+                        connection.release();
+                        //How to get cook?
+
+                        mealOne.forEach(meal => {
+                            let participants = [];
+                            result.forEach(user => {
+                                console.log(user.mealId);
+                                if(user.mealId == meal.id){
+                                    console.log(`Meal with id ${meal.id} got user with mealId: ${user.mealId}`);
+                                    delete user.mealId;
+                                    delete user.userId;
+                                    participants.push(user);
+                                }
+                            });
+                            meal.participants = participants;
+                        });
+                        res.status(200).json({
+                            status: 200,
+                            amount: mealOne.length,
+                            result: mealOne
+                        })
+                    })
+                )
         })
 
 
@@ -245,11 +267,11 @@ let controller = {
                             console.log('Cook==')
                             console.log(cookResult[0])
                             cook = cookResult[0];
-                            if(hasMeals){
+                            if (hasMeals) {
                                 meal.isActive = (meal.isActive == 1);
                                 meal.isVega = (meal.isVega == 1);
                                 meal.isVegan = (meal.isVegan == 1);
-                                meal.isToTakeHome =(meal.isToTakeHome == 1);
+                                meal.isToTakeHome = (meal.isToTakeHome == 1);
                                 meal.allergenes = meal.allergenes.split(",");
                                 cook.roles = cook.roles.split(",");
                                 cook.isActive = (cook.isActive == 1);
@@ -260,19 +282,19 @@ let controller = {
                                     status: 200,
                                     result: meal
                                 })
-                            } else{
+                            } else {
                                 const err = {
                                     status: 404,
                                     result: "Meal does not exist"
                                 }
                                 next(err);
                             }
-                        }).finally(()=>{
+                        }).finally(() => {
                             connect.release();
                             console.log('Einde')
                         })))
         })
-        
+
     },
 
 
