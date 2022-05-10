@@ -186,40 +186,45 @@ let controller = {
         let mealOne = null;
         DB.getConnection((error, connection) => {
             if (error) { throw error };
-            const query = "SELECT * FROM meal;"
+            const query = "SELECT meal.id, meal.isActive, meal.isVega, meal.isVegan, meal.isToTakeHome, meal.dateTime, meal.maxAmountOfParticipants, meal.price, meal.imageUrl, meal.createDate, meal.updateDate, meal.name, meal.description, meal.allergenes, JSON_OBJECT('id', meal.cookId, 'firstName', user.firstName, 'lastName', user.lastName, 'isActive', user.isActive, 'emailAdress', user.emailAdress, 'roles', user.roles, 'phoneNumber', user.phoneNumber, 'city', user.city, 'street', user.street) AS cook FROM meal JOIN user ON user.id = meal.cookId;"
             connection.promise()
                 .query(query)
                 .then(([rows]) => {
                     mealOne = rows;
-                    for (const element of mealOne) {
-                        let meal = element;
-                        if (meal.allergenes != null) {
-                            if (meal.allergenes.length > 0) {
-                                meal.allergenes = meal.allergenes.split(",");
-                            }
-                        }
-                    }
                 }).then(connection.promise()
-                    .query('SELECT * FROM meal_participants_user INNER JOIN user ON meal_participants_user.userId = user.id ORDER BY meal_participants_user.mealId ASC;')
-                    .then(([result]) => {
-                        console.log('SELECT * FROM meal_participants_user INNER JOIN user ON meal_participants_user.userId = user.id ORDER BY meal_participants_user.mealId ASC;');
-                        console.log(result)
+                    .query('SELECT * FROM user JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);')
+                    .then(([result, fields]) => {
+                        console.log(`Length of result: ${result}`)
+                        console.log(result);
                         connection.release();
-                        //How to get cook?
-
-                        mealOne.forEach(meal => {
+                        for (const element of mealOne) {
+                            let meal = element;
                             let participants = [];
+                            meal.cook = JSON.parse(meal.cook);
+                            meal.cook.isActive = intToBoolean(meal.cook.isActive);
+                            meal.cook.roles = meal.cook.roles.split(",");
+                            meal.isActive = intToBoolean(meal.isActive);
+                            meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
+                            meal.isVega = intToBoolean(meal.isVega);
+                            meal.isVegan = intToBoolean(meal.isVegan);
+                            if (meal.allergenes != null) {
+                                if (meal.allergenes.length > 0) {
+                                    meal.allergenes = meal.allergenes.split(",");
+                                }
+                            }
                             result.forEach(user => {
                                 console.log(user.mealId);
-                                if(user.mealId == meal.id){
+                                if (user.mealId == meal.id) {
                                     console.log(`Meal with id ${meal.id} got user with mealId: ${user.mealId}`);
+                                    user.isActive = intToBoolean(user.isActive);
                                     delete user.mealId;
                                     delete user.userId;
+                                    delete user.password;
                                     participants.push(user);
                                 }
                             });
                             meal.participants = participants;
-                        });
+                        }
                         res.status(200).json({
                             status: 200,
                             amount: mealOne.length,

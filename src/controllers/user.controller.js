@@ -45,17 +45,16 @@ let controller = {
     ,
     testDateDB: (req, res, next) => {
         DBConnection.getConnection((err, con) => {
-            con.promise()
-                .query("SELECT id, roles, firstName, lastName,isActive, emailAdress, phoneNumber, street, city, mealId FROM user JOIN meal_participants_user ON meal_participants_user.userId = user.id;")
-                .then(([rows, fields]) => {
-
-                    res.status(200).json({
-                        status: 200,
-                        result: rows
-                    })
-                }).finally(() => {
-                    con.release();
+            con.query('SELECT * FROM user INNER JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);', (err, resu, fied)=>{
+                console.log("Length of resultset")
+                console.log('SELECT COUNT(*) AS answer FROM user INNER JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);');
+                console.log(resu);
+                con.release();
+                res.status(200).json({
+                    status: 200,
+                    result: resu
                 })
+            })  
         })
     }
     ,
@@ -339,8 +338,8 @@ let controller = {
                             });
                             user.Own_meals = meal;
                             console.log(user);
-                            res.status(202).json({
-                                status: 202,
+                            res.status(200).json({
+                                status: 200,
                                 result: `User with id: ${userId} found`,
                                 user: user
                             })
