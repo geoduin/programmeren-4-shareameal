@@ -72,8 +72,7 @@ let controller = {
         }
     },
 
-    //Assists UC-205, Note: The functional design document has stated that the response code for non-existent users when updating a user is 400. 
-    //Unlike that of the response code for non-existent users of UC-206, which is 404. That is why their is two similiar methods of validating user existence
+    //Assists UC-205, 
     checkUserExistenceAndOwnership: (req, res, next) => {
         const userId = parseInt(req.params.userId);
         //Id of user performing the update
@@ -123,7 +122,7 @@ let controller = {
                     let err = null;
                     if (error.message == 'User does not exist') {
                         err = {
-                            status: 404,
+                            status: 400,
                             result: error.message
                         }
                     } else {
@@ -139,6 +138,7 @@ let controller = {
 
     }
     ,
+    //Assists UC-201
     checkUserExistence: (req, res, next) => {
         const userEmail = req.body.email;
         DBConnection.getConnection((err, con) => {
@@ -148,8 +148,8 @@ let controller = {
                     if (result[0].amount == 0) {
                         next();
                     } else {
-                        res.status(401).json({
-                            status: 401,
+                        res.status(409).json({
+                            status: 409,
                             result: "Email has been taken"
                         })
                     }
@@ -159,6 +159,7 @@ let controller = {
         })
     }
     ,
+    //Assists UC-201
     validateUserRegistration: (req, res, next) => {
         let User = req.body;
         let { firstName, lastName, street, city, email, password, phoneNumber } = User;
@@ -184,6 +185,7 @@ let controller = {
             next(error);
         }
     },
+    //Assists UC-205
     validateUserPost: (req, res, next) => {
         let User = req.body.user;
         console.log(User);
@@ -225,14 +227,20 @@ let controller = {
                         //Token generation in development
                         console.log(results[0]);
                         res.status(200).json({
-                            status: 200,
+                            status: 201,
                             result: `User has been registered.`,
                             user: results[0]
                         })
                     }).finally(() => {
                         connect.release();
                     })
-                )
+                ).catch(err => {
+                    res.status(409).json({
+                        status: 409,
+                        result: "Email has been taken"
+                    })
+                    connect.release();
+                })
         })
     }
     ,
@@ -371,8 +379,8 @@ let controller = {
                 .then(([result]) => {
                     console.log(`Affected rows UPDATE: ${result.affectedRows}`);
                     if (result.affectedRows == 0) {
-                        res.status(404).json({
-                            status: 404,
+                        res.status(400).json({
+                            status: 400,
                             result: `Update has failed. Id: ${id} does not exist.`
                         })
                     } else {
