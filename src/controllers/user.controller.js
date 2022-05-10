@@ -140,7 +140,7 @@ let controller = {
                     let err = null;
                     if (error.message == 'User does not exist') {
                         err = {
-                            status: 404,
+                            status: 400,
                             result: error.message
                         }
                     } else {
@@ -222,8 +222,8 @@ let controller = {
                             console.log(`User with ${user.email} has been found.`);
                             //Token generation in development
                             console.log(results[0]);
-                            res.status(200).json({
-                                status: 200,
+                            res.status(201).json({
+                                status: 201,
                                 result: `User has been registered.`,
                                 user: results[0]
                             })
@@ -233,8 +233,8 @@ let controller = {
                 }).catch(err => {
                     console.log(err);
                     connect.release();
-                    res.status(401).json({
-                        status: 401,
+                    res.status(409).json({
+                        status: 409,
                         result: "Email has been taken"
                     })
                 })
@@ -343,8 +343,8 @@ let controller = {
                             });
                             user.Own_meals = meal;
                             console.log(user);
-                            res.status(202).json({
-                                status: 202,
+                            res.status(200).json({
+                                status: 200,
                                 result: `User with id: ${userId} found`,
                                 user: user
                             })
@@ -415,8 +415,8 @@ let controller = {
                             CurrentUsers: dataSet.userData
                         })
                     } else {
-                        res.status(404).json({
-                            status: 404,
+                        res.status(400).json({
+                            status: 400,
                             result: `Removal has failed. Id ${iD} has either been removed or does not exist`
                         })
                     }

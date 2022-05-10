@@ -175,7 +175,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 res.should.be.an('object');
                 let { status, result } = res.body;
                 result.should.be.equals('Email has been taken');
-                status.should.be.equals(401);
+                status.should.be.equals(409);
                 done();
             })
         })
@@ -191,7 +191,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, result, user } = res.body;
-                status.should.be.equals(200);
+                status.should.be.equals(201);
                 result.should.be.a('string').that.equals('User has been registered.');
                 //Token test will be tested in the future
                 done();
@@ -516,7 +516,7 @@ describe('UC-204 User details checker', (done) => {
             .end((err, res) => {
                 res.should.be.a('object');
                 let { status, result, user } = res.body;
-                status.should.be.equal(202);
+                status.should.be.equal(200);
                 result.should.be.equal(`User with id: ${userid} found`);
                 assert.deepEqual(res.body.user, {
                     id: 1,
@@ -747,7 +747,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
             .send({ id: 200 })
             .end((req, res) => {
                 let { status, result } = res.body;
-                status.should.be.equal(404);
+                status.should.be.equal(400);
                 result.should.be.equal('User does not exist');
                 done();
             })
