@@ -26,9 +26,9 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 phoneNumber: "1233455677"
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equals(400);
-                result.should.be.a('string').that.equals('Title must be a string');
+                message.should.be.a('string').that.equals('Title must be a string');
                 done();
             })
         })
@@ -45,9 +45,9 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 phoneNumber: "1233455677"
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equals(400);
-                result.should.be.a('string').that.equals('LastName must be a string');
+                message.should.be.a('string').that.equals('LastName must be a string');
                 done();
             })
         })
@@ -63,9 +63,9 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 phoneNumber: "1233455677"
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equals(400);
-                result.should.be.a('string').that.equals('City must be a string');
+                message.should.be.a('string').that.equals('City must be a string');
                 done();
             })
         })
@@ -81,9 +81,9 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 phoneNumber: "1233455677"
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equals(400);
-                result.should.be.a('string').that.equals('Street must be a string');
+                message.should.be.a('string').that.equals('Street must be a string');
                 done();
             })
         })
@@ -99,9 +99,9 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 phoneNumber: "1233455677"
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equals(400);
-                result.should.be.a('string').that.equals('email must be a string');
+                message.should.be.a('string').that.equals('email must be a string');
                 done();
             })
         })
@@ -116,9 +116,9 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 phoneNumber: "1233455677"
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equals(400);
-                result.should.be.a('string').that.equals('password must be a string');
+                message.should.be.a('string').that.equals('password must be a string');
                 done();
             })
         })
@@ -133,9 +133,9 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 password: "qweqweqweq",
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result, user } = res.body;
+                let { status, message, user } = res.body;
                 status.should.be.equals(400);
-                result.should.be.a('string').that.equals('Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
+                message.should.be.a('string').that.equals('Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
                 //Token test will be tested in the future
                 done();
             })
@@ -153,8 +153,8 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 phoneNumber: "06 789032909"
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result } = res.body;
-                result.should.be.equals('at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
+                let { status, message } = res.body;
+                message.should.be.equals('at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
                 status.should.be.equals(400);
                 done();
             })
@@ -173,8 +173,8 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 phoneNumber: "06 789032909"
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result } = res.body;
-                result.should.be.equals('Email has been taken');
+                let { status, message } = res.body;
+                message.should.be.equals('Email has been taken');
                 status.should.be.equals(409);
                 done();
             })
@@ -190,9 +190,9 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 password: "Erika!23Opa",
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result, user } = res.body;
+                let { status, message, user } = res.body;
                 status.should.be.equals(201);
-                result.should.be.a('string').that.equals('User has been registered.');
+                message.should.be.a('string').that.equals('User has been registered.');
                 //Token test will be tested in the future
                 done();
             })
@@ -462,9 +462,9 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
             .get('/api/user/profile')
             .send({ id: 0 })
             .end((req, res) => {
-                let { result, status } = res.body;
+                let { message, status } = res.body;
                 status.should.be.equal(401);
-                result.should.be.equal('Correct token functionality has not been implemented');
+                message.should.be.equal('Correct token functionality has not been implemented');
                 done();
             })
     })
@@ -473,9 +473,9 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
             .get('/api/user/profile')
             .send({ id: 0 })
             .end((req, res) => {
-                let { result, status } = res.body;
+                let { message, status } = res.body;
                 status.should.be.equal(401);
-                result.should.be.equal('Correct token functionality has not been implemented');
+                message.should.be.equal('Correct token functionality has not been implemented');
                 done();
             })
     })
@@ -502,9 +502,9 @@ describe('UC-204 User details checker', (done) => {
             //.send({id:1})
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equal(404);
-                result.should.be.equal(`User with id: ${id} does not exist. Retrieval has failed.`)
+                message.should.be.equal(`User with id: ${id} does not exist. Retrieval has failed.`)
                 done();
             })
     })
@@ -515,9 +515,9 @@ describe('UC-204 User details checker', (done) => {
             .send({ id: 1 })
             .end((err, res) => {
                 res.should.be.a('object');
-                let { status, result, user } = res.body;
+                let { status, message, user } = res.body;
                 status.should.be.equal(200);
-                result.should.be.equal(`User with id: ${userid} found`);
+                message.should.be.equal(`User with id: ${userid} found`);
                 assert.deepEqual(res.body.user, {
                     id: 1,
                     firstName: 'Mariëtte',
@@ -588,8 +588,9 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                 })
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equal(400);
+                message.should.be.equal('password must be a string');
                 done();
             })
     })
@@ -614,9 +615,9 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             })
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equal(400);
-                result.should.be.equal('Phonenumber must be 9 characters long');
+                message.should.be.equal('Phonenumber must be 9 characters long');
                 done();
             })
     })
@@ -642,9 +643,9 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             })
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equal(400);
-                result.should.be.equal(`User does not exist.`);
+                message.should.be.equal(`User does not exist.`);
                 done();
             })
     })
@@ -698,8 +699,8 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             })
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status, result, updatedUser } = res.body;
-                result.should.be.equal("Succesful transaction");
+                let { status, message, updatedUser } = res.body;
+                message.should.be.equal("Succesful transaction");
                 status.should.be.equal(200);
                 assert.deepEqual(updatedUser, {
                     id: 199,
@@ -746,9 +747,9 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
             .delete('/api/user/' + id)
             .send({ id: 200 })
             .end((req, res) => {
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equal(400);
-                result.should.be.equal('User does not exist');
+                message.should.be.equal('User does not exist');
                 done();
             })
     })
@@ -760,7 +761,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
             //No object send
             .end((req, res) => {
                 res.body.status.should.be.equal(401);
-                res.body.result.should.be.equal('User has not been logged in');
+                res.body.message.should.be.equal('User has not been logged in');
                 done();
             })
     })
@@ -771,6 +772,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
             .send({ id: 201 })
             .end((req, res) => {
                 res.body.status.should.be.equal(401);
+                res.body.message.should.be.equal(`This user does not own user with ID ${id}`);
                 done();
             })
     })
@@ -781,9 +783,9 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
             //Placeholder method
             .send({ id: 200 })
             .end((req, res) => {
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equal(200);
-                result.should.be.equal(`User with user with Id ${id}, has been removed.`);
+                message.should.be.equal(`User with user with Id ${id}, has been removed.`);
                 done();
             })
     })
