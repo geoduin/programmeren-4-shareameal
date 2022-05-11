@@ -28,7 +28,7 @@ UserRouter.get("/api/user/profile",
 //UserController.checkToken, 
 UserController.getProfile);
 
-//UC-204 Retrieves user, based on userId. 
+//UC-204 Retrieves user, based on userId. //
 //Client will send (Later replaced by tokens) 
 //object => { id:(UserId)}
 UserRouter.get("/api/user/:userId",
