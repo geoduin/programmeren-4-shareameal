@@ -96,7 +96,7 @@ let controller = {
     checkUserExistenceAndOwnership: (req, res, next) => {
         console.log('UC-205 Check ownership and existence');
         const userId = parseInt(req.params.userId);
-        //Id of user performing the update
+        //Id of user performing the update/
         const inputUserId = req.body.id;
         console.log(`UserId stated in the path parameters: ${userId}, by Current user ID: ${inputUserId}.`);
 
