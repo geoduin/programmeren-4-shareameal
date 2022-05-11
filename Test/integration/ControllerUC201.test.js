@@ -194,7 +194,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 status.should.be.equals(201);
                 result.should.be.an('object').to.deep.equal(result);
                 //Token test will be tested in the future
-            
+
                 done();
             })
         })
@@ -299,7 +299,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                 let { status, amount, result } = res.body;
                 assert.equal(status, 200);
                 assert.equal(amount, 1);
-                assert.deepEqual(result,[
+                assert.deepEqual(result, [
                     {
                         "id": 4,
                         "firstName": "Marieke",
@@ -315,7 +315,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "street": "",
                         "city": ""
                     }
-                ] )
+                ])
                 result.forEach((item) => {
                     assert.isFalse(item.isActive);
                 })
@@ -549,7 +549,7 @@ describe('UC-204 User details checker', (done) => {
                             //   updateDate: "2022-04-26T10:33:51.000Z",
                             name: 'Pasta Bolognese met tomaat, spekjes en kaas',
                             description: 'Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!',
-                            allergenes: ['gluten','lactose']
+                            allergenes: ['gluten', 'lactose']
                         }
                     ]
                 });
@@ -576,16 +576,13 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             .send(
                 {
                     id: 199,
-                    user: {
-                        id: 199,
-                        firstName: "Xon",
-                        lastName: "Wong",
-                        city: "Rotterdam",
-                        street: "Maskauplein",
-                        emailAdress: "Xin20Wang@outlook.com",
-                        isActive: true,
-                        phoneNumber: "06 1242545"
-                    }
+                    firstName: "Xon",
+                    lastName: "Wong",
+                    city: "Rotterdam",
+                    street: "Maskauplein",
+                    emailAdress: "Xin20Wang@outlook.com",
+                    isActive: true,
+                    phoneNumber: "06 1242545"
                 })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -629,18 +626,14 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             .put('/api/user/' + id)
             .send({
                 id: 0,
-                user: {
-                    id: 0,
-                    firstName: "Xon",
-                    lastName: "Wong",
-                    city: "Rotterdam",
-                    street: "Maskauplein",
-                    emailAdress: "Xin20Wang@outlook.com",
-                    password: "Password111",
-                    isActive: true,
-                    phoneNumber: "06 123456789"
-                }
-
+                firstName: "Xon",
+                lastName: "Wong",
+                city: "Rotterdam",
+                street: "Maskauplein",
+                emailAdress: "Xin20Wang@outlook.com",
+                password: "Password111",
+                isActive: true,
+                phoneNumber: "06 123456789"
             })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -686,17 +679,14 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             .send({
                 //Placeholder object
                 id: 199,
-                user: {
-                    id: 199,
-                    firstName: "Xon",
-                    lastName: "Wong",
-                    city: "Rotterdam",
-                    street: "Maskauplein",
-                    emailAdress: "Xin20Wang@outlook.com",
-                    password: "Password111",
-                    isActive: true,
-                    phoneNumber: "06 123456789"
-                }
+                firstName: "Xon",
+                lastName: "Wong",
+                city: "Rotterdam",
+                street: "Maskauplein",
+                emailAdress: "Xin20Wang@outlook.com",
+                password: "Password111",
+                isActive: true,
+                phoneNumber: "06 123456789"
             })
             .end((req, res) => {
                 res.should.be.a('object');

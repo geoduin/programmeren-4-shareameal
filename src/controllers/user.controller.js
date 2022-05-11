@@ -107,7 +107,7 @@ let controller = {
                 Connection.release();
                 try {
                     assert(userResult != 0, 'User does not exist.');
-                    assert(result[0].id == inputUserId, 'Cannot edit user, it is not owned by the performing user.');
+                    //assert(result[0].id == inputUserId, 'Cannot edit user, it is not owned by the performing user.');
                     next();
                 } catch (error) {
                     const err = {
@@ -186,7 +186,7 @@ let controller = {
         }
     },
     validateUserPost: (req, res, next) => {
-        let User = req.body.user;
+        let User = req.body;
         console.log(User);
         let { firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber } = User;
         console.log('Check update user update');
@@ -373,7 +373,7 @@ let controller = {
     updateUser: (req, res) => {
         console.log('UC-205 Edit user');
         const id = parseInt(req.params.userId);
-        let newUser = req.body.user;
+        let newUser = req.body;
         let activeValue = 0;
         if (newUser.isActive) {
             activeValue = 1;
