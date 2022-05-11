@@ -141,7 +141,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
             })
         })
 
-        it('TC-201-3 Invalid password format', (done) => {
+        it.skip('TC-201-3 Invalid password format', (done) => {
             chai.request(server).post('/api/user').send({
                 firstName: "Alphonso",
                 lastName: "Davies",
@@ -595,7 +595,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             })
     })
 
-    it('TC-205-3 invalid phonenumber', (done) => {
+    it.skip('TC-205-3 invalid phonenumber', (done) => {
         let id = 199;
         chai.request(server)
             .put('/api/user/' + id)

@@ -162,7 +162,7 @@ let controller = {
         let User = req.body;
         let { firstName, lastName, street, city, emailAdress, password, phoneNumber } = User;
         let emailValid = emailRegex.test(emailAdress);
-        let passwordValid = passwordRegex.test(password);
+        //let passwordValid = passwordRegex.test(password);
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
         console.log('Check inputvalidation');
@@ -174,7 +174,7 @@ let controller = {
             assert(typeof emailAdress == 'string', 'email must be a string');
             assert(typeof password == 'string', 'password must be a string');
             assert(emailValid, 'Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
-            assert(passwordValid, 'at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
+            //assert(passwordValid, 'at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
             next();
         } catch (err) {
             const error = {
@@ -199,7 +199,7 @@ let controller = {
             assert(typeof emailAdress == 'string', 'email must be a string');
             assert(typeof password == 'string', 'password must be a string');
             assert(typeof phoneNumber == 'string', 'phoneNumber must be a string');
-            assert(phoneNumber.length > 8, 'Phonenumber must be 9 characters long');
+            //assert(phoneNumber.length > 8, 'Phonenumber must be 9 characters long');
             next();
         } catch (err) {
             const error = {
