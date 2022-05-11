@@ -23,7 +23,7 @@ let controller = {
         } catch (error) {
             const err = {
                 status: 404,
-                result: error.message,
+                message: error.message,
                 note: 'Token implementation has not been implemented. It is in process'
             }
             next(err);
@@ -66,7 +66,7 @@ let controller = {
         } catch (error) {
             const err = {
                 status: 401,
-                result: error.message
+                message: error.message
             }
             next(err);
         }
@@ -90,7 +90,7 @@ let controller = {
                 } catch (error) {
                     const err = {
                         status: 400,
-                        result: error.message,
+                        message: error.message,
                         error_Specific: error
                     }
                     next(err);
@@ -123,12 +123,12 @@ let controller = {
                     if (error.message == 'User does not exist') {
                         err = {
                             status: 400,
-                            result: error.message
+                            message: error.message
                         }
                     } else {
                         err = {
                             status: 401,
-                            result: error.message
+                            message: error.message
                         }
                     }
                     next(err);
@@ -150,7 +150,7 @@ let controller = {
                     } else {
                         res.status(409).json({
                             status: 409,
-                            result: "Email has been taken"
+                            message: "Email has been taken"
                         })
                     }
                 }).finally(() => {
@@ -180,7 +180,7 @@ let controller = {
         } catch (err) {
             const error = {
                 status: 400,
-                result: err.message
+                message: err.message
             };
             next(error);
         }
@@ -206,7 +206,7 @@ let controller = {
         } catch (err) {
             const error = {
                 status: 400,
-                result: err.message
+                message: err.message
             };
             next(error);
         }
@@ -226,9 +226,9 @@ let controller = {
                         console.log(`User with ${user.email} has been found.`);
                         //Token generation in development
                         console.log(results[0]);
-                        res.status(200).json({
+                        res.status(201).json({
                             status: 201,
-                            result: `User has been registered.`,
+                            message: `User has been registered.`,
                             user: results[0]
                         })
                     }).finally(() => {
@@ -237,7 +237,7 @@ let controller = {
                 ).catch(err => {
                     res.status(409).json({
                         status: 409,
-                        result: "Email has been taken"
+                        message: "Email has been taken"
                     })
                     connect.release();
                 })
@@ -315,7 +315,7 @@ let controller = {
         //Token, still empty
         res.status(401).json({
             status: 401,
-            result: "Correct token functionality has not been implemented",
+            message: "Correct token functionality has not been implemented",
         })
     }
     ,
@@ -348,13 +348,13 @@ let controller = {
                             console.log(user);
                             res.status(200).json({
                                 status: 200,
-                                result: `User with id: ${userId} found`,
+                                message: `User with id: ${userId} found`,
                                 user: user
                             })
                         } else {
                             res.status(404).json({
                                 status: 404,
-                                result: `User with id: ${userId} does not exist. Retrieval has failed.`
+                                message: `User with id: ${userId} does not exist. Retrieval has failed.`
                             })
                         }
                     }).then(() => {
@@ -381,7 +381,7 @@ let controller = {
                     if (result.affectedRows == 0) {
                         res.status(400).json({
                             status: 400,
-                            result: `Update has failed. Id: ${id} does not exist.`
+                            message: `Update has failed. Id: ${id} does not exist.`
                         })
                     } else {
                         connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
@@ -391,7 +391,7 @@ let controller = {
                             result2[0].roles = result2[0].roles.split(",")
                             res.status(200).json({
                                 status: 200,
-                                result: "Succesful transaction",
+                                message: "Succesful transaction",
                                 updatedUser: result2[0]
                             })
                         })
@@ -414,13 +414,13 @@ let controller = {
                     if (result.affectedRows > 0) {
                         res.status(200).json({
                             status: 200,
-                            result: `User with user with Id ${iD}, has been removed.`,
+                            message: `User with user with Id ${iD}, has been removed.`,
                             CurrentUsers: dataSet.userData
                         })
                     } else {
                         res.status(404).json({
                             status: 404,
-                            result: `Removal has failed. Id ${iD} has either been removed or does not exist`
+                            message: `Removal has failed. Id ${iD} has either been removed or does not exist`
                         })
                     }
                 }).finally(() => {
