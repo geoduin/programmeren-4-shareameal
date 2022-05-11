@@ -16,6 +16,7 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
 let controller = {
     //As placeholder for the token, will the object with the id function as the Id, Object{id:(id)}/
     checkToken: (req, res, next) => {
+        console.log('Token checker');
         const userObject = req.body.id;
         try {
             assert(typeof userObject == 'number', 'Invalid token')
@@ -76,6 +77,7 @@ let controller = {
     }
     ,
     checkLogin: (req, res, next) => {
+        console.log('Check login');
         const userObject = req.body.id;
         try {
             assert(typeof userObject == 'number', 'User has not been logged in')
@@ -92,6 +94,7 @@ let controller = {
     //Assists UC-205, Note: The functional design document has stated that the response code for non-existent users when updating a user is 400. 
     //Unlike that of the response code for non-existent users of UC-206, which is 404. That is why their is two similiar methods of validating user existence
     checkUserExistenceAndOwnership: (req, res, next) => {
+        console.log('UC-205 Check ownership and existence');
         const userId = parseInt(req.params.userId);
         //Id of user performing the update
         const inputUserId = req.body.id;
@@ -122,6 +125,7 @@ let controller = {
     checkOwnershipUser: (req, res, next) => {
         const userId = parseInt(req.params.userId);
         const inputUserId = req.body.id;
+        console.log('UC-206 Check ownership user and existence');
         console.log(`ID of user is ${userId}.`);
 
         DBConnection.getConnection((err2, Connection) => {
@@ -161,6 +165,7 @@ let controller = {
         let passwordValid = passwordRegex.test(password);
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
+        console.log('Check inputvalidation');
         try {
             assert(typeof firstName == 'string', 'Title must be a string');
             assert(typeof lastName == 'string', 'LastName must be a string');
@@ -183,7 +188,7 @@ let controller = {
         let User = req.body.user;
         console.log(User);
         let { firstName, lastName, street, city, isActive, email, password, phoneNumber } = User;
-
+        console.log('Check update user update');
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
         try {
@@ -206,6 +211,7 @@ let controller = {
     },
     //UC-201 Creates user. 
     createUser: (req, res) => {
+        console.log('UC-201 User creation');
         let user = req.body;
         console.log(user);
         DBConnection.getConnection((err, connect) => {
@@ -243,6 +249,7 @@ let controller = {
     //amount=? query parameters
     //active or inactive query parameters
     getAllUsers: (req, res) => {
+        console.log('UC-202 Retrieval users');
         const active = req.query.isActive;
         const searchTerm = req.query.searchTerm;
         const limit = req.query.amount;
@@ -307,6 +314,7 @@ let controller = {
     //UC-203 Retrieve user profile, based on Token and userID
     //Token functionality has not been developed - in process
     getProfile: (req, res) => {
+        console.log('UC-203 Profile');
         //Token, still empty
         res.status(401).json({
             status: 401,
@@ -316,6 +324,7 @@ let controller = {
     ,
     //UC-204 Retrieves user, based on userId
     retrieveUserById: (req, res) => {
+        console.log('UC-204 Retrieve user');
         const userId = req.params.userId;
         let user = null;
         let results = null;
@@ -360,6 +369,7 @@ let controller = {
     ,
     //UC-205 Edits user.
     updateUser: (req, res) => {
+        console.log('UC-205 Edit user');
         const id = parseInt(req.params.userId);
         let newUser = req.body.user;
         let activeValue = 0;
@@ -399,6 +409,7 @@ let controller = {
     ,
     //UC-206 Deletes user based on id
     deleteUser: (req, res) => {
+        console.log('UC-206 Remove user');
         const iD = req.params.userId
         DBConnection.getConnection((error, conn) => {
             conn.promise()
