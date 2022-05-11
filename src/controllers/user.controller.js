@@ -354,7 +354,7 @@ let controller = {
                             res.status(200).json({
                                 status: 200,
                                 message: `User with id: ${userId} found`,
-                                user: user
+                                result: user
                             })
                         } else {
                             res.status(404).json({

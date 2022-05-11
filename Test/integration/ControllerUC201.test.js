@@ -519,7 +519,7 @@ describe('UC-204 User details checker', (done) => {
                 let { status, message, user } = res.body;
                 status.should.be.equal(200);
                 message.should.be.equal(`User with id: ${userid} found`);
-                assert.deepEqual(res.body.user, {
+                assert.deepEqual(res.body.result, {
                     id: 1,
                     firstName: 'Mariëtte',
                     lastName: 'van den Dullemen',
