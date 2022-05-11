@@ -14,7 +14,7 @@ const phoneRegex = /06|31( {1}|-{1})\d{9}/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
 
 let controller = {
-    //As placeholder for the token, will the object with the id function as the Id, Object{id:(id)}
+    //As placeholder for the token, will the object with the id function as the Id, Object{id:(id)}/
     checkToken: (req, res, next) => {
         const userObject = req.body.id;
         try {
