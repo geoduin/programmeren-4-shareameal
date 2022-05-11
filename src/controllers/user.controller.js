@@ -118,7 +118,7 @@ let controller = {
 
     }
     ,
-    //Assists UC-206
+    //Assists UC-206//
     checkOwnershipUser: (req, res, next) => {
         const userId = parseInt(req.params.userId);
         const inputUserId = req.body.id;
