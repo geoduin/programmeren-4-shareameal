@@ -224,7 +224,7 @@ let controller = {
                             console.log(results[0]);
                             res.status(201).json({
                                 status: 201,
-                                result: `User has been registered.`,
+                                message: `User has been registered.`,
                                 user: results[0]
                             })
                         }).finally(() => {
@@ -235,7 +235,7 @@ let controller = {
                     connect.release();
                     res.status(409).json({
                         status: 409,
-                        result: "Email has been taken"
+                        message: "Email has been taken"
                     })
                 })
         })
@@ -345,7 +345,7 @@ let controller = {
                             console.log(user);
                             res.status(200).json({
                                 status: 200,
-                                result: `User with id: ${userId} found`,
+                                message: `User with id: ${userId} found`,
                                 user: user
                             })
                         } else {
