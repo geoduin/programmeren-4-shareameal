@@ -21,7 +21,7 @@ UserController.createUser);
 UserRouter.get("/api/user", 
 UserController.getAllUsers);
 
-//UC-203 Retrieve user profile, based on Token and userID
+//UC-203 Retrieve user profile, based on Token and userID/
 //Token functionality has not been developed - in process
 //Client will send (Later replaced by tokens) => object = { id:(id)}
 UserRouter.get("/api/user/profile",  
