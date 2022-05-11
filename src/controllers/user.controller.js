@@ -102,6 +102,7 @@ let controller = {
 
         DBConnection.getConnection((error1, Connection) => {
             Connection.query('SELECT id FROM user WHERE id = ?;', [userId], (err1, result, fields) => {
+                if(err1)throw err1;
                 const userResult = result.length;
                 Connection.release();
                 try {
@@ -402,6 +403,8 @@ let controller = {
                             })
                         })
                     }
+                }).catch(err =>{
+                    throw err;
                 }).finally(() => {
                     connection.release();
                 })
