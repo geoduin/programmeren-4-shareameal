@@ -209,7 +209,7 @@ let controller = {
             next(error);
         }
     },
-    //UC-201 Creates user. 
+    //UC-201 Creates user.s 
     createUser: (req, res) => {
         console.log('UC-201 User creation');
         let user = req.body;
