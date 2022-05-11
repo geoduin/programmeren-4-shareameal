@@ -137,7 +137,7 @@ let controller = {
                 try {
                     console.log(aa);
                     assert(aa > 0, 'User does not exist');
-                    assert(result[0].id == inputUserId, `This user does not own user with ID ${userId}`)
+                    //assert(result[0].id == inputUserId, `This user does not own user with ID ${userId}`)
                     next();
                 } catch (error) {
                     let err = null;
@@ -399,7 +399,7 @@ let controller = {
                             res.status(200).json({
                                 status: 200,
                                 message: "Succesful transaction",
-                                updatedUser: result2[0]
+                                result: result2[0]
                             })
                         })
                     }
