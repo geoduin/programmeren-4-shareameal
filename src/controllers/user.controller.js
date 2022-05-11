@@ -160,8 +160,8 @@ let controller = {
     ,
     validateUserRegistration: (req, res, next) => {
         let User = req.body;
-        let { firstName, lastName, street, city, email, password, phoneNumber } = User;
-        let emailValid = emailRegex.test(email);
+        let { firstName, lastName, street, city, emailAdress, password, phoneNumber } = User;
+        let emailValid = emailRegex.test(emailAdress);
         let passwordValid = passwordRegex.test(password);
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
@@ -171,7 +171,7 @@ let controller = {
             assert(typeof lastName == 'string', 'LastName must be a string');
             assert(typeof city == 'string', 'City must be a string');
             assert(typeof street == 'string', 'Street must be a string');
-            assert(typeof email == 'string', 'email must be a string');
+            assert(typeof emailAdress == 'string', 'email must be a string');
             assert(typeof password == 'string', 'password must be a string');
             assert(emailValid, 'Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
             assert(passwordValid, 'at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
@@ -187,7 +187,7 @@ let controller = {
     validateUserPost: (req, res, next) => {
         let User = req.body.user;
         console.log(User);
-        let { firstName, lastName, street, city, isActive, email, password, phoneNumber } = User;
+        let { firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber } = User;
         console.log('Check update user update');
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
@@ -196,7 +196,7 @@ let controller = {
             assert(typeof lastName == 'string', 'LastName must be a string');
             assert(typeof city == 'string', 'City must be a string');
             assert(typeof street == 'string', 'Street must be a string');
-            assert(typeof email == 'string', 'email must be a string');
+            assert(typeof emailAdress == 'string', 'email must be a string');
             assert(typeof password == 'string', 'password must be a string');
             assert(typeof phoneNumber == 'string', 'phoneNumber must be a string');
             assert(phoneNumber.length > 8, 'Phonenumber must be 9 characters long');
@@ -218,7 +218,7 @@ let controller = {
             connect.promise()
                 .query(
                     'INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
-                    [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.email, user.password])
+                    [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.emailAdress, user.password])
                 .then(() => {
                     connect.promise()
                         .query('SELECT * FROM user WHERE emailAdress = ?', [user.email])
@@ -380,7 +380,7 @@ let controller = {
         DBConnection.getConnection((error, connection) => {
             connection.promise()
                 .query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
-                    [newUser.firstName, newUser.lastName, newUser.city, newUser.street, newUser.password, newUser.email, activeValue, newUser.phoneNumber, id])
+                    [newUser.firstName, newUser.lastName, newUser.city, newUser.street, newUser.password, newUser.emailAdress, activeValue, newUser.phoneNumber, id])
                 .then(([result]) => {
                     console.log(`Affected rows UPDATE: ${result.affectedRows}`);
                     if (result.affectedRows == 0) {

@@ -20,7 +20,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 lastName: "Arezo",
                 city: "Montevideo",
                 street: "Straat",
-                email: "DoaeM@outlook.com",
+                emailAdress: "DoaeM@outlook.com",
                 password: "MontevideoFC",
                 isActive: true,
                 phoneNumber: "1233455677"
@@ -39,7 +39,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 firstName: "Matias",
                 city: "Montevideo",
                 street: "Straat",
-                email: "DoaeM@outlook.com",
+                emailAdress: "DoaeM@outlook.com",
                 password: "MontevideoFC",
                 isActive: true,
                 phoneNumber: "1233455677"
@@ -57,7 +57,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 firstName: "Matias",
                 lastName: "Arezo",
                 street: "Straat",
-                email: "DoaeM@outlook.com",
+                emailAdress: "DoaeM@outlook.com",
                 password: "MontevideoFC",
                 isActive: true,
                 phoneNumber: "1233455677"
@@ -75,7 +75,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 firstName: "Matias",
                 lastName: "Arezo",
                 city: "Montevideo",
-                email: "DoaeM@outlook.com",
+                emailAdress: "DoaeM@outlook.com",
                 password: "MontevideoFC",
                 isActive: true,
                 phoneNumber: "1233455677"
@@ -111,7 +111,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 lastName: "Arezo",
                 city: "Montevideo",
                 street: "Straat",
-                email: "DoaeM@outlook.com",
+                emailAdress: "DoaeM@outlook.com",
                 isActive: true,
                 phoneNumber: "1233455677"
             }).end((err, res) => {
@@ -129,7 +129,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 lastName: "Almada",
                 city: "Buenos Aires",
                 street: "Pluebo district uno",
-                email: "@outlook.com",
+                emailAdress: "@outlook.com",
                 password: "qweqweqweq",
             }).end((err, res) => {
                 res.should.be.an('object');
@@ -147,7 +147,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 lastName: "Davies",
                 city: "Ottawa",
                 street: "Cardin avenue",
-                email: "m.vandullemen@server.nl",
+                emailAdress: "m.vandullemen@server.nl",
                 password: "oooooooo",
                 isActive: true,
                 phoneNumber: "06 789032909"
@@ -167,7 +167,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 lastName: "Davies",
                 city: "Ottawa",
                 street: "Cardin avenue",
-                email: "m.vandullemen@server.nl",
+                emailAdress: "m.vandullemen@server.nl",
                 password: "Erika!23Opa",
                 isActive: true,
                 phoneNumber: "06 789032909"
@@ -186,7 +186,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 lastName: "Almada",
                 city: "Buenos Aires",
                 street: "Pluebo district uno",
-                email: "ArezoStanistan@outlook.com",
+                emailAdress: "ArezoStanistan@outlook.com",
                 password: "Erika!23Opa",
             }).end((err, res) => {
                 res.should.be.an('object');
@@ -581,7 +581,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                         lastName: "Wong",
                         city: "Rotterdam",
                         street: "Maskauplein",
-                        email: "Xin20Wang@outlook.com",
+                        emailAdress: "Xin20Wang@outlook.com",
                         isActive: true,
                         phoneNumber: "06 1242545"
                     }
@@ -607,7 +607,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     lastName: "Wong",
                     city: "Rotterdam",
                     street: "Maskauplein",
-                    email: "Xin20Wang@outlook.com",
+                    emailAdress: "Xin20Wang@outlook.com",
                     password: "Password111",
                     isActive: true,
                     phoneNumber: "06 124"
@@ -634,7 +634,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     lastName: "Wong",
                     city: "Rotterdam",
                     street: "Maskauplein",
-                    email: "Xin20Wang@outlook.com",
+                    emailAdress: "Xin20Wang@outlook.com",
                     password: "Password111",
                     isActive: true,
                     phoneNumber: "06 123456789"
@@ -663,7 +663,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     lastName: "Wong",
                     city: "Rotterdam",
                     street: "Maskauplein",
-                    email: "Xin20Wang@outlook.com",
+                    emailAdress: "Xin20Wang@outlook.com",
                     password: "Password111",
                     isActive: true,
                     phoneNumber: "06 123456789"
@@ -691,7 +691,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     lastName: "Wong",
                     city: "Rotterdam",
                     street: "Maskauplein",
-                    email: "Xin20Wang@outlook.com",
+                    emailAdress: "Xin20Wang@outlook.com",
                     password: "Password111",
                     isActive: true,
                     phoneNumber: "06 123456789"
