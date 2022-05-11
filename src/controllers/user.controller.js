@@ -125,9 +125,7 @@ let controller = {
         console.log(`ID of user is ${userId}.`);
 
         DBConnection.getConnection((err2, Connection) => {
-            if (err2) { throw err2 }
             Connection.query('SELECT * FROM user WHERE id = ?;', [userId], (err3, result) => {
-                if (err3) { throw err3 }
                 Connection.release();
                 let aa = result.length;
                 //assert(aa != 0, 'User is not found')
