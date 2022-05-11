@@ -221,15 +221,15 @@ let controller = {
                     [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.emailAdress, user.password])
                 .then(() => {
                     connect.promise()
-                        .query('SELECT * FROM user WHERE emailAdress = ?', [user.email])
+                        .query('SELECT * FROM user WHERE emailAdress = ?', [user.emailAdress])
                         .then(([results]) => {
                             console.log(`User with ${user.email} has been found.`);
                             //Token generation in development
                             console.log(results[0]);
                             res.status(201).json({
                                 status: 201,
-                                message: `User has been registered.`,
-                                user: results[0]
+                                //result: `User has been registered.`,
+                                result: results[0]
                             })
                         }).finally(() => {
                             connect.release();

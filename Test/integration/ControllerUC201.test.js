@@ -190,10 +190,11 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 password: "Erika!23Opa",
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, message, user } = res.body;
+                let { status, result } = res.body;
                 status.should.be.equals(201);
-                message.should.be.a('string').that.equals('User has been registered.');
+                result.should.be.an('object').to.deep.equal(result);
                 //Token test will be tested in the future
+            
                 done();
             })
         })
