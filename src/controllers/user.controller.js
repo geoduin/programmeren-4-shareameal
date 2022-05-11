@@ -226,6 +226,7 @@ let controller = {
                             console.log(`User with ${user.email} has been found.`);
                             //Token generation in development
                             console.log(results[0]);
+                            results[0].isActive = intToBoolean(results[0].isActive);
                             res.status(201).json({
                                 status: 201,
                                 //result: `User has been registered.`,
