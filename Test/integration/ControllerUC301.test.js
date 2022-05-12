@@ -6,6 +6,7 @@ const chaiHttp = require('chai-http');
 const { it } = require('mocha');
 const server = require('../../index');
 const DB = require('../../src/data/dbConnection')
+const tokens = require('../../src/tokens/UserTokens.token');
 
 //Testcases UC-301 to UC-305
 describe('UC-301 add meal to database POST /api/meal', (done) => {

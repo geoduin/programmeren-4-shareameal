@@ -6,16 +6,7 @@ const chaiHttp = require('chai-http');
 const { it } = require('mocha');
 const server = require('../../index');
 const DB = require('../../src/data/dbConnection');
-
-//Tokens user id 1 to 5 expires at july 1th 2022
-const Mariete = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWxBZHJlc3MiOiJtLnZhbmR1bGxlbWVuQHNlcnZlci5ubCIsImlhdCI6MTY1MjM4MjI4NCwiZXhwIjoxNjU2NzAyMjg0fQ.iTsQLzQvUp8J3EhvDm3xpZ9CW1M1K1TpgTRY9Dzw24c";
-const John = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWxBZHJlc3MiOiJqLmRvZUBzZXJ2ZXIuY29tIiwiaWF0IjoxNjUyMzgyMjUwLCJleHAiOjE2NTY3MDIyNTB9.FyrRFDPeiz4E62PyK0g5o94l1KAvYPj7EHS4JIAxTXM";
-const Herman = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWxBZHJlc3MiOiJoLmh1aXppbmdhQHNlcnZlci5ubCIsImlhdCI6MTY1MjM4MjIyNCwiZXhwIjoxNjU2NzAyMjI0fQ.zx08je9sibmH27RxuZLPtPZzsDAdL3n8FKfrFPWRaBc";
-const Marieke = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWxBZHJlc3MiOiJtLnZhbmRhbUBzZXJ2ZXIubmwiLCJpYXQiOjE2NTIzODIyMDQsImV4cCI6MTY1NjcwMjIwNH0.IQGTGLsQrEIYFoJZqDf-8K2BZ-FHY1gGlNWfD8_ypdk";
-const Henk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWxBZHJlc3MiOiJoLnRhbmtAc2VydmVyLmNvbSIsImlhdCI6MTY1MjM4MjE2NywiZXhwIjoxNjU2NzAyMTY3fQ.vIdUhGo7aftiQmto_ERgBK_pPH7lzj_fQcdFOlDlsjk";
-const MarieteInvalidDate = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWxBZHJlc3MiOiJtLnZhbmR1bGxlbWVuQHNlcnZlci5ubCIsImlhdCI6MTY1MjM4MjYxMCwiZXhwIjoxNjUyMzgyNjExfQ.MXpKQn2z4WeYbQfyoO84cWPx8uNcTKdw2BOt6JuzbAg"
-const Xilo = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTk5LCJlbWFpbEFkcmVzcyI6Ik1vb21vb0BnbWFpbC5jb20iLCJpYXQiOjE2NTIzODQzNTYsImV4cCI6MTY1NjcwNDM1Nn0.mIKBRNpQagNifXCcI0T7FEoqR5-GhHf-CvnGfbTfqBo"
-const Jessie = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAwLCJlbWFpbEFkcmVzcyI6Ikplc3NpZUBob3RtYWlsLmNvbSIsImlhdCI6MTY1MjM4NTcwMiwiZXhwIjoxNjU2NzA1NzAyfQ.bvyRyfGEo7prR6BPnEI24h-2vQxOcuP93X7CrvkvJlo";
+const tokens = require('../../src/tokens/UserTokens.token');
 
 
 describe('UC-201 Create new User POST /api/user', (done) => {
@@ -475,7 +466,7 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
     it('TC-203-1 Invalid token', (done) => {
         chai.request(server)
             .get('/api/user/profile')
-            .auth(MarieteInvalidDate, { type: 'bearer' })
+            .auth(tokens.MarieteInvalidDate, { type: 'bearer' })
             .end((req, res) => {
                 let { message, status } = res.body;
                 status.should.be.equal(401);
@@ -486,7 +477,7 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
     it('TC-203-2 valid token and existing users', (done) => {
         chai.request(server)
             .get('/api/user/profile')
-            .auth(Mariete, { type: 'bearer' })
+            .auth(tokens.Mariete, { type: 'bearer' })
             .end((req, res) => {
                 let { result, status } = res.body;
                 status.should.be.equal(200);
@@ -511,7 +502,7 @@ describe('UC-204 User details checker', (done) => {
         let id = 99;
         chai.request(server)
             .get('/api/user/' + id)
-            .auth(MarieteInvalidDate, { type: 'bearer' })
+            .auth(tokens.MarieteInvalidDate, { type: 'bearer' })
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, message } = res.body;
@@ -525,7 +516,7 @@ describe('UC-204 User details checker', (done) => {
         let id = 99;
         chai.request(server)
             .get('/api/user/' + id)
-            .auth(Mariete, { type: 'bearer' })
+            .auth(tokens.Mariete, { type: 'bearer' })
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, message } = res.body;
@@ -538,7 +529,7 @@ describe('UC-204 User details checker', (done) => {
         let userid = 1;
         chai.request(server)
             .get('/api/user/' + userid)
-            .auth(Mariete, { type: 'bearer' })
+            .auth(tokens.Mariete, { type: 'bearer' })
             .end((err, res) => {
                 res.should.be.a('object');
                 let { status, message, result } = res.body;
@@ -595,7 +586,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
         let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
-            .auth(Xilo, { type: 'bearer' })
+            .auth(tokens.Xilo, { type: 'bearer' })
             .send(
                 {
                     id: 199,
@@ -621,7 +612,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
         let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
-            .auth(Xilo, { type: 'bearer' })
+            .auth(tokens.Xilo, { type: 'bearer' })
             .send({
                 id: 199,
                 firstName: "Xon",
@@ -647,7 +638,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
         let id = 999;
         chai.request(server)
             .put('/api/user/' + id)
-            .auth(Xilo, { type: 'bearer' })
+            .auth(tokens.Xilo, { type: 'bearer' })
             .send({
                 id: 199,
                 firstName: "Xon",
@@ -696,7 +687,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
         let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
-            .auth(Xilo, {type:'bearer'})
+            .auth(tokens.Xilo, {type:'bearer'})
             .send({
                     id: 199,
                     firstName: "Xon",
@@ -756,7 +747,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
         let id = 99999;
         chai.request(server)
             .delete('/api/user/' + id)
-            .auth(Jessie, { type:'bearer'})
+            .auth(tokens.Jessie, { type:'bearer'})
             .end((req, res) => {
                 let { status, message } = res.body;
                 status.should.be.equal(400);
@@ -779,7 +770,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
         let id = 200;
         chai.request(server)
             .delete('/api/user/' + id)
-            .auth(Henk, {type: 'bearer'})
+            .auth(tokens.Henk, {type: 'bearer'})
             .end((req, res) => {
                 res.body.status.should.be.equal(403);
                 res.body.message.should.be.equal(`This user does not own user with ID ${id}`);
@@ -790,7 +781,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
         let id = 200;
         chai.request(server)
             .delete('/api/user/' + id)
-            .auth(Jessie, { type:'bearer'})
+            .auth(tokens.Jessie, { type:'bearer'})
             .end((req, res) => {
                 let { status, message } = res.body;
                 status.should.be.equal(200);
