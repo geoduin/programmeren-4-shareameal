@@ -1,9 +1,9 @@
 const req = require("express/lib/request");
 const assert = require('assert');
-const dataSet = require('../data/data.inMemory');
 const DBConnection = require("../data/dbConnection");
 const jwt = require('jsonwebtoken');
 const secretKey = require('../config/config').jwtSecretKey;
+const logr = require('../config/config').logger;
 
 //Note: Due to the dummydata present within the in-memory database(in case of testing), the id will start at 2 instead of 0. 
 let id = 2;
@@ -48,14 +48,6 @@ let controller = {
     testDateDB: (req, res, next) => {
         //Generate token functionality
 
-
-
-        // DBConnection.getConnection((err, con) => {
-        //     con.query('SELECT * FROM user INNER JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);', (err, resu, fied)=>{
-        //         console.log("Length of resultset")
-        //         console.log('SELECT COUNT(*) AS answer FROM user INNER JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);');
-        //         console.log(resu);
-        //         con.release();
         res.status(200).json({
             status: 200,
             result: "HelloSir"
@@ -85,7 +77,7 @@ let controller = {
         const token = req.headers.authorization;
         let package = jwt.decode(token.substring(7, token.length));
         const ownerUserId = package.id;
-        console.log(`UserId stated in the path parameters: ${userId}, by Current user ID: ${ownerUserId}.`);
+        logr.trace(`UserId stated in the path parameters: ${userId}, by Current user ID: ${ownerUserId}.`);
 
         DBConnection.getConnection((error1, Connection) => {
             Connection.query('SELECT id FROM user WHERE id = ?;', [userId], (err1, result, fields) => {
@@ -114,7 +106,7 @@ let controller = {
         const token = auth.substring(7, auth.length);
         const decoder = jwt.decode(token);
         const currentId = decoder.id;
-        console.log(`ID of user is ${userId}.`);
+        logr.trace(`ID of user is ${userId}.`);
 
         DBConnection.getConnection((err2, Connection) => {
             if (err2) { throw err2 }
@@ -124,10 +116,10 @@ let controller = {
                 let aa = result.length;
                 //assert(aa != 0, 'User is not found')
                 try {
-                    console.log(aa);
+                    logr.trace(aa);
                     assert(aa > 0, 'User does not exist');
                     let ID =  result[0].id;
-                    console.log(currentId);
+                    logr.trace(currentId);
                     assert(ID== currentId, `This user does not own user with ID ${userId}`)
                     next();
                 } catch (error) {
@@ -201,7 +193,7 @@ let controller = {
     //Assists UC-205
     validateUserPost: (req, res, next) => {
         let User = req.body;
-        console.log(User);
+        logr.trace(User);
         let { firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber } = User;
 
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
@@ -227,7 +219,7 @@ let controller = {
     //UC-201 Creates user. 
     createUser: (req, res) => {
         let user = req.body;
-        console.log(user);
+        logr.trace(user);
         DBConnection.getConnection((err, connect) => {
             connect.promise()
                 .query(
@@ -236,15 +228,15 @@ let controller = {
                 .then(connect.promise()
                     .query('SELECT * FROM user WHERE emailAdress = ?;', [user.emailAdress])
                     .then(([results]) => {
-                        console.log(`User with ${user.emailAdress} has been found.`);
+                        logr.trace(`User with ${user.emailAdress} has been found.`);
                         //Token generation in development
-                        console.log(results[0]);
+                        logr.trace(results[0]);
                         let User = results[0];
                         const payLoad = { id: User.id };
                         jwt.sign(payLoad, secretKey, { expiresIn: '31d' }, (err, token) => {
                             connect.release();
                             User = {...User , token};
-                            console.log(User);
+                            logr.trace(User);
                             res.status(201).json({
                                 status: 201,
                                 message: `User has been registered.`,
@@ -273,38 +265,38 @@ let controller = {
         if (active != undefined && active == 'true') {
             booleanValue = 1;
         }
-        console.log(booleanValue)
+        logr.trace(booleanValue)
 
         let query = "SELECT * FROM user";
         let inserts = [];
-        console.log(`Active is ${active}`);
-        console.log(`Searchterm is ${searchTerm}`)
-        console.log(`Limit is ${limit}`)
+        logr.trace(`Active is ${active}`);
+        logr.trace(`Searchterm is ${searchTerm}`)
+        logr.trace(`Limit is ${limit}`)
 
         if (active != undefined && searchTerm != undefined && limit != undefined) {
             query += ` WHERE isActive = ${booleanValue} AND firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%' LIMIT ${limit};`
             inserts = [booleanValue, searchTerm, searchTerm, limit];
             // query = mysql.format(query, inserts);
-            console.log(query);
+            logr.trace(query);
         } else if (active != undefined && searchTerm != undefined) {
             query += ` WHERE isActive = ? AND firstName LIKE '%?%' OR lastName LIKE '%?%';`
             inserts = [booleanValue, searchTerm, searchTerm];
             query = mysql.format(query, inserts);
-            console.log(query);
+            logr.trace(query);
         } else if (searchTerm != undefined && limit != undefined) {
             query += ` WHERE firstName LIKE '%?%' OR lastName LIKE '%?%' LIMIT ?;`
             inserts = [searchTerm, searchTerm, limit];
             query = mysql.format(query, inserts);
-            console.log(query);
+            logr.trace(query);
         } else if (limit != undefined) {
             query += ` LIMIT ${limit};`
-            console.log(query);
+            logr.trace(query);
         } else if (active != undefined) {
             query += ` WHERE isActive = ${booleanValue};`
-            console.log(query);
+            logr.trace(query);
         } else if (searchTerm != undefined) {
             query += ` WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%';`
-            console.log(query);
+            logr.trace(query);
         }
         DBConnection.getConnection((error, connection) => {
             connection
@@ -368,8 +360,8 @@ let controller = {
         DBConnection.getConnection((error, connect) => {
             connect.promise().query('SELECT * FROM user WHERE id = ?;', [userId])
                 .then(([result, fields]) => {
-                    console.log(`Length of result is ${result.length}`);
-                    console.log(result[0]);
+                    logr.trace(`Length of result is ${result.length}`);
+                    logr.trace(result[0]);
                     results = result;
                 }).then(connect.promise()
                     .query('SELECT * FROM meal WHERE cookId = ?;', [userId])
@@ -386,7 +378,7 @@ let controller = {
                                 meal.allergenes = meal.allergenes.split(",");
                             });
                             user.Own_meals = meal;
-                            console.log(user);
+                            logr.trace(user);
                             res.status(200).json({
                                 status: 200,
                                 message: `User with id: ${userId} found`,
@@ -416,13 +408,13 @@ let controller = {
         if (newUser.isActive) {
             activeValue = 1;
         }
-        console.log(`UserID of ${newUser.firstName} is ${id}.`)
+        logr.trace(`UserID of ${newUser.firstName} is ${id}.`)
         DBConnection.getConnection((error, connection) => {
             connection.promise()
                 .query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
                     [newUser.firstName, newUser.lastName, newUser.city, newUser.street, newUser.password, newUser.emailAdress, activeValue, newUser.phoneNumber, id])
                 .then(([result]) => {
-                    console.log(`Affected rows UPDATE: ${result.affectedRows}`);
+                    logr.trace(`Affected rows UPDATE: ${result.affectedRows}`);
                     if (result.affectedRows == 0) {
                         res.status(400).json({
                             status: 400,
@@ -431,7 +423,7 @@ let controller = {
                     } else {
                         connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
                             if (err4) { throw err4 }
-                            console.log(result2);
+                            logr.trace(result2);
                             result2[0].isActive = (result2[0].isActive == 1);
                             result2[0].roles = result2[0].roles.split(",")
                             res.status(200).json({
@@ -454,8 +446,8 @@ let controller = {
             conn.promise()
                 .query('DELETE FROM user  WHERE id = ?;', [iD])
                 .then(([result]) => {
-                    console.log('Ronde deletion');
-                    console.log(result.affectedRows);
+                    logr.trace('Ronde deletion');
+                    logr.trace(result.affectedRows);
                     if (result.affectedRows > 0) {
                         res.status(200).json({
                             status: 200,

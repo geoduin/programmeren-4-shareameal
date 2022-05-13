@@ -3,6 +3,7 @@ const express = require('express');
 const UserRouter = express.Router();
 const UserController = require('../controllers/user.controller');
 const tokenAuthController = require('../controllers/auth.controller');
+const logr = require('../config/config').logger;
 //Test command.
 UserRouter.get("/", (req, res) => {
     res.status(200).json({

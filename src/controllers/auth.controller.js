@@ -1,10 +1,10 @@
 const req = require("express/lib/request");
-const data = require('../data/data.inMemory');
 const assert = require('assert');
 const DataConnection = require('../data/dbConnection');
 const jwt = require('jsonwebtoken');
 const { text } = require("express");
 const { stringify } = require("querystring");
+const logr = require('../config/config').logger;
 
 let controller = {
     testDateDB: (req, res, next) => {
@@ -17,9 +17,9 @@ let controller = {
             //Algoritme is verwijdert
             function (err, token) {
                 if (err) {
-                    console.log(err)
+                   logr.trace(err)
                 } else {
-                    console.log(token);
+                    logr.trace(token);
                     token2 = token;
                     res.status(200).json({
                         status: 200,
@@ -29,26 +29,6 @@ let controller = {
 
             }
         );
-    },
-    validateTokenLogin2: (req, res, next) => {
-        const token = req.headers.authorization.substring(7, req.headers.authorization.length);
-        console.log('Header is')
-        console.log(token);
-        let load = jwt.decode(token);
-        let expireDate = load.exp;
-        let currentDate = new Date().getTime() / 1000;
-        try {
-            assert(typeof token == 'string', 'Token must be string');
-            //Checks if token is still valid?
-            assert(currentDate < expireDate, 'Token has expired');
-            next();
-        } catch (error) {
-            const err = {
-                status: 401,
-                message: error.message
-            }
-            next(err);
-        }
     }
     ,
     validateTokenLogin: (req, res, next) => {
@@ -59,8 +39,8 @@ let controller = {
         let currentDate = undefined;
         if (auth) {
             token = auth.substring(7, auth.length);
-            console.log('Header is')
-            console.log(token);
+            logr.trace('Header is')
+            logr.trace(token);
             load = jwt.decode(token);
             expireDate = load.exp;
             currentDate = new Date().getTime() / 1000;
@@ -83,12 +63,12 @@ let controller = {
     ,
     validateToken: (req, res, next) => {
         jwt.sign(
-            { id: 200, emailAdress: "Jessie@hotmail.com" },
+            { id: 999 },
             process.env.JWT_SECRET, { expiresIn: '50d' },
             //Algoritme is verwijdert
             function (err, token) {
-                if (err) { console.log(err) } else {
-                    console.log(token);
+                if (err) { logr.trace(err) } else {
+                    logr.trace(token);
                     res.status(200).json({
                         status: 200,
                         result: token

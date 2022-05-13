@@ -14,7 +14,7 @@ const MealRouter = require('./src/routes/meal.routes');
 const LoginRouter = require('./src/routes/login.routes');
 const ParticipateRouter = require('./src/routes/participation.routes');
 const res = require("express/lib/response");
-
+const logr = require('./src/config/config').logger;
 app.use(bodyParser.json());
 
 //In-memory database for users
@@ -55,7 +55,7 @@ let id = 2;
 
 app.all("*", (req, res, next) => {
   const method = req.method;
-  console.log(`Method ${method} is aangeroepen`);
+  logr.trace(`Method ${method} is aangeroepen`);
   next();
 });
 //Test command.
@@ -93,7 +93,7 @@ app.all("*", (req, res) => {
 });
 //Miscellaneous code
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  logr.trace(`Example app listening on port ${port}`);
 });
 
 

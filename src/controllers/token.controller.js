@@ -1,9 +1,8 @@
 const req = require("express/lib/request");
 const assert = require('assert');
-const dataSet = require('../data/data.inMemory');
 const DBConnection = require("../data/dbConnection");
 const jwt = require('jsonwebtoken');
-
+const logr = require('../config/config').logger;
 let controller = {
     testDateDB: (req, res, next) => {
         //Generate token functionality
@@ -15,9 +14,9 @@ let controller = {
             //Algoritme is verwijdert
             function (err, token) {
                 if (err) {
-                    console.log(err)
+                    logr.trace(err)
                 } else {
-                    console.log(token);
+                    logr.trace('Token we got');
                     token2 = token;
                     res.status(200).json({
                         status: 200,
@@ -28,16 +27,6 @@ let controller = {
             }
         );
 
-
-        // DBConnection.getConnection((err, con) => {
-        //     con.query('SELECT * FROM user INNER JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);', (err, resu, fied)=>{
-        //         console.log("Length of resultset")
-        //         console.log('SELECT COUNT(*) AS answer FROM user INNER JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);');
-        //         console.log(resu);
-        //         con.release();
-
-        //     })  
-        // })
     },
     
 }
