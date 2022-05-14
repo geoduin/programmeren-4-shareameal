@@ -152,6 +152,12 @@ let controller = {
                     connection.query('SELECT * FROM meal WHERE id = ?;', [currentId], (error, meal, fields) => {
                         connection.release();
                         if (err) { throw err };
+                        let Meal = meal[0];
+                        Meal.isActive = intToBoolean(Meal.isActive);
+                        Meal.isToTakeHome = intToBoolean(Meal.isToTakeHome);
+                        Meal.isVega = intToBoolean(Meal.isVega);
+                        Meal.isVegan = intToBoolean(Meal.isVegan);
+                        Meal.allergenes = Meal.allergenes.split(",");
                         logr.trace('Affected rows  ====V====')
                         logr.trace('Update has succeeded!');
                         res.status(200).json({
@@ -236,10 +242,6 @@ let controller = {
                     logr.trace(ParticipantResults);
                     //Assign participants to participant attribute
                     participants = ParticipantResults;
-                    participants.forEach(user => {
-                        user.roles = user.roles.split(",");
-                        user.isActive = (user.isActive == 1);
-                    });
                 }).then(connect
                     .promise()
                     .query('SELECT * FROM meal WHERE id = ?;', [currentId])
@@ -263,9 +265,16 @@ let controller = {
                                 meal.allergenes = meal.allergenes.split(",");
                                 cook.roles = cook.roles.split(",");
                                 cook.isActive = (cook.isActive == 1);
+                                delete cook.password;
                                 delete meal.cookId;
+                                delete meal.password;
                                 meal.cook = cook;
                                 meal.participants = participants;
+                                meal.participants.forEach(user =>{
+                                    user.roles = user.roles.split(",");
+                                    user.isActive = (user.isActive == 1);
+                                    delete user.password;
+                                })
                                 res.status(200).json({
                                     status: 200,
                                     result: meal

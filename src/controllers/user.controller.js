@@ -4,6 +4,7 @@ const DBConnection = require("../data/dbConnection");
 const jwt = require('jsonwebtoken');
 const secretKey = require('../config/config').jwtSecretKey;
 const logr = require('../config/config').logger;
+const BCrypt = require('bcrypt');
 
 //Note: Due to the dummydata present within the in-memory database(in case of testing), the id will start at 2 instead of 0. 
 let id = 2;
@@ -118,9 +119,9 @@ let controller = {
                 try {
                     logr.trace(aa);
                     assert(aa > 0, 'User does not exist');
-                    let ID =  result[0].id;
+                    let ID = result[0].id;
                     logr.trace(currentId);
-                    assert(ID== currentId, `This user does not own user with ID ${userId}`)
+                    assert(ID == currentId, `This user does not own user with ID ${userId}`)
                     next();
                 } catch (error) {
                     let err = null;
@@ -220,38 +221,43 @@ let controller = {
     createUser: (req, res) => {
         let user = req.body;
         logr.trace(user);
-        DBConnection.getConnection((err, connect) => {
-            connect.promise()
-                .query(
-                    'INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
-                    [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.emailAdress, user.password])
-                .then(connect.promise()
-                    .query('SELECT * FROM user WHERE emailAdress = ?;', [user.emailAdress])
-                    .then(([results]) => {
-                        logr.trace(`User with ${user.emailAdress} has been found.`);
-                        //Token generation in development
-                        logr.trace(results[0]);
-                        let User = results[0];
-                        const payLoad = { id: User.id };
-                        jwt.sign(payLoad, secretKey, { expiresIn: '31d' }, (err, token) => {
-                            connect.release();
-                            User = {...User , token};
-                            logr.trace(User);
-                            res.status(201).json({
-                                status: 201,
-                                message: `User has been registered.`,
-                                result: User
+        BCrypt.hash(user.password, 10)
+            .then((hash) => {
+                DBConnection.getConnection((err, connect) => {
+                    connect.promise()
+                        .query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
+                            [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.emailAdress, hash])
+                        .then(connect.promise()
+                            .query('SELECT * FROM user WHERE emailAdress = ?;', [user.emailAdress])
+                            .then(([results]) => {
+                                logr.trace(`User with ${user.emailAdress} has been found.`);
+                                //Token generation in development
+                                logr.trace(results[0]);
+                                let { password, ...User } = results[0]
+                                const payLoad = { id: User.id };
+                                jwt.sign(payLoad, secretKey, { expiresIn: '31d' }, (err, token) => {
+                                    connect.release();
+                                    User = { ...User, token };
+                                    User.roles = User.roles.split(",");
+                                    logr.trace(User);
+                                    res.status(201).json({
+                                        status: 201,
+                                        message: `User has been registered.`,
+                                        result: User
+                                    })
+                                })
                             })
+                        ).catch(err => {
+                            res.status(409).json({
+                                status: 409,
+                                message: "Email has been taken"
+                            })
+                            connect.release();
                         })
-                    })
-                ).catch(err => {
-                    res.status(409).json({
-                        status: 409,
-                        message: "Email has been taken"
-                    })
-                    connect.release();
                 })
-        })
+            })
+
+
     }
     ,
     //UC-202 Retrieves all users
@@ -260,7 +266,7 @@ let controller = {
     getAllUsers: (req, res) => {
         const active = req.query.isActive;
         const searchTerm = req.query.searchTerm;
-        const limit = req.query.amount;
+        const limit = parseInt(req.query.limit);
         let booleanValue = 0;
         if (active != undefined && active == 'true') {
             booleanValue = 1;
@@ -269,45 +275,35 @@ let controller = {
 
         let query = "SELECT * FROM user";
         let inserts = [];
-        logr.trace(`Active is ${active}`);
-        logr.trace(`Searchterm is ${searchTerm}`)
-        logr.trace(`Limit is ${limit}`)
+        logr.trace(`Active is ${active} + Searchterm is ${searchTerm} + Limit is ${limit}`);
 
-        if (active != undefined && searchTerm != undefined && limit != undefined) {
-            query += ` WHERE isActive = ${booleanValue} AND firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%' LIMIT ${limit};`
-            inserts = [booleanValue, searchTerm, searchTerm, limit];
-            // query = mysql.format(query, inserts);
-            logr.trace(query);
-        } else if (active != undefined && searchTerm != undefined) {
-            query += ` WHERE isActive = ? AND firstName LIKE '%?%' OR lastName LIKE '%?%';`
-            inserts = [booleanValue, searchTerm, searchTerm];
-            query = mysql.format(query, inserts);
-            logr.trace(query);
-        } else if (searchTerm != undefined && limit != undefined) {
-            query += ` WHERE firstName LIKE '%?%' OR lastName LIKE '%?%' LIMIT ?;`
-            inserts = [searchTerm, searchTerm, limit];
-            query = mysql.format(query, inserts);
-            logr.trace(query);
-        } else if (limit != undefined) {
-            query += ` LIMIT ${limit};`
-            logr.trace(query);
-        } else if (active != undefined) {
-            query += ` WHERE isActive = ${booleanValue};`
-            logr.trace(query);
-        } else if (searchTerm != undefined) {
-            query += ` WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%';`
-            logr.trace(query);
+        if (active && searchTerm) {
+            query += ` WHERE isActive = ? AND firstName LIKE('%${searchTerm}%') OR lastName LIKE('%${searchTerm}%')`
+            inserts = [booleanValue];
+        } else if (active) {
+            query += ` WHERE isActive = ?`
+            inserts = [booleanValue];
+        } else if (searchTerm) {
+            query += ` WHERE firstName LIKE('%${searchTerm}%') OR lastName LIKE('%${searchTerm}%')`;
         }
+
+        if (limit) {
+            query += ' LIMIT ?';
+            inserts.push(limit);
+        }
+        query += ';'
+        logr.debug(query);
         DBConnection.getConnection((error, connection) => {
             connection
                 .promise()
-                .query(query)
+                .query(query, inserts)
                 .then(([result, fields]) => {
                     let roles = [];
                     result.forEach(user => {
                         roles = user.roles.split(",");
                         user.roles = roles;
                         user.isActive = (user.isActive == 1);
+                        delete user.password
                     });
                     res.status(200).json({
                         status: 200,
@@ -346,7 +342,7 @@ let controller = {
                             isActive: (user.isActive == 1)
                         }
                     })
-                }).then(()=>{
+                }).then(() => {
                     con.release();
                 })
         })
@@ -370,6 +366,7 @@ let controller = {
                             user = results[0];
                             user.isActive = intToBoolean(user.isActive);
                             user.roles = user.roles.split(",");
+                            delete user.password;
                             meal.forEach(meal => {
                                 meal.isActive = intToBoolean(meal.isActive);
                                 meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
@@ -408,35 +405,39 @@ let controller = {
         if (newUser.isActive) {
             activeValue = 1;
         }
-        logr.trace(`UserID of ${newUser.firstName} is ${id}.`)
-        DBConnection.getConnection((error, connection) => {
-            connection.promise()
-                .query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
-                    [newUser.firstName, newUser.lastName, newUser.city, newUser.street, newUser.password, newUser.emailAdress, activeValue, newUser.phoneNumber, id])
-                .then(([result]) => {
-                    logr.trace(`Affected rows UPDATE: ${result.affectedRows}`);
-                    if (result.affectedRows == 0) {
-                        res.status(400).json({
-                            status: 400,
-                            message: `Update has failed. Id: ${id} does not exist.`
-                        })
-                    } else {
-                        connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
-                            if (err4) { throw err4 }
-                            logr.trace(result2);
-                            result2[0].isActive = (result2[0].isActive == 1);
-                            result2[0].roles = result2[0].roles.split(",")
-                            res.status(200).json({
-                                status: 200,
-                                message: "Succesful transaction",
-                                result: result2[0]
+
+        BCrypt.hash(newUser.password, 10).then((hash) => {
+            logr.trace(`UserID of ${newUser.firstName} is ${id}.`)
+            DBConnection.getConnection((error, connection) => {
+                connection.promise()
+                    .query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
+                        [newUser.firstName, newUser.lastName, newUser.city, newUser.street, hash, newUser.emailAdress, activeValue, newUser.phoneNumber, id])
+                    .then(([result]) => {
+                        logr.trace(`Affected rows UPDATE: ${result.affectedRows}`);
+                        if (result.affectedRows == 0) {
+                            res.status(400).json({
+                                status: 400,
+                                message: `Update has failed. Id: ${id} does not exist.`
                             })
-                        })
-                    }
-                }).finally(() => {
-                    connection.release();
-                })
+                        } else {
+                            connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
+                                if (err4) { throw err4 }
+                                logr.trace(result2);
+                                result2[0].isActive = (result2[0].isActive == 1);
+                                result2[0].roles = result2[0].roles.split(",")
+                                res.status(200).json({
+                                    status: 200,
+                                    message: "Succesful transaction",
+                                    result: result2[0]
+                                })
+                            })
+                        }
+                    }).finally(() => {
+                        connection.release();
+                    })
+            })
         })
+
     }
     ,
     //UC-206 Deletes user based on id

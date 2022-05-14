@@ -200,6 +200,18 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 result.token.should.be.a('string');
                 result.id.should.be.a('number');
                 result.firstName.should.be.a('string');
+                assert.deepEqual(result, {
+                    id: result.id,
+                    firstName: "James",
+                    lastName: "Almada",
+                    isActive: 1,
+                    emailAdress: "ArezoStanistan@outlook.com",
+                    phoneNumber: null,
+                    roles: ["editor","guest"],
+                    street: "Pluebo district uno",
+                    city: "Buenos Aires",
+                    token: result.token,
+                  })
                 done();
             })
         })
@@ -241,7 +253,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
     it('TC-202-2 show two users', (done) => {
         chai.request(server)
             .get('/api/user')
-            .query({ amount: 2 })
+            .query({ limit: 2 })
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, amount, result } = res.body;
@@ -254,7 +266,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "van den Dullemen",
                         "isActive": true,
                         "emailAdress": "m.vandullemen@server.nl",
-                        "password": "secret",
                         "phoneNumber": "",
                         "roles": [
                             ""
@@ -268,7 +279,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Doe",
                         "isActive": true,
                         "emailAdress": "j.doe@server.com",
-                        "password": "secret",
                         "phoneNumber": "06 12425475",
                         "roles": [
                             "editor",
@@ -311,7 +321,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Van Dam",
                         "isActive": false,
                         "emailAdress": "m.vandam@server.nl",
-                        "password": "secret",
                         "phoneNumber": "06-12345678",
                         "roles": [
                             "editor",
@@ -344,7 +353,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "van den Dullemen",
                         "isActive": true,
                         "emailAdress": "m.vandullemen@server.nl",
-                        "password": "secret",
                         "phoneNumber": "",
                         "roles": [
                             ""
@@ -358,7 +366,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Doe",
                         "isActive": true,
                         "emailAdress": "j.doe@server.com",
-                        "password": "secret",
                         "phoneNumber": "06 12425475",
                         "roles": [
                             "editor",
@@ -373,7 +380,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Huizinga",
                         "isActive": true,
                         "emailAdress": "h.huizinga@server.nl",
-                        "password": "secret",
                         "phoneNumber": "06-12345678",
                         "roles": [
                             "editor",
@@ -388,7 +394,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Tank",
                         "isActive": true,
                         "emailAdress": "h.tank@server.com",
-                        "password": "secret",
                         "phoneNumber": "06 12425495",
                         "roles": [
                             "editor",
@@ -418,7 +423,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "van den Dullemen",
                         "isActive": true,
                         "emailAdress": "m.vandullemen@server.nl",
-                        "password": "secret",
                         "phoneNumber": "",
                         "roles": [
                             ""
@@ -432,7 +436,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Huizinga",
                         "isActive": true,
                         "emailAdress": "h.huizinga@server.nl",
-                        "password": "secret",
                         "phoneNumber": "06-12345678",
                         "roles": [
                             "editor",
@@ -447,7 +450,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Van Dam",
                         "isActive": false,
                         "emailAdress": "m.vandam@server.nl",
-                        "password": "secret",
                         "phoneNumber": "06-12345678",
                         "roles": [
                             "editor",
@@ -486,7 +488,7 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
                     firstName: "Mariëtte",
                     lastName: "van den Dullemen",
                     emailAdress: "m.vandullemen@server.nl",
-                    password: "secret",
+                    password: result.password,
                     street: "",
                     city: "",
                     roles: [""],
@@ -541,7 +543,6 @@ describe('UC-204 User details checker', (done) => {
                     lastName: 'van den Dullemen',
                     isActive: true,
                     emailAdress: 'm.vandullemen@server.nl',
-                    password: 'secret',
                     phoneNumber: '',
                     roles: [""],
                     street: '',
@@ -710,7 +711,8 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     city: "Rotterdam",
                     street: "Maskauplein",
                     emailAdress: "Moomoo@gmail.com",
-                    password: "Password111",
+                    //Every update, it will create a new hashcode
+                    password: result.password,
                     isActive: true,
                     roles: ["editor", "guest"],
                     phoneNumber: "06 123456789"

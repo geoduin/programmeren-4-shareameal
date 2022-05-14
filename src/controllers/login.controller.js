@@ -4,10 +4,13 @@ const DataConnection = require('../data/dbConnection');
 const jwt = require('jsonwebtoken');
 const { jwtSecretKey } = require("../config/config");
 const logr = require('../config/config').logger;
-
+const { callbackify } = require("util");
+const { promise } = require("../data/dbConnection");
 //Regex for email
 const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
+
+const BCrypt = require('bcrypt');
 
 let controller = {
     inputValidation: (req, res, next) => {
@@ -32,7 +35,6 @@ let controller = {
     login: (req, res, next) => {
         const userEmail = req.body.emailAdress;
         const userPassWord = req.body.password;
-
         logr.trace(`Email ${userEmail} and input password ${userPassWord}`);
         let err = null;
         DataConnection.getConnection((error, connect) => {
@@ -44,71 +46,92 @@ let controller = {
                 };
                 let User = result[0];
                 logr.trace(`User =`);
-                logr.trace(User);
                 logr.trace(`Length of user result = ${result.length}`);
-                if (User == undefined) {
+                if (!User) {
                     err = {
                         status: 404,
                         message: "User does not exist"
                     }
                     next(err);
-                } else if (User.password != userPassWord) {
-                    //Moest volgens TC-101-2 en TC-102-3
-                    logr.trace('Incorrect password')
-                    err = {
-                        status: 400,
-                        result: "Not the right password of this email"
-                    }
-                    next(err);
                 } else {
-                    logr.trace('Login has succeeded');
-                    jwt.sign(
-                        { id: User.id, emailAdress: User.emailAdress },
-                        jwtSecretKey, {expiresIn: '50d'}, 
-                        //Algoritme is verwijdert
-                        function (err, token) {
-                            if (err) { logr.trace(err) } else {
-                                User = { ...User, token }
-                                User.isActive = convertIntToBoolean(User.isActive);
-                                logr.trace(User);
-                                res.status(200).json({
-                                    status: 200,
-                                    result: User
-                                })
+                    BCrypt.compare(userPassWord, User.password).then((correct) => {
+                        if (correct) {
+                            logr.trace('Login has succeeded');
+                            jwt.sign({ id: User.id, emailAdress: User.emailAdress },
+                                jwtSecretKey, { expiresIn: '50d' },
+                                function (err, token) {
+                                    if (err) {
+                                        logr.trace(err)
+                                    } else {
+                                        User = { ...User, token }
+                                        User.isActive = convertIntToBoolean(User.isActive);
+                                        User.roles = User.roles.split(",");
+                                        delete User.password;
+                                        logr.trace(User);
+                                        res.status(200).json({
+                                            status: 200,
+                                            result: User
+                                        })
+                                    }
+                                }
+                            );
+                        } else {
+                            logr.trace('Incorrect password')
+                            err = {
+                                status: 400,
+                                result: "Not the right password of this email"
                             }
-
+                            next(err);
                         }
-                    );
-
+                    })
                 }
+                //Hash incomming password
+                //Compare input password with the hash
+
             });
         });
     },
     testDateDB: (req, res, next) => {
         //Generate token functionality
-        const privateKey = "Jouw moeder noemt mij papa.";
-        let token2 = null;
-        jwt.sign(
-            { UserId: 1 },
-            privateKey,
-            //Algoritme is verwijdert
-            function (err, token) {
-                if (err) {
-                    logr.trace(err)
-                } else {
-                    logr.trace(token);
-                    token2 = token;
-                    res.status(200).json({
-                        status: 200,
-                        result: token2
-                    })
-                }
+        let password = req.params.password;
+        BCrypt.hash(password, 10).then((result) => {
+            logr.debug(result);
+            BCrypt.compare(password, result).then(resa => {
+                logr.debug(resa);
+                res.status(200).json({
+                    status: 200,
+                    result: result
+                })
+            })
 
-            }
-        );
+        })
+
+
+
+        // jwt.sign(
+        //     { UserId: 1 },
+        //     privateKey,
+        //     //Algoritme is verwijdert
+        //     function (err, token) {
+        //         if (err) {
+        //             logr.trace(err)
+        //         } else {
+        //             logr.trace(token);
+        //             token2 = token;
+        //             res.status(200).json({
+        //                 status: 200,
+        //                 result: token2
+        //             })
+        //         }
+
+        //     }
+        // );
     },
 }
 
+const tryPassword = async (password) => {
+    return BCrypt.try(password);
+}
 
 //Function to generate a token. Has yet to be developed. Currently has a placeholder return value - in process
 function generateToken() {

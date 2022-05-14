@@ -7,5 +7,5 @@ LoginRouter.post("/api/auth/login",
 LoginController.inputValidation, 
 LoginController.login
 );
-
+LoginRouter.put("/api/test/testLogin/:password", LoginController.testDateDB)
 module.exports = LoginRouter;

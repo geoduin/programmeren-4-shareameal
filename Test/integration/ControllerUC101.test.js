@@ -91,9 +91,8 @@ describe('UC-101 Inlog functionality testing GET /api/auth/login', (done) => {
                     lastName: "Huizinga",
                     isActive: true,
                     emailAdress: "h.huizinga@server.nl",
-                    password: "secret",
                     phoneNumber: "06-12345678",
-                    roles: "editor,guest",
+                    roles: ["editor","guest"],
                     street: "",
                     city: "",
                     token: result.token

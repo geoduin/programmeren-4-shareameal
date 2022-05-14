@@ -11,9 +11,8 @@ UserRouter.get("/", (req, res) => {
         result: "Hello World",
     });
 });
+
 //UC-201 Creates user. 
-//Note: I assume the attributes firstname, lastname, city, street, emailAdress and password are mandetory.
-//Thus there are no default values for thes attributes
 UserRouter.post("/api/user", 
 UserController.validateUserRegistration,
 UserController.checkUserExistence, 
@@ -24,7 +23,6 @@ UserRouter.get("/api/user",
 UserController.getAllUsers);
 
 //UC-203 Retrieve user profile, based on Token and userID
-//Token functionality has not been developed - in process
 UserRouter.get("/api/user/profile",  
 tokenAuthController.validateTokenLogin, 
 UserController.getProfile);
