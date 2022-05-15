@@ -639,7 +639,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                 city: "Rotterdam",
                 street: "Maskauplein",
                 emailAdress: "Moomoo@gmail.com",
-                password: "Password111",
+                password: "Password#@@#s!111",
                 isActive: true,
                 phoneNumber: "06 124"
 
@@ -648,7 +648,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                 res.should.be.a('object');
                 let { status, message } = res.body;
                 status.should.be.equal(400);
-                message.should.be.equal('Phonenumber must be 9 characters long');
+                message.should.be.equal('Invalid phonenumber');
                 done();
             })
     })
@@ -665,9 +665,9 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                 city: "Rotterdam",
                 street: "Maskauplein",
                 emailAdress: "Moomoo@gmail.com",
-                password: "Password111",
+                password: "Password#@@#s!111",
                 isActive: true,
-                phoneNumber: "06 123456789"
+                phoneNumber: "31 123456789"
             })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -714,9 +714,9 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     city: "Rotterdam",
                     street: "Maskauplein",
                     emailAdress: "Moomoo@gmail.com",
-                    password: "Password111",
+                    password: "Password!!111",
                     isActive: true,
-                    phoneNumber: "06 123456789"
+                    phoneNumber: "31 123456789"
             })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -734,7 +734,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     password: result.password,
                     isActive: true,
                     roles: ["editor", "guest"],
-                    phoneNumber: "06 123456789"
+                    phoneNumber: "31 123456789"
                 })
                 done();
             })
