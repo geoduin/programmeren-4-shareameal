@@ -10,8 +10,8 @@ const BCrypt = require('bcrypt');
 let id = 2;
 //Regex for email
 const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-//Regex for phones - every phonenumber must start with 06
-const phoneRegex = /06|31( {1}|-{1})\d{9}/;
+//Regex for phones - every phonenumber must start with 06 or 31 and has either a space sign, - or nothing in between, and then 9 digits
+const phoneRegex = /(06|31)(\s|\-|)\d{9}/;
 //Regex for passwords - at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
 
@@ -171,6 +171,7 @@ let controller = {
         let { firstName, lastName, street, city, emailAdress, password, phoneNumber } = User;
         let emailValid = emailRegex.test(emailAdress);
         let passwordValid = passwordRegex.test(password);
+        let phoneNumberValid = phoneRegex.test(phoneNumber);
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
         try {
@@ -182,6 +183,7 @@ let controller = {
             assert(typeof password == 'string', 'password must be a string');
             assert(emailValid, 'Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
             assert(passwordValid, 'at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
+            assert(phoneNumberValid, 'Invalid phonenumber')
             next();
         } catch (err) {
             const error = {

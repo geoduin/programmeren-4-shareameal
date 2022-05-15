@@ -133,12 +133,31 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 street: "Pluebo district uno",
                 emailAdress: "@outlook.com",
                 password: "qweqweqweq",
+                phoneNumber: "31123456789"
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, message, user } = res.body;
                 status.should.be.equals(400);
                 message.should.be.a('string').that.equals('Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
                 //Token test will be tested in the future
+                done();
+            })
+        })
+
+        it('TC-201-2.5 Invalid Phone number test', (done) => {
+            chai.request(server).post('/api/user').send({
+                firstName: "James",
+                lastName: "Almada",
+                city: "Buenos Aires",
+                street: "Pluebo district uno",
+                phoneNumber: "02-123456789",
+                emailAdress: "m.vandullemen@server.nl",
+                password: "Erika!23Opa",
+            }).end((err, res) => {
+                res.should.be.an('object');
+                let { status, message, user } = res.body;
+                status.should.be.equals(400);
+                message.should.be.a('string').that.equals('Invalid phonenumber');
                 done();
             })
         })
@@ -152,7 +171,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 emailAdress: "m.vandullemen@server.nl",
                 password: "oooooooo",
                 isActive: true,
-                phoneNumber: "06 789032909"
+                phoneNumber: "31123456789"
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, message } = res.body;
@@ -165,14 +184,13 @@ describe('UC-201 Create new User POST /api/user', (done) => {
         //Fixes need to be made
         it('TC-201-4 When email has already been registered, it will return a error message and does not persist within the database', (done) => {
             chai.request(server).post('/api/user').send({
-                firstName: "Alphonso",
-                lastName: "Davies",
-                city: "Ottawa",
-                street: "Cardin avenue",
+                firstName: "James",
+                lastName: "Almada",
+                city: "Buenos Aires",
+                street: "Pluebo district uno",
+                phoneNumber: "31 123456789",
                 emailAdress: "m.vandullemen@server.nl",
                 password: "Erika!23Opa",
-                isActive: true,
-                phoneNumber: "06 789032909"
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, message } = res.body;
@@ -188,13 +206,14 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 lastName: "Almada",
                 city: "Buenos Aires",
                 street: "Pluebo district uno",
+                phoneNumber: "31 123456789",
                 emailAdress: "ArezoStanistan@outlook.com",
                 password: "Erika!23Opa",
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, message, result } = res.body;
-                status.should.be.equals(201);
                 message.should.be.a('string').that.equals('User has been registered.');
+                status.should.be.equals(201);
                 //Token test will be tested in the future
                 result.should.be.a('object');
                 result.token.should.be.a('string');
@@ -206,7 +225,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                     lastName: "Almada",
                     isActive: 1,
                     emailAdress: "ArezoStanistan@outlook.com",
-                    phoneNumber: null,
+                    phoneNumber: "31 123456789",
                     roles: ["editor","guest"],
                     street: "Pluebo district uno",
                     city: "Buenos Aires",
