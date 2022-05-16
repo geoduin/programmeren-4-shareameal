@@ -1,8 +1,8 @@
 # Share-a-Meal API
-Een API om maaltijden te zoeken, maken, verwijderen.
+Een API om maaltijden te zoeken, maken, verwijderen. geschreven door Xin X. Wang
 
 ## Over de Share-a-Meal API
-Als eerste jaars student, heb ik naar aanleiding van het vak programmeren 4 een API gebouwd in nodeJs. 
+Als eerstejaars Avans student heb ik naar aanleiding van het vak programmeren 4 een API gebouwd in nodeJs. 
 
 Hiermee kun je maaltijden toevoegen, verwijderen, wijzigen en zoeken.
 
