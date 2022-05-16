@@ -519,7 +519,7 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
 });
 
 describe('UC-204 User details checker', (done) => {
-    it.skip('TC-204-1 Invalid token', (done) => {
+    it('TC-204-1 Invalid token', (done) => {
         let id = 99;
         chai.request(server)
             .get('/api/user/' + id)
@@ -626,7 +626,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             })
     })
 
-    it.skip('TC-205-3 invalid phonenumber', (done) => {
+    it('TC-205-3 invalid phonenumber', (done) => {
         let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
@@ -677,7 +677,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             })
     })
 
-    it.skip('TC-205-5 User has not logged in', (done) => {
+    it('TC-205-5 User has not logged in', (done) => {
         let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
@@ -774,7 +774,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
             })
     })
     //Either token or user object will be send to
-    it.skip('TC-206-2 User not logged in', (done) => {
+    it('TC-206-2 User not logged in', (done) => {
         let id = 200;
         chai.request(server)
             .delete('/api/user/' + id)
@@ -785,7 +785,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
                 done();
             })
     })
-    it.skip('TC-206-3 User not the owner of user', (done) => {
+    it('TC-206-3 User not the owner of user', (done) => {
         let id = 200;
         chai.request(server)
             .delete('/api/user/' + id)
