@@ -45,14 +45,10 @@ let Login = {
 }
 ```
 
-|status code:||
-|---|---|
+|status code:|
 |200| inlog succesvol voldaan. Ontvangt gebruiker met een token.|
-|---|---|
 Ontvangt gebruiker met een token.|
-|---|---|
 |400| Verkeerde input|
-|---|---|
 |404| gebruiker bestaat niet, op basis van input emailAdress.|
 
 ### Gebruikersbeheer
@@ -78,12 +74,9 @@ Gebruiker aanmaak body =
         }
 ```
 
-|Status code||
-|---|---|
+|Status code|
 |201| succesvolle gebruiker aangemaakt|
-|---|---|
 |400| verplicht veld ontbreekt en email en wachtwoord niet valide|
-|---|---|
 |409| Gebruiker bestaat al|
 
 #### GET /api/user, Gebruiker zoeken
@@ -100,7 +93,6 @@ Beschikbare query parameters:
 Body = niet van toepassing
 
 |status|
-|---|---|
 |200| laat alle gebruikers zien.|
 
 #### GET /api/user/{userId}, Gebruiker op ID zoeken
@@ -112,11 +104,8 @@ Vereisten:
 
 |status||
 |200| laat gebruiker zien|
-|---|---|
 |401| ongeldige token|
-|---|---|
 |404| GebruikerID bestaat niet|
-|---|---|
 
 #### Profiel opvragen
 Request: GET
@@ -259,9 +248,9 @@ Route:      /api/meal
 Vereisten: 
 niet van toepassing
 
-|Status code||
+|Status code|
 |---|---|
-|200| Geeft lijst met maaltijden terug
+|200| Geeft lijst met maaltijden terug|
 
 #### GET /api/meal/{mealId}, Maaltijd details opvragen
 Request:    GET
@@ -280,7 +269,7 @@ Vereisten:
 -Moet eigenaar zijn van de maaltijd
 -Maaltijd moet bestaan
 
-|Status code||
+|Status code|
 |---|---|
 |200| maaltijd succesvol verwijdert|
 |---|---|
@@ -300,7 +289,7 @@ Vereisten:
 -Moet eigenaar zijn van de maaltijd
 -Maaltijd moet bestaan
 
-|Status code||
+|Status code|
 |---|---|
 |200| succesvolle aanmelding|
 |---|---|
@@ -316,7 +305,7 @@ Vereisten:
 -Maaltijd moet bestaan
 -Aanmelding moet bestaan
 
-|Status code||
+|Status code|
 |---|---|
 |200| succesvolle afmelding|
 |---|---|
