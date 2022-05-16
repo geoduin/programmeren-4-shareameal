@@ -41,7 +41,7 @@ let controller = {
             connect.query('SELECT * FROM user WHERE emailAdress = ?;', [userEmail], (error, result) => {
                 connect.release();
                 if (error) {
-                    logr.trace("Error?: ----------------");
+                    logr.debug("Error?: ----------------");
                     logr.trace(error)
                 };
                 let User = result[0];
@@ -54,9 +54,10 @@ let controller = {
                     }
                     next(err);
                 } else {
+                    logr.debug(User.password);
                     BCrypt.compare(userPassWord, User.password).then((correct) => {
                         if (correct) {
-                            logr.trace('Login has succeeded');
+                            logr.debug('Login has succeeded');
                             jwt.sign({ id: User.id, emailAdress: User.emailAdress },
                                 jwtSecretKey, { expiresIn: '50d' },
                                 function (err, token) {
@@ -67,7 +68,7 @@ let controller = {
                                         User.isActive = convertIntToBoolean(User.isActive);
                                         User.roles = User.roles.split(",");
                                         delete User.password;
-                                        logr.trace(User);
+                                        logr.debug(User);
                                         res.status(200).json({
                                             status: 200,
                                             result: User
@@ -76,7 +77,7 @@ let controller = {
                                 }
                             );
                         } else {
-                            logr.trace('Incorrect password')
+                            logr.debug('Incorrect password')
                             err = {
                                 status: 400,
                                 result: "Not the right password of this email"

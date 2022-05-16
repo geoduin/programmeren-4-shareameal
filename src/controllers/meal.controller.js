@@ -187,6 +187,7 @@ let controller = {
                     for (const element of mealOne) {
                         let meal = element;
                         let participants = [];
+                        logr.debug(meal.cook);
                         meal.cook = JSON.parse(meal.cook);
                         meal.cook.isActive = intToBoolean(meal.cook.isActive);
                         meal.cook.roles = meal.cook.roles.split(",");
