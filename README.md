@@ -45,9 +45,8 @@ let Login = {
 }
 ```
 
-|status code:|
+|status code:| |
 |200| inlog succesvol voldaan. Ontvangt gebruiker met een token.|
-Ontvangt gebruiker met een token.|
 |400| Verkeerde input|
 |404| gebruiker bestaat niet, op basis van input emailAdress.|
 
@@ -74,7 +73,7 @@ Gebruiker aanmaak body =
         }
 ```
 
-|Status code|
+|Status code| |
 |201| succesvolle gebruiker aangemaakt|
 |400| verplicht veld ontbreekt en email en wachtwoord niet valide|
 |409| Gebruiker bestaat al|
@@ -92,7 +91,7 @@ Beschikbare query parameters:
 
 Body = niet van toepassing
 
-|status|
+|status| |
 |200| laat alle gebruikers zien.|
 
 #### GET /api/user/{userId}, Gebruiker op ID zoeken
@@ -102,7 +101,7 @@ Vereisten:
 -Geldige token
 -Bestaande gebruikers
 
-|status||
+|status| |
 |200| laat gebruiker zien|
 |401| ongeldige token|
 |404| GebruikerID bestaat niet|
@@ -113,7 +112,7 @@ Route: /api/user/profile
 Vereisten:
 -Geldige token
 -Moet ingelogd zijn
-|status||
+|status| |
 |200| laat profiel zien.|
 |---|---|
 |401| ongeldige token.|
@@ -141,12 +140,10 @@ let body =
             phoneNumber:    "Telefoon"
         }
 ```
-|status|
+|status| |
 |---|---|
 |200| succesvolle wijziging|
-|---|---|
 |400| Niet valide input|
-|---|---|
 |401| Niet ingelogd |      
 
 #### Gebruiker verwijderen
@@ -158,7 +155,7 @@ Vereisten:
 -Moet ingelogd zijn
 -Moet eigenaar zijn van de gebruiker
 
-|Status code||
+|Status code| |
 |---|---|
 |200| succesvolle verwijdering|
 |---|---|
@@ -195,14 +192,11 @@ let body =
                 }
 ```
 
-|Status code||
+|Status code| |
 |---|---|
 |201| maaltijd succesvol aangemaakt|
-|---|---|
 |401| niet ingelogd|
-|---|---|
 |400| inputwaarden ongeldig/ontbreken|
-|---|---|
 
 #### PUT /api/meal/{mealId}, Maaltijd wijzigen
 Request:    PUT
@@ -230,16 +224,12 @@ let body =
                     price:                   prijs
                 }
 ```
-|Status code||
+|Status code| |
 |---|---|
 |201| maaltijd succesvol gewijzigd|
-|---|---|
 |400| inputwaarden ongeldig/ontbreken|
-|---|---|
 |401| niet ingelogd|
-|---|---|
 |403| niet de eigenaar van de maaltijd|
-|---|---|
 |404| Maaltijd bestaat niet|
 
 #### GET /api/meal, Maaltijd ophalen
@@ -248,7 +238,7 @@ Route:      /api/meal
 Vereisten: 
 niet van toepassing
 
-|Status code|
+|Status code| |
 |---|---|
 |200| Geeft lijst met maaltijden terug|
 
@@ -269,14 +259,11 @@ Vereisten:
 -Moet eigenaar zijn van de maaltijd
 -Maaltijd moet bestaan
 
-|Status code|
+|Status code| |
 |---|---|
 |200| maaltijd succesvol verwijdert|
-|---|---|
 |401| niet ingelogd|
-|---|---|
 |403| niet de eigenaar van de maaltijd|
-|---|---|
 |404| maaltijd bestaat niet|
 
 ### Deelname aan maaltijd
@@ -292,9 +279,7 @@ Vereisten:
 |Status code|
 |---|---|
 |200| succesvolle aanmelding|
-|---|---|
 |401| niet ingelogd|
-|---|---|
 |404|maaltijd bestaat niet|
 
 #### PUT /api/meal/{mealId}/signOff, Afmelden maaltijd
@@ -308,9 +293,7 @@ Vereisten:
 |Status code|
 |---|---|
 |200| succesvolle afmelding|
-|---|---|
 |401| niet ingelogd|
-|---|---|
 |404| maaltijd bestaat niet|
 
 
@@ -323,7 +306,6 @@ Hieronder staan alle technische specificaties beschreven die in de applicatie zi
 |Programmeertalen:| Doeleinden|Versie|
 |---|---|---|
 |NodeJs|Server en API|17.9.0|
-|---|---|---|
 |MariaDB|Relationele database|10.4.24|
 
 ### Andere applicaties
@@ -332,9 +314,7 @@ Hieronder staan alle applicaties die zijn gebruikt die de applicatie ondersteune
 |Applicatie|Doeleinden|
 |---|---|
 |Heroku|Hosten van de server|
-|---|---|
 |Github Action|Continues Integration/Development(CD/CI)|
-|---|---|
 |Github|Cloud repository en versiebeheer|
 
 ## Contact
