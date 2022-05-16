@@ -1,6 +1,8 @@
 # Share-a-Meal API
 Een API om maaltijden te zoeken, maken, verwijderen. geschreven door Xin X. Wang
 
+URL: https://share-meal-programmeren-4.herokuapp.com/
+
 ## Over de Share-a-Meal API
 Als eerstejaars Avans student heb ik naar aanleiding van het vak programmeren 4 een API gebouwd in nodeJs. 
 
@@ -39,6 +41,22 @@ De API biedt de mogelijkheid om:
 3. Maaltijden zoeken/wijzigen of verwijderen
 4. Deelname of afmelding van een maaltijd
 
+|REQUEST|Route|
+|---|---|
+|POST| /api/auth/login |
+|POST| /api/meal |
+|GET| /api/meal |
+|GET| /api/meal/{id} |
+|PUT| /api/meal/{id} |
+|DELETE| /api/meal/{id} |
+|POST| /api/user |
+|GET| /api/user |
+|GET| /api/user/{id} |
+|GET| /api/user/profile |
+|PUT| /api/user/{id} |
+|DELETE| /api/user/{id} |
+|POST| /api/meal/{id}/signUp |
+|PUT| /api/meal/{id}/signOff |
 ### POST /api/auth/login, Login van gebruiker
 Request:    POST
 
@@ -140,7 +158,7 @@ Vereisten:
 |401| ongeldige token|
 |404| GebruikerID bestaat niet|
 
-#### Profiel opvragen
+#### GET /api/user/profile, Profiel opvragen
 Request: GET
 Route: /api/user/profile
 Vereisten:
@@ -186,7 +204,7 @@ let body =
 |400| Niet valide input|
 |401| Niet ingelogd|      
 
-#### Gebruiker verwijderen
+#### DELETE /api/user/{userId}, Gebruiker verwijderen
 Request:    DELETE
 
 Route:      /api/user/{userId}
