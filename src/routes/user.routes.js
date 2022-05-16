@@ -2,7 +2,8 @@ const express = require('express');
 
 const UserRouter = express.Router();
 const UserController = require('../controllers/user.controller');
-
+const tokenAuthController = require('../controllers/auth.controller');
+const logr = require('../config/config').logger;
 //Test command.
 UserRouter.get("/", (req, res) => {
     res.status(200).json({
@@ -10,35 +11,33 @@ UserRouter.get("/", (req, res) => {
         result: "API van Xin X. Wang 2154458",
     });
 });
+
 //UC-201 Creates user. 
-//Note: I assume the attributes firstname, lastname, city, street, email and password are mandetory.
-//Thus there are no default values for thes attributes
 UserRouter.post("/api/user", 
-UserController.validateUserRegistration, 
+UserController.validateUserRegistration,
+UserController.checkUserExistence, 
 UserController.createUser);
 
 //UC-202 Retrieves all users
 UserRouter.get("/api/user", 
 UserController.getAllUsers);
 
-//UC-203 Retrieve user profile, based on Token and userID/
-//Token functionality has not been developed - in process
-//Client will send (Later replaced by tokens) => object = { id:(id)}
+//UC-203 Retrieve user profile, based on Token and userID
 UserRouter.get("/api/user/profile",  
-//UserController.checkToken, 
+tokenAuthController.validateTokenLogin, 
 UserController.getProfile);
 
 //UC-204 Retrieves user, based on userId. //
 //Client will send (Later replaced by tokens) 
 //object => { id:(UserId)}
 UserRouter.get("/api/user/:userId",
-//UserController.checkToken, 
+tokenAuthController.validateTokenLogin,  
 UserController.retrieveUserById);
 
 //UC-205 Edits user. client will send object to api 
 //=> sendObject {id:(UserId), newUserData:{attributes}}
 UserRouter.put("/api/user/:userId",  
-//UserController.checkLogin, 
+tokenAuthController.validateTokenLogin, 
 UserController.validateUserPost, 
 UserController.checkUserExistenceAndOwnership,  
 UserController.updateUser);
@@ -46,8 +45,13 @@ UserController.updateUser);
 //UC-206 Deletes user based on id, client will send id - (checkOwnerShip method) object to api
 // => Object = { id:(id)}
 UserRouter.delete("/api/user/:userId", 
-//UserController.checkLogin, 
+tokenAuthController.validateTokenLogin, 
 UserController.checkOwnershipUser, 
 UserController.deleteUser);
 
+//Test
+
+//UserRouter.put('/api/test/:mealId', UserController.testDateDB);
+UserRouter.post('/api/test', UserController.checkToken);
+UserRouter.post('/api/test/login', tokenAuthController.validateToken);
 module.exports = UserRouter;

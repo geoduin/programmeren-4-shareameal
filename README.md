@@ -1,92 +1,426 @@
-# programmeren-4-sam-server
+# Share-a-Meal API
+Een API om maaltijden te zoeken, maken, verwijderen. geschreven door Xin X. Wang
+
+URL: https://share-meal-programmeren-4.herokuapp.com/
+
+## Over de Share-a-Meal API
+Als eerstejaars Avans student heb ik naar aanleiding van het vak programmeren 4 een API gebouwd in nodeJs. 
+
+Hiermee kun je maaltijden toevoegen, verwijderen, wijzigen en zoeken.
+
+Daarnaast kun jezelf aanmelden, registreren of gebruikers zoeken.
+
+Ook kun je deelnemen aan maaltijden.
 
 
+Om de kwaliteit van de applicatie te waarborgen, hebben we integratietesten uitgevoerd met behulp van chai/mocha en passen we CI/CD toe met github action.
 
-## Getting started
-!
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Installatie code
+1. Om de code te downloaden, kun je in de github een fork doen op deze repository.
+2. Download de zip-bestand uit de repository.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+### Lokaal API uitvoeren
+Hieronder kun je de applicatie lokaal uitvoeren met deze commands.
 
-## Add your files
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+``` 
+npm start
+//Of
+nodemon index.js
+```
+
+## Routes API
+Om gebruik te maken van de share-a-meal, zijn hieronder alle API-routes vermeld. 
+
+Bij elke API-route, staat er vermeld wat men nodig heeft om de API te gebruiken.
+
+De API biedt de mogelijkheid om:
+
+1. In te loggen
+2. Gebruikers te zoeken/wijzigen en verwijderen
+3. Maaltijden zoeken/wijzigen of verwijderen
+4. Deelname of afmelding van een maaltijd
+
+|REQUEST|Route|
+|---|---|
+|POST| /api/auth/login |
+|POST| /api/meal |
+|GET| /api/meal |
+|GET| /api/meal/{id} |
+|PUT| /api/meal/{id} |
+|DELETE| /api/meal/{id} |
+|POST| /api/user |
+|GET| /api/user |
+|GET| /api/user/{id} |
+|GET| /api/user/profile |
+|PUT| /api/user/{id} |
+|DELETE| /api/user/{id} |
+|POST| /api/meal/{id}/signUp |
+|PUT| /api/meal/{id}/signOff |
+### POST /api/auth/login, Login van gebruiker
+Request:    POST
+
+Route:      /api/auth/login
+
+Vereisten:
+
+Niet van toepassing
+
+Benodigde body
+
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/rschellius/programmeren-4-sam-server.git
-git branch -M main
-git push -uf origin main
+let Login = {
+    emailAdress: "emailAdress"
+    password: "password"
+}
 ```
 
-## Integrate with your tools
+|status code:| |
+|---|---|
+|200| inlog succesvol voldaan. Ontvangt gebruiker met een token.|
+|400| Verkeerde input|
+|404| gebruiker bestaat niet, op basis van input emailAdress.|
 
-- [ ] [Set up project integrations](https://gitlab.com/rschellius/programmeren-4-sam-server/-/settings/integrations)
+### Gebruikersbeheer
 
-## Collaborate with your team
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+#### POST /api/user, Gebruiker aanmaken
+Request: POST
 
-## Test and Deploy
+Route: /api/user
 
-Use the built-in continuous integration in GitLab.!
+Vereisten:
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Valide email vereist
 
-***
+Wachtwoord minstens 8 charracters en 1 hoofdletter
 
-# Editing this README
+Valide telefoonnummer vereist
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!).  Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```
+Gebruiker aanmaak body = 
+        {
+            name:       "naam",
+            password:   "password",
+            emailAdress:"email",
+            phoneNumber:"phonenumber",
+            city:       "City",
+            street:     "street"
+        }
+```
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+|Status code| |
+|---|---|
+|201| succesvolle gebruiker aangemaakt|
+|400| verplicht veld ontbreekt en email en wachtwoord niet valide|
+|409| Gebruiker bestaat al|
 
-## Name
-Choose a self-explaining name for your project.
+#### GET /api/user, Gebruiker zoeken
+Request: GET
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+Route: /api/user
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Vereisten:
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+Niet van toepassing
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+Beschikbare query parameters:
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+- limit => om de maximale hoeveelheid gezochte gebruikers op te vragen
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+- searchTerm => op basis van een zoekterm naar gebruikers zoeken die ongeveer voldoet aan de zoekterm.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+- isActive => Zoekt op gebruikers die actief of inactief zijn. Waarden: true/false
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+Body = niet van toepassing
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+|status| |
+|---|---|
+|200| laat alle gebruikers zien.|
 
-## License
-For open source projects, say how it is licensed.
+#### GET /api/user/{userId}, Gebruiker op ID zoeken
+Request: GET
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Route: /api/user/{userId}
+
+Vereisten:
+
+-Geldige token
+
+-Bestaande gebruikers
+
+|status| |
+|---|---|
+|200| laat gebruiker zien|
+|401| ongeldige token|
+|404| GebruikerID bestaat niet|
+
+#### GET /api/user/profile, Profiel opvragen
+Request: GET
+Route: /api/user/profile
+Vereisten:
+-Geldige token
+-Moet ingelogd zijn
+|status| |
+|---|---|
+|200| laat profiel zien.|
+|401| ongeldige token.|
+
+#### PUT /api/user/{userId}, Gebruiker wijzigen
+Request: PUT
+
+Route: /api/user/{userId}
+
+Vereisten:
+
+-Bestaande gebruikers
+
+-Geldige token
+
+-Moet ingelogd zijn
+
+-Moet eigenaar zijn van de gebruiker
+
+
+```
+let body = 
+        {
+            firstName:      "voornaam",
+            lastName:       "achternaame",
+            city:           "stad",
+            street:         "straat",
+            emailAdress:    "Email",
+            password:       "Wachtwoord",
+            isActive:       "isactive",
+            phoneNumber:    "Telefoon"
+        }
+```
+|status| |
+|---|---|
+|200| succesvolle wijziging|
+|400| Niet valide input|
+|401| Niet ingelogd|      
+
+#### DELETE /api/user/{userId}, Gebruiker verwijderen
+Request:    DELETE
+
+Route:      /api/user/{userId}
+
+Vereisten: 
+
+-Bestaande gebruikers
+
+-Geldige token
+
+-Moet ingelogd zijn
+
+-Moet eigenaar zijn van de gebruiker
+
+|Status code| |
+|---|---|
+|200| succesvolle verwijdering|
+|401| niet ingelogd|
+|403| niet de eigenaar van de gebruiker|
+|400| gebruiker bestaat niet|
+
+### Maaltijdenbeheer
+
+#### POST /api/meal Maaltijd aanmaken
+Request:    POST
+
+Route:      /api/meal
+
+Vereisten: 
+
+-token is vereist
+
+-Moet ingelogd zijn
+
+-Alle velden zijn verplicht
+
+```
+let body = 
+                {
+                    name:                   "naam",
+                    description:            "Beschrijving",
+                    isActive:               "boolean",
+                    isVega:                 "boolean",
+                    isVegan:                "boolean",
+                    isToTakeHome:           "boolean",
+                    dateTime:               "Jaar-maand-dagTuur:minuten:seconden",
+                    imageUrl:               "https://afbeelding.jpg",
+                    allergenes:              allergenen,
+                    maxAmountOfParticipants: nummer,
+                    price:                   prijs
+                }
+```
+
+|Status code| |
+|---|---|
+|201| maaltijd succesvol aangemaakt|
+|401| niet ingelogd|
+|400| inputwaarden ongeldig/ontbreken|
+
+#### PUT /api/meal/{mealId}, Maaltijd wijzigen
+Request:    PUT
+
+Route:      /api/meal/{mealId}
+
+Vereisten: 
+
+-Token is vereist
+
+-Moet ingelogd zijn
+
+-Alle velden zijn verplicht
+
+-Moet eigenaar zijn van de maaltijd
+
+-Maaltijd moet bestaan
+
+
+```
+let body = 
+                {
+                    name:                   "naam",
+                    description:            "Beschrijving",
+                    isActive:               "boolean",
+                    isVega:                 "boolean",
+                    isVegan:                "boolean",
+                    isToTakeHome:           "boolean",
+                    dateTime:               "Jaar-maand-dagTuur:minuten:seconden",
+                    imageUrl:               "https://afbeelding.jpg",
+                    allergenes:              allergenen,
+                    maxAmountOfParticipants: nummer,
+                    price:                   prijs
+                }
+```
+|Status code| |
+|---|---|
+|201| maaltijd succesvol gewijzigd|
+|400| inputwaarden ongeldig/ontbreken|
+|401| niet ingelogd|
+|403| niet de eigenaar van de maaltijd|
+|404| Maaltijd bestaat niet|
+
+#### GET /api/meal, Maaltijd ophalen
+Request:    GET
+
+Route:      /api/meal
+
+Vereisten: 
+
+niet van toepassing
+
+
+|Status code| |
+|---|---|
+|200| Geeft lijst met maaltijden terug|
+
+#### GET /api/meal/{mealId}, Maaltijd details opvragen
+
+Request:    GET
+
+Route:      /api/meal/{mealId}
+
+Vereisten: 
+
+niet van toepassing
+
+
+Status code
+200 Maaltijd met details terug
+
+#### DELETE /api/meal/{mealId}, Maaltijd verwijderen
+
+Request:    DELETE
+
+Route:      /api/meal/{mealId}
+
+Vereisten: 
+
+-Token is vereist
+
+-Moet eigenaar zijn van de maaltijd
+
+-Maaltijd moet bestaan
+
+|Status code| |
+|---|---|
+|200| maaltijd succesvol verwijdert|
+|401| niet ingelogd|
+|403| niet de eigenaar van de maaltijd|
+|404| maaltijd bestaat niet|
+
+### Deelname aan maaltijd
+
+#### POST /api/meal/{mealId}/signup, Aanmelding maaltijd
+
+Request:    POST
+
+Route:      /api/meal/{mealId}/signup
+
+Vereisten: 
+
+-Token is vereist
+
+-Moet eigenaar zijn van de maaltijd
+
+-Maaltijd moet bestaan
+
+|Status code| |
+|---|---|
+|200| succesvolle aanmelding|
+|401| niet ingelogd|
+|404|maaltijd bestaat niet|
+
+#### PUT /api/meal/{mealId}/signOff, Afmelden maaltijd
+Request:    PUT
+
+Route:      /api/meal/{mealId}/signOff
+
+Vereisten: 
+
+-Token is vereist
+
+-Maaltijd moet bestaan
+
+-Aanmelding moet bestaan
+
+|Status code| |
+|---|---|
+|200| succesvolle afmelding|
+|401| niet ingelogd|
+|404| maaltijd bestaat niet|
+
+
+## Technische specificaties
+
+### Programmeertalen
+
+Hieronder staan alle technische specificaties beschreven die in de applicatie zijn toegepast.
+
+|Programmeertalen:| Doeleinden|Versie|
+|---|---|---|
+|NodeJs|Server en API|17.9.0|
+|MariaDB|Relationele database|10.4.24|
+
+### Andere applicaties
+Hieronder staan alle applicaties die zijn gebruikt die de applicatie ondersteunen.
+
+|Applicatie|Doeleinden|
+|---|---|
+|Heroku|Hosten van de server|
+|Github Action|Continues Integration/Development(CD/CI)|
+|Github|Cloud repository en versiebeheer|
+
+## Contact
+
+Voor contact met de ontwikkelaar, kunt u een mail sturen naar het volgende emailadres.
+
+Email: xx.wang@student.avans.nl
+
+

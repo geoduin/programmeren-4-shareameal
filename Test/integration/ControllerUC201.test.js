@@ -6,6 +6,8 @@ const chaiHttp = require('chai-http');
 const { it } = require('mocha');
 const server = require('../../index');
 const DB = require('../../src/data/dbConnection');
+const tokens = require('../../src/tokens/UserTokens.token');
+
 
 describe('UC-201 Create new User POST /api/user', (done) => {
     describe('UC-201 set up users', () => {
@@ -131,6 +133,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 street: "Pluebo district uno",
                 emailAdress: "@outlook.com",
                 password: "qweqweqweq",
+                phoneNumber: "31123456789"
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, message, user } = res.body;
@@ -141,7 +144,25 @@ describe('UC-201 Create new User POST /api/user', (done) => {
             })
         })
 
-        it.skip('TC-201-3 Invalid password format', (done) => {
+        it('TC-201-2.5 Invalid Phone number test', (done) => {
+            chai.request(server).post('/api/user').send({
+                firstName: "James",
+                lastName: "Almada",
+                city: "Buenos Aires",
+                street: "Pluebo district uno",
+                phoneNumber: "02-123456789",
+                emailAdress: "m.vandullemen@server.nl",
+                password: "Erika!23Opa",
+            }).end((err, res) => {
+                res.should.be.an('object');
+                let { status, message, user } = res.body;
+                status.should.be.equals(400);
+                message.should.be.a('string').that.equals('Invalid phonenumber');
+                done();
+            })
+        })
+
+        it('TC-201-3 Invalid password format', (done) => {
             chai.request(server).post('/api/user').send({
                 firstName: "Alphonso",
                 lastName: "Davies",
@@ -150,7 +171,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 emailAdress: "m.vandullemen@server.nl",
                 password: "oooooooo",
                 isActive: true,
-                phoneNumber: "06 789032909"
+                phoneNumber: "31123456789"
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, message } = res.body;
@@ -163,14 +184,13 @@ describe('UC-201 Create new User POST /api/user', (done) => {
         //Fixes need to be made
         it('TC-201-4 When email has already been registered, it will return a error message and does not persist within the database', (done) => {
             chai.request(server).post('/api/user').send({
-                firstName: "Alphonso",
-                lastName: "Davies",
-                city: "Ottawa",
-                street: "Cardin avenue",
+                firstName: "James",
+                lastName: "Almada",
+                city: "Buenos Aires",
+                street: "Pluebo district uno",
+                phoneNumber: "31 123456789",
                 emailAdress: "m.vandullemen@server.nl",
                 password: "Erika!23Opa",
-                isActive: true,
-                phoneNumber: "06 789032909"
             }).end((err, res) => {
                 res.should.be.an('object');
                 let { status, message } = res.body;
@@ -186,15 +206,31 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 lastName: "Almada",
                 city: "Buenos Aires",
                 street: "Pluebo district uno",
+                phoneNumber: "31 123456789",
                 emailAdress: "ArezoStanistan@outlook.com",
                 password: "Erika!23Opa",
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result } = res.body;
+                let { status, message, result } = res.body;
+                message.should.be.a('string').that.equals('User has been registered.');
                 status.should.be.equals(201);
-                result.should.be.an('object').to.deep.equal(result);
                 //Token test will be tested in the future
-
+                result.should.be.a('object');
+                result.token.should.be.a('string');
+                result.id.should.be.a('number');
+                result.firstName.should.be.a('string');
+                assert.deepEqual(result, {
+                    id: result.id,
+                    firstName: "James",
+                    lastName: "Almada",
+                    isActive: 1,
+                    emailAdress: "ArezoStanistan@outlook.com",
+                    phoneNumber: "31 123456789",
+                    roles: ["editor","guest"],
+                    street: "Pluebo district uno",
+                    city: "Buenos Aires",
+                    token: result.token,
+                  })
                 done();
             })
         })
@@ -236,7 +272,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
     it('TC-202-2 show two users', (done) => {
         chai.request(server)
             .get('/api/user')
-            .query({ amount: 2 })
+            .query({ limit: 2 })
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, amount, result } = res.body;
@@ -249,7 +285,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "van den Dullemen",
                         "isActive": true,
                         "emailAdress": "m.vandullemen@server.nl",
-                        "password": "secret",
                         "phoneNumber": "",
                         "roles": [
                             ""
@@ -263,7 +298,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Doe",
                         "isActive": true,
                         "emailAdress": "j.doe@server.com",
-                        "password": "secret",
                         "phoneNumber": "06 12425475",
                         "roles": [
                             "editor",
@@ -306,7 +340,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Van Dam",
                         "isActive": false,
                         "emailAdress": "m.vandam@server.nl",
-                        "password": "secret",
                         "phoneNumber": "06-12345678",
                         "roles": [
                             "editor",
@@ -339,7 +372,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "van den Dullemen",
                         "isActive": true,
                         "emailAdress": "m.vandullemen@server.nl",
-                        "password": "secret",
                         "phoneNumber": "",
                         "roles": [
                             ""
@@ -353,7 +385,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Doe",
                         "isActive": true,
                         "emailAdress": "j.doe@server.com",
-                        "password": "secret",
                         "phoneNumber": "06 12425475",
                         "roles": [
                             "editor",
@@ -368,7 +399,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Huizinga",
                         "isActive": true,
                         "emailAdress": "h.huizinga@server.nl",
-                        "password": "secret",
                         "phoneNumber": "06-12345678",
                         "roles": [
                             "editor",
@@ -383,7 +413,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Tank",
                         "isActive": true,
                         "emailAdress": "h.tank@server.com",
-                        "password": "secret",
                         "phoneNumber": "06 12425495",
                         "roles": [
                             "editor",
@@ -413,7 +442,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "van den Dullemen",
                         "isActive": true,
                         "emailAdress": "m.vandullemen@server.nl",
-                        "password": "secret",
                         "phoneNumber": "",
                         "roles": [
                             ""
@@ -427,7 +455,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Huizinga",
                         "isActive": true,
                         "emailAdress": "h.huizinga@server.nl",
-                        "password": "secret",
                         "phoneNumber": "06-12345678",
                         "roles": [
                             "editor",
@@ -442,7 +469,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "lastName": "Van Dam",
                         "isActive": false,
                         "emailAdress": "m.vandam@server.nl",
-                        "password": "secret",
                         "phoneNumber": "06-12345678",
                         "roles": [
                             "editor",
@@ -461,22 +487,32 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
     it('TC-203-1 Invalid token', (done) => {
         chai.request(server)
             .get('/api/user/profile')
-            .send({ id: 0 })
+            .auth(tokens.MarieteInvalidDate, { type: 'bearer' })
             .end((req, res) => {
                 let { message, status } = res.body;
                 status.should.be.equal(401);
-                message.should.be.equal('Correct token functionality has not been implemented');
+                message.should.be.equal('Token has expired');
                 done();
             })
     })
     it('TC-203-2 valid token and existing users', (done) => {
         chai.request(server)
             .get('/api/user/profile')
-            .send({ id: 0 })
+            .auth(tokens.Mariete, { type: 'bearer' })
             .end((req, res) => {
-                let { message, status } = res.body;
-                status.should.be.equal(401);
-                message.should.be.equal('Correct token functionality has not been implemented');
+                let { result, status } = res.body;
+                status.should.be.equal(200);
+                assert.deepEqual(result, {
+                    id: 1,
+                    firstName: "Mariëtte",
+                    lastName: "van den Dullemen",
+                    emailAdress: "m.vandullemen@server.nl",
+                    password: result.password,
+                    street: "",
+                    city: "",
+                    roles: [""],
+                    isActive: true
+                })
                 done();
             })
     })
@@ -485,13 +521,14 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
 describe('UC-204 User details checker', (done) => {
     it.skip('TC-204-1 Invalid token', (done) => {
         let id = 99;
-        chai.request(server).get('/api/user/' + id)
+        chai.request(server)
+            .get('/api/user/' + id)
+            .auth(tokens.MarieteInvalidDate, { type: 'bearer' })
             .end((req, res) => {
                 res.should.be.a('object');
-                let { status, result, note } = res.body;
-                status.should.be.equal(404);
-                result.should.be.equal('Invalid token');
-                note.should.be.equal('Token implementation has not been implemented. It is in process');
+                let { status, message } = res.body;
+                status.should.be.equal(401);
+                message.should.be.equal('Token has expired');
                 done();
             })
     })
@@ -500,7 +537,7 @@ describe('UC-204 User details checker', (done) => {
         let id = 99;
         chai.request(server)
             .get('/api/user/' + id)
-            //.send({id:1})
+            .auth(tokens.Mariete, { type: 'bearer' })
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, message } = res.body;
@@ -513,19 +550,18 @@ describe('UC-204 User details checker', (done) => {
         let userid = 1;
         chai.request(server)
             .get('/api/user/' + userid)
-            .send({ id: 1 })
+            .auth(tokens.Mariete, { type: 'bearer' })
             .end((err, res) => {
                 res.should.be.a('object');
-                let { status, message, user } = res.body;
+                let { status, message, result } = res.body;
                 status.should.be.equal(200);
                 message.should.be.equal(`User with id: ${userid} found`);
-                assert.deepEqual(res.body.result, {
+                assert.deepEqual(result, {
                     id: 1,
                     firstName: 'Mariëtte',
                     lastName: 'van den Dullemen',
                     isActive: true,
                     emailAdress: 'm.vandullemen@server.nl',
-                    password: 'secret',
                     phoneNumber: '',
                     roles: [""],
                     street: '',
@@ -538,15 +574,12 @@ describe('UC-204 User details checker', (done) => {
                             isVegan: false,
                             isToTakeHome: true,
                             dateTime: "2022-03-22T17:35:00.000Z",
-                            //   dateTime: "2022-03-22T16:35:00.000Z",
                             maxAmountOfParticipants: 4,
                             price: '12.75',
                             imageUrl: 'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
                             cookId: 1,
                             createDate: "2022-02-26T18:12:40.048Z",
                             updateDate: "2022-04-26T12:33:51.000Z",
-                            //   createDate: "2022-02-26T17:12:40.048Z",
-                            //   updateDate: "2022-04-26T10:33:51.000Z",
                             name: 'Pasta Bolognese met tomaat, spekjes en kaas',
                             description: 'Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!',
                             allergenes: ['gluten', 'lactose']
@@ -563,16 +596,16 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
         DB.getConnection((err, con) => {
             con.query('INSERT INTO user VALUES(199, "Xilo", "Phone", 1, "Moomoo@gmail.com", "Secrid", "0612345678", "editor,guest", "XiaXiaStan", "Harbin");', (err, result) => {
                 con.release();
-                console.log(result);
             })
         })
         done();
     })
 
-    it('TC-205-1 required field missing', (done) => {
+    it('TC-205-1 required field missing, example: password is missing', (done) => {
         let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
+            .auth(tokens.Xilo, { type: 'bearer' })
             .send(
                 {
                     id: 199,
@@ -597,31 +630,55 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
         let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
+            .auth(tokens.Xilo, { type: 'bearer' })
             .send({
                 id: 199,
-                user: {
-                    id: 199,
-                    firstName: "Xon",
-                    lastName: "Wong",
-                    city: "Rotterdam",
-                    street: "Maskauplein",
-                    emailAdress: "Xin20Wang@outlook.com",
-                    password: "Password111",
-                    isActive: true,
-                    phoneNumber: "06 124"
-                }
+                firstName: "Xon",
+                lastName: "Wong",
+                city: "Rotterdam",
+                street: "Maskauplein",
+                emailAdress: "Moomoo@gmail.com",
+                password: "Password#@@#s!111",
+                isActive: true,
+                phoneNumber: "06 124"
+
             })
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, message } = res.body;
                 status.should.be.equal(400);
-                message.should.be.equal('Phonenumber must be 9 characters long');
+                message.should.be.equal('Invalid phonenumber');
                 done();
             })
     })
 
     it('TC-205-4 User does not exist', (done) => {
         let id = 999;
+        chai.request(server)
+            .put('/api/user/' + id)
+            .auth(tokens.Xilo, { type: 'bearer' })
+            .send({
+                id: 199,
+                firstName: "Xon",
+                lastName: "Wong",
+                city: "Rotterdam",
+                street: "Maskauplein",
+                emailAdress: "Moomoo@gmail.com",
+                password: "Password#@@#s!111",
+                isActive: true,
+                phoneNumber: "31 123456789"
+            })
+            .end((req, res) => {
+                res.should.be.a('object');
+                let { status, message } = res.body;
+                status.should.be.equal(400);
+                message.should.be.equal(`User does not exist.`);
+                done();
+            })
+    })
+
+    it.skip('TC-205-5 User has not logged in', (done) => {
+        let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
             .send({
@@ -638,36 +695,8 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, message } = res.body;
-                status.should.be.equal(400);
-                message.should.be.equal(`User does not exist.`);
-                done();
-            })
-    })
-
-    it.skip('TC-205-5 User has not logged in', (done) => {
-        let id = 199;
-        chai.request(server)
-            .put('/api/user/' + id)
-            .send({
-                //It lacks a id attribute above the user object.
-                //Will be replaced by a token
-                user: {
-                    id: 0,
-                    firstName: "Xon",
-                    lastName: "Wong",
-                    city: "Rotterdam",
-                    street: "Maskauplein",
-                    emailAdress: "Xin20Wang@outlook.com",
-                    password: "Password111",
-                    isActive: true,
-                    phoneNumber: "06 123456789"
-                }
-            })
-            .end((req, res) => {
-                res.should.be.a('object');
-                let { status, result } = res.body;
                 status.should.be.equal(401);
-                result.should.be.equal('User has not been logged in');
+                message.should.be.equal('Not logged in');
                 done();
             })
     })
@@ -676,17 +705,17 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
         let id = 199;
         chai.request(server)
             .put('/api/user/' + id)
+            .auth(tokens.Xilo, {type:'bearer'})
             .send({
-                //Placeholder object
-                id: 199,
-                firstName: "Xon",
-                lastName: "Wong",
-                city: "Rotterdam",
-                street: "Maskauplein",
-                emailAdress: "Xin20Wang@outlook.com",
-                password: "Password111",
-                isActive: true,
-                phoneNumber: "06 123456789"
+                    id: 199,
+                    firstName: "Xon",
+                    lastName: "Wong",
+                    city: "Rotterdam",
+                    street: "Maskauplein",
+                    emailAdress: "Moomoo@gmail.com",
+                    password: "Password!!111",
+                    isActive: true,
+                    phoneNumber: "31 123456789"
             })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -699,22 +728,22 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     lastName: "Wong",
                     city: "Rotterdam",
                     street: "Maskauplein",
-                    emailAdress: "Xin20Wang@outlook.com",
-                    password: "Password111",
+                    emailAdress: "Moomoo@gmail.com",
+                    //Every update, it will create a new hashcode
+                    password: result.password,
                     isActive: true,
                     roles: ["editor", "guest"],
-                    phoneNumber: "06 123456789"
+                    phoneNumber: "31 123456789"
                 })
                 done();
             })
     })
     after((done) => {
         DB.getConnection((err, con) => {
-            con.query('DELETE FROM user WHERE emailAdress = "Xin20Wang@outlook.com";', (err, result) => {
+            con.query('DELETE FROM user WHERE emailAdress = "Moomoo@gmail.com";', (err, result) => {
                 con.query('ALTER TABLE user AUTO_INCREMENT = 6;', (err, result) => {
                     con.release();
                 });
-                console.log(result);
             })
         })
         done();
@@ -736,7 +765,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
         let id = 99999;
         chai.request(server)
             .delete('/api/user/' + id)
-            .send({ id: 200 })
+            .auth(tokens.Jessie, { type:'bearer'})
             .end((req, res) => {
                 let { status, message } = res.body;
                 status.should.be.equal(400);
@@ -752,7 +781,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
             //No object send
             .end((req, res) => {
                 res.body.status.should.be.equal(401);
-                res.body.message.should.be.equal('User has not been logged in');
+                res.body.message.should.be.equal('Not logged in');
                 done();
             })
     })
@@ -760,9 +789,9 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
         let id = 200;
         chai.request(server)
             .delete('/api/user/' + id)
-            .send({ id: 201 })
+            .auth(tokens.Henk, {type: 'bearer'})
             .end((req, res) => {
-                res.body.status.should.be.equal(401);
+                res.body.status.should.be.equal(403);
                 res.body.message.should.be.equal(`This user does not own user with ID ${id}`);
                 done();
             })
@@ -771,8 +800,7 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
         let id = 200;
         chai.request(server)
             .delete('/api/user/' + id)
-            //Placeholder method
-            .send({ id: 200 })
+            .auth(tokens.Jessie, { type:'bearer'})
             .end((req, res) => {
                 let { status, message } = res.body;
                 status.should.be.equal(200);
@@ -785,7 +813,6 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
         DB.getConnection((err, con) => {
             con.query('DELETE FROM user WHERE id = 200;', (err, result) => {
                 con.query('ALTER TABLE user AUTO_INCREMENT = 8');
-                console.log(result);
             })
         })
         done();

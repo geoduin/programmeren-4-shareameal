@@ -1,33 +1,34 @@
 const express = require('express');
 const MealRouter = express.Router();
 const mealController = require('../controllers/meal.controller');
-
-//UC-301 Register meal - in process
-MealRouter.post("/api/meal", 
-mealController.validateLogin,
-mealController.validateMealCreation, 
+const authorizationController = require('../controllers/auth.controller');
+//UC-301 Register meal 
+MealRouter.post("/api/meal",
+authorizationController.validateTokenLogin,  
+mealController.validateMealCreation,
 mealController.createMeal);
 
-//UC-302 Update meal - in process
+//UC-302 Update meal
 MealRouter.put("/api/meal/:mealId", 
-mealController.validateLogin,
+authorizationController.validateTokenLogin, 
 mealController.validateMealCreation, 
 mealController.checkMealStatus, 
 mealController.updateMealById);
 
-//UC-303 Get all meals - in process
+//UC-303 Get all meals
 MealRouter.get("/api/meal", 
 mealController.getAllMeals);
 
-//UC-304 get meal based on id - in process
+//UC-304 get meal based on id 
 MealRouter.get("/api/meal/:mealId", 
 mealController.getMealById);
 
-//UC-305 Delete meal - in process
+//UC-305 Delete meal
 MealRouter.delete("/api/meal/:mealId", 
-mealController.validateLogin,
+authorizationController.validateTokenLogin, 
 mealController.checkMealStatus,
 mealController.deleteMeal);
+
 
 
 module.exports = MealRouter;

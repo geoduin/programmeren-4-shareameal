@@ -5,6 +5,8 @@
 //Robin zal een echte/testdatabase schrijven.
 const mysql = require('mysql2');
 require('dotenv').config();
+const logr = require('../config/config').logger;
+
 const pool = mysql.createPool({
     connectionLimit: 10,
     host: process.env.DB_HOST,
@@ -12,15 +14,16 @@ const pool = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
+    multipleStatements: true, 
     timezone: 'UTC'
 })
 
 module.exports = pool;
 
 pool.on('acquire', function (connection) {
-    console.log('Connection %d acquired', connection.threadId);
+    logr.trace('Connection %d acquired', connection.threadId);
 });
 
 pool.on('release', function (connection) {
-    console.log('Connection %d released', connection.threadId);
+    logr.trace('Connection %d released', connection.threadId);
 });
