@@ -46,6 +46,7 @@ let Login = {
 ```
 
 |status code:| |
+|---|---|
 |200| inlog succesvol voldaan. Ontvangt gebruiker met een token.|
 |400| Verkeerde input|
 |404| gebruiker bestaat niet, op basis van input emailAdress.|
@@ -74,6 +75,7 @@ Gebruiker aanmaak body =
 ```
 
 |Status code| |
+|---|---|
 |201| succesvolle gebruiker aangemaakt|
 |400| verplicht veld ontbreekt en email en wachtwoord niet valide|
 |409| Gebruiker bestaat al|
@@ -92,6 +94,7 @@ Beschikbare query parameters:
 Body = niet van toepassing
 
 |status| |
+|---|---|
 |200| laat alle gebruikers zien.|
 
 #### GET /api/user/{userId}, Gebruiker op ID zoeken
@@ -102,6 +105,7 @@ Vereisten:
 -Bestaande gebruikers
 
 |status| |
+|---|---|
 |200| laat gebruiker zien|
 |401| ongeldige token|
 |404| GebruikerID bestaat niet|
@@ -113,10 +117,9 @@ Vereisten:
 -Geldige token
 -Moet ingelogd zijn
 |status| |
+|---|---|
 |200| laat profiel zien.|
-|---|---|
 |401| ongeldige token.|
-|---|---|
 
 #### PUT /api/user/{userId}, Gebruiker wijzigen
 Request: PUT
@@ -144,7 +147,7 @@ let body =
 |---|---|
 |200| succesvolle wijziging|
 |400| Niet valide input|
-|401| Niet ingelogd |      
+|401| Niet ingelogd|      
 
 #### Gebruiker verwijderen
 Request:    DELETE
@@ -158,11 +161,8 @@ Vereisten:
 |Status code| |
 |---|---|
 |200| succesvolle verwijdering|
-|---|---|
 |401| niet ingelogd|
-|---|---|
 |403| niet de eigenaar van de gebruiker|
-|---|---|
 |400| gebruiker bestaat niet|
 
 ### Maaltijdenbeheer
@@ -276,7 +276,7 @@ Vereisten:
 -Moet eigenaar zijn van de maaltijd
 -Maaltijd moet bestaan
 
-|Status code|
+|Status code| |
 |---|---|
 |200| succesvolle aanmelding|
 |401| niet ingelogd|
@@ -290,7 +290,7 @@ Vereisten:
 -Maaltijd moet bestaan
 -Aanmelding moet bestaan
 
-|Status code|
+|Status code| |
 |---|---|
 |200| succesvolle afmelding|
 |401| niet ingelogd|
