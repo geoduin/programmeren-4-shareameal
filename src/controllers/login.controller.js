@@ -24,6 +24,7 @@ let controller = {
             next();
         } catch (error) {
             logr.trace(error.message);
+            logr.debug(error.message);
             const err = {
                 status: 400,
                 message: error.message
