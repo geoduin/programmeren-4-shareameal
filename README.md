@@ -3,9 +3,13 @@ Een API om maaltijden te zoeken, maken, verwijderen.
 
 ## Over de Share-a-Meal API
 Als eerste jaars student, heb ik naar aanleiding van het vak programmeren 4 een API gebouwd in nodeJs. 
+
 Hiermee kun je maaltijden toevoegen, verwijderen, wijzigen en zoeken.
+
 Daarnaast kun jezelf aanmelden, registreren of gebruikers zoeken.
+
 Ook kun je deelnemen aan maaltijden.
+
 
 Om de kwaliteit van de applicatie te waarborgen, hebben we integratietesten uitgevoerd met behulp van chai/mocha en passen we CI/CD toe met github action.
 
@@ -16,14 +20,20 @@ Om de kwaliteit van de applicatie te waarborgen, hebben we integratietesten uitg
 ### Lokaal API uitvoeren
 Hieronder kun je de applicatie lokaal uitvoeren met deze commands.
 
+
 ``` 
 npm start
 //Of
 nodemon index.js
 ```
+
 ## Routes API
-Om gebruik te maken van de share-a-meal, zijn hieronder alle API-routes vermeld. Bij elke API-route, staat er vermeld wat men nodig heeft om de API te gebruiken.
+Om gebruik te maken van de share-a-meal, zijn hieronder alle API-routes vermeld. 
+
+Bij elke API-route, staat er vermeld wat men nodig heeft om de API te gebruiken.
+
 De API biedt de mogelijkheid om:
+
 1. In te loggen
 2. Gebruikers te zoeken/wijzigen en verwijderen
 3. Maaltijden zoeken/wijzigen of verwijderen
@@ -31,12 +41,15 @@ De API biedt de mogelijkheid om:
 
 ### POST /api/auth/login, Login van gebruiker
 Request:    POST
+
 Route:      /api/auth/login
+
 Vereisten:
 
 Niet van toepassing
 
 Benodigde body
+
 
 ```
 let Login = {
@@ -56,10 +69,15 @@ let Login = {
 
 #### POST /api/user, Gebruiker aanmaken
 Request: POST
+
 Route: /api/user
+
 Vereisten:
+
 Valide email vereist
+
 Wachtwoord minstens 8 charracters en 1 hoofdletter
+
 Valide telefoonnummer vereist
 
 ```
@@ -82,14 +100,22 @@ Gebruiker aanmaak body =
 
 #### GET /api/user, Gebruiker zoeken
 Request: GET
+
 Route: /api/user
+
 Vereisten:
+
 Niet van toepassing
 
+
 Beschikbare query parameters:
+
 - limit => om de maximale hoeveelheid gezochte gebruikers op te vragen
+
 - searchTerm => op basis van een zoekterm naar gebruikers zoeken die ongeveer voldoet aan de zoekterm.
+
 - isActive => Zoekt op gebruikers die actief of inactief zijn. Waarden: true/false
+
 
 Body = niet van toepassing
 
@@ -99,9 +125,13 @@ Body = niet van toepassing
 
 #### GET /api/user/{userId}, Gebruiker op ID zoeken
 Request: GET
+
 Route: /api/user/{userId}
+
 Vereisten:
+
 -Geldige token
+
 -Bestaande gebruikers
 
 |status| |
@@ -123,12 +153,19 @@ Vereisten:
 
 #### PUT /api/user/{userId}, Gebruiker wijzigen
 Request: PUT
+
 Route: /api/user/{userId}
+
 Vereisten:
+
 -Bestaande gebruikers
+
 -Geldige token
+
 -Moet ingelogd zijn
+
 -Moet eigenaar zijn van de gebruiker
+
 
 ```
 let body = 
@@ -151,11 +188,17 @@ let body =
 
 #### Gebruiker verwijderen
 Request:    DELETE
+
 Route:      /api/user/{userId}
+
 Vereisten: 
+
 -Bestaande gebruikers
+
 -Geldige token
+
 -Moet ingelogd zijn
+
 -Moet eigenaar zijn van de gebruiker
 
 |Status code| |
@@ -169,10 +212,15 @@ Vereisten:
 
 #### POST /api/meal Maaltijd aanmaken
 Request:    POST
+
 Route:      /api/meal
+
 Vereisten: 
+
 -token is vereist
+
 -Moet ingelogd zijn
+
 -Alle velden zijn verplicht
 
 ```
@@ -200,13 +248,21 @@ let body =
 
 #### PUT /api/meal/{mealId}, Maaltijd wijzigen
 Request:    PUT
+
 Route:      /api/meal/{mealId}
+
 Vereisten: 
+
 -Token is vereist
+
 -Moet ingelogd zijn
+
 -Alle velden zijn verplicht
+
 -Moet eigenaar zijn van de maaltijd
+
 -Maaltijd moet bestaan
+
 
 ```
 let body = 
@@ -234,29 +290,44 @@ let body =
 
 #### GET /api/meal, Maaltijd ophalen
 Request:    GET
+
 Route:      /api/meal
+
 Vereisten: 
+
 niet van toepassing
+
 
 |Status code| |
 |---|---|
 |200| Geeft lijst met maaltijden terug|
 
 #### GET /api/meal/{mealId}, Maaltijd details opvragen
+
 Request:    GET
+
 Route:      /api/meal/{mealId}
+
 Vereisten: 
+
 niet van toepassing
+
 
 Status code
 200 Maaltijd met details terug
 
 #### DELETE /api/meal/{mealId}, Maaltijd verwijderen
+
 Request:    DELETE
+
 Route:      /api/meal/{mealId}
+
 Vereisten: 
+
 -Token is vereist
+
 -Moet eigenaar zijn van de maaltijd
+
 -Maaltijd moet bestaan
 
 |Status code| |
@@ -269,11 +340,17 @@ Vereisten:
 ### Deelname aan maaltijd
 
 #### POST /api/meal/{mealId}/signup, Aanmelding maaltijd
+
 Request:    POST
+
 Route:      /api/meal/{mealId}/signup
+
 Vereisten: 
+
 -Token is vereist
+
 -Moet eigenaar zijn van de maaltijd
+
 -Maaltijd moet bestaan
 
 |Status code| |
@@ -284,10 +361,15 @@ Vereisten:
 
 #### PUT /api/meal/{mealId}/signOff, Afmelden maaltijd
 Request:    PUT
+
 Route:      /api/meal/{mealId}/signOff
+
 Vereisten: 
+
 -Token is vereist
+
 -Maaltijd moet bestaan
+
 -Aanmelding moet bestaan
 
 |Status code| |
@@ -320,6 +402,7 @@ Hieronder staan alle applicaties die zijn gebruikt die de applicatie ondersteune
 ## Contact
 
 Voor contact met de ontwikkelaar, kunt u een mail sturen naar het volgende emailadres.
+
 Email: xx.wang@student.avans.nl
 
 
