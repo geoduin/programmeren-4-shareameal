@@ -103,6 +103,7 @@ let controller = {
         newMeal.isVega = convertBooleanToInt(newMeal.isVega);
         newMeal.isVegan = convertBooleanToInt(newMeal.isVegan);
         newMeal.isToTakeHome = convertBooleanToInt(newMeal.isToTakeHome);
+        newMeal.allergenes = newMeal.allergenes.join();
         logr.trace(`newMeal after convertion ----------------------------------------------`);
         logr.trace(newMeal);
 
