@@ -2,6 +2,7 @@ const req = require("express/lib/request");
 const assert = require('assert');
 const DB = require('../data/dbConnection');
 const jwt = require('jsonwebtoken');
+const { query } = require("../data/dbConnection");
 const logr = require('../config/config').logger;
 let controller = {
 
@@ -172,59 +173,59 @@ let controller = {
     //UC-303
     getAllMeals: (req, res) => {
         //Query to collect all meals from database.
-        let meals = null;
         let mealOne = null;
-        DB.getConnection((error, connection) => {
-            if (error) { throw error };
-            const query = "SELECT meal.id, meal.isActive, meal.isVega, meal.isVegan, meal.isToTakeHome, meal.dateTime, meal.maxAmountOfParticipants, meal.price, meal.imageUrl, meal.createDate, meal.updateDate, meal.name, meal.description, meal.allergenes, JSON_OBJECT('id', meal.cookId, 'firstName', user.firstName, 'lastName', user.lastName, 'isActive', user.isActive, 'emailAdress', user.emailAdress, 'roles', user.roles, 'phoneNumber', user.phoneNumber, 'city', user.city, 'street', user.street) AS cook FROM meal JOIN user ON user.id = meal.cookId;"
-            connection.promise()
-                .query(query)
-                .then(([rows]) => {
-                    mealOne = rows;
-                }).then(connection.promise()
-                    .query('SELECT * FROM user JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);')
-                    .then(([result, fields]) => {
-                        logr.trace(`Length of result: ${result}`)
-                        logr.trace(result);
-                        connection.release();
-                        for (const element of mealOne) {
-                            let meal = element;
-                            let participants = [];
-                            meal.cook = JSON.parse(meal.cook);
-                            meal.cook.isActive = intToBoolean(meal.cook.isActive);
-                            meal.cook.roles = meal.cook.roles.split(",");
-                            meal.isActive = intToBoolean(meal.isActive);
-                            meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
-                            meal.isVega = intToBoolean(meal.isVega);
-                            meal.isVegan = intToBoolean(meal.isVegan);
-                            if (meal.allergenes != null) {
-                                if (meal.allergenes.length > 0) {
-                                    meal.allergenes = meal.allergenes.split(",");
-                                }
-                            }
-                            result.forEach(user => {
-                                logr.trace(user.mealId);
-                                if (user.mealId == meal.id) {
-                                    logr.trace(`Meal with id ${meal.id} got user with mealId: ${user.mealId}`);
-                                    user.isActive = intToBoolean(user.isActive);
-                                    delete user.mealId;
-                                    delete user.userId;
-                                    delete user.password;
-                                    participants.push(user);
-                                }
-                            });
-                            meal.participants = participants;
+        const selectMeals = 'SELECT * FROM meal;'
+        const selectCook = 'SELECT * FROM user WHERE id IN (SELECT cookId FROM meal);'
+        const selectParticipants = 'SELECT * FROM user JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);';
+        const ExecuteTaskQuery = selectMeals + selectCook + selectParticipants;
+
+        DB.getConnection((error, connect) => {
+            connect.query(ExecuteTaskQuery, (err, results) => {
+                connect.release();
+                let meals = results[0];
+                let cookList = results[1];
+                let participantsList = results[2];
+                for (const cook of cookList) {
+                    delete cook.password;
+                    cook.isActive = intToBoolean(cook.isActive);
+                    cook.roles = cook.roles.split(",");
+                }
+                meals.forEach(meal => {
+                    logr.trace(`Current Meal is id ${meal.id}`);
+                    let participants = [];
+                    meal.isActive = intToBoolean(meal.isActive);
+                    meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
+                    meal.isVega = intToBoolean(meal.isVega);
+                    meal.isVegan = intToBoolean(meal.isVegan);
+                    meal.allergenes = meal.allergenes.split(",");
+                    for (const cook of cookList){
+                        if(cook.id == meal.cookId){
+                            meal.cook = cook;
+                            break;
                         }
-                        res.status(200).json({
-                            status: 200,
-                            amount: mealOne.length,
-                            result: mealOne
-                        })
-                    })
-                )
+                    }
+                    for (const participant of participantsList) {
+                        logr.trace(`Participant = ${participant.mealId} AND Current Meal is id ${meal.id}`);
+                        if (participant.mealId == meal.id) {
+                            logr.trace(`Participant  ${participant.mealId} Pushed to Current Meal is id ${meal.id}`);
+                            delete participant.password;
+                            delete participant.mealId;
+                            delete participant.userId;
+                            participant.isActive = intToBoolean(participant.isActive);
+                            participant.roles = participant.roles.split(",");
+                            participants.push(participant);
+                        }
+                    }
+                    delete meal.cookId;
+                    meal.participants = participants;
+                });
+                res.status(200).json({
+                    status: 200,
+                    amount: meals.length,
+                    result: meals
+                })
+            })
         })
-
-
     }
     ,
     //UC-304
@@ -270,7 +271,7 @@ let controller = {
                                 delete meal.password;
                                 meal.cook = cook;
                                 meal.participants = participants;
-                                meal.participants.forEach(user =>{
+                                meal.participants.forEach(user => {
                                     user.roles = user.roles.split(",");
                                     user.isActive = (user.isActive == 1);
                                     delete user.password;

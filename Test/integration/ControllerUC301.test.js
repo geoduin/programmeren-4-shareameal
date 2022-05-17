@@ -103,7 +103,285 @@ describe('UC-301 add meal to database POST /api/meal', (done) => {
         done();
     })
 })
+describe('UC-303 get all meals GET /api/meal/', (done) => {
+    before((done) => {
+        DB.getConnection((error, con) => {
+            con.query('UPDATE meal SET name = "Spaghetti met tapenadekip uit de oven en frisse salade", updateDate = "2022-03-15T14:10:19.000Z" WHERE id = 3;', (error, result) => {
+                con.release();
+                done();
+            })
+        })
+    })
 
+    it('TC-303 get list of users', (done) => {
+        chai.request(server)
+            .get('/api/meal')
+            .end((req, res) => {
+                res.should.be.a('object');
+                let { status, result } = res.body;
+                status.should.be.equals(200);
+                assert.deepEqual(result, [
+                    {
+                        "id": 1,
+                        "isActive": true,
+                        "isVega": false,
+                        "isVegan": false,
+                        "isToTakeHome": true,
+                        "dateTime": "2022-03-22T17:35:00.000Z",
+                        "maxAmountOfParticipants": 4,
+                        "price": "12.75",
+                        "imageUrl": "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
+                        "createDate": "2022-02-26T18:12:40.048Z",
+                        "updateDate": "2022-04-26T12:33:51.000Z",
+                        "name": "Pasta Bolognese met tomaat, spekjes en kaas",
+                        "description": "Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!",
+                        "allergenes": [
+                            "gluten",
+                            "lactose"
+                        ],
+                        "cook": {
+                            "id": 1,
+                            "firstName": "Mariëtte",
+                            "lastName": "van den Dullemen",
+                            "isActive": true,
+                            "emailAdress": "m.vandullemen@server.nl",
+                            "roles": [
+                                ""
+                            ],
+                            "phoneNumber": "",
+                            "city": "",
+                            "street": ""
+                        },
+                        "participants": [
+                            {
+                                "id": 2,
+                                "firstName": "John",
+                                "lastName": "Doe",
+                                "isActive": true,
+                                "emailAdress": "j.doe@server.com",
+                                "phoneNumber": "06 12425475",
+                                "roles": ["editor","guest"],
+                                "street": "",
+                                "city": ""
+                            },
+                            {
+                                "id": 3,
+                                "firstName": "Herman",
+                                "lastName": "Huizinga",
+                                "isActive": true,
+                                "emailAdress": "h.huizinga@server.nl",
+                                "phoneNumber": "06-12345678",
+                                "roles": ["editor","guest"],
+                                "street": "",
+                                "city": ""
+                            },
+                            {
+                                "id": 5,
+                                "firstName": "Henk",
+                                "lastName": "Tank",
+                                "isActive": true,
+                                "emailAdress": "h.tank@server.com",
+                                "phoneNumber": "06 12425495",
+                                "roles": ["editor","guest"],
+                                "street": "",
+                                "city": ""
+                            }
+                        ]
+                    },
+                    {
+                        "id": 2,
+                        "isActive": true,
+                        "isVega": true,
+                        "isVegan": false,
+                        "isToTakeHome": false,
+                        "dateTime": "2022-05-22T13:35:00.000Z",
+                        "maxAmountOfParticipants": 4,
+                        "price": "12.75",
+                        "imageUrl": "https://static.ah.nl/static/recepten/img_RAM_PRD159322_1024x748_JPG.jpg",
+                        "createDate": "2022-02-26T18:12:40.048Z",
+                        "updateDate": "2022-04-25T12:56:05.000Z",
+                        "name": "Aubergine uit de oven met feta, muntrijst en tomatensaus",
+                        "description": "Door aubergines in de oven te roosteren worden ze heerlijk zacht. De balsamico maakt ze heerlijk zoet.",
+                        "allergenes": [
+                            "noten"
+                        ],
+                        "cook": {
+                            "id": 2,
+                            "firstName": "John",
+                            "lastName": "Doe",
+                            "isActive": true,
+                            "emailAdress": "j.doe@server.com",
+                            "roles": [
+                                "editor",
+                                "guest"
+                            ],
+                            "phoneNumber": "06 12425475",
+                            "city": "",
+                            "street": ""
+                        },
+                        "participants": [
+                            {
+                                "id": 4,
+                                "firstName": "Marieke",
+                                "lastName": "Van Dam",
+                                "isActive": false,
+                                "emailAdress": "m.vandam@server.nl",
+                                "phoneNumber": "06-12345678",
+                                "roles": ["editor","guest"],
+                                "street": "",
+                                "city": ""
+                            }
+                        ]
+                    },
+                    {
+                        "id": 3,
+                        "isActive": true,
+                        "isVega": false,
+                        "isVegan": false,
+                        "isToTakeHome": true,
+                        "dateTime": "2022-05-22T17:30:00.000Z",
+                        "maxAmountOfParticipants": 4,
+                        "price": "10.75",
+                        "imageUrl": "https://static.ah.nl/static/recepten/img_099918_1024x748_JPG.jpg",
+                        "createDate": "2022-02-26T18:12:40.048Z",
+                        "updateDate": "2022-03-15T14:10:19.000Z",
+                        "name": "Spaghetti met tapenadekip uit de oven en frisse salade",
+                        "description": "Perfect voor doordeweeks, maar ook voor gasten tijdens een feestelijk avondje.",
+                        "allergenes": [
+                            "gluten",
+                            "lactose"
+                        ],
+                        "cook": {
+                            "id": 2,
+                            "firstName": "John",
+                            "lastName": "Doe",
+                            "isActive": true,
+                            "emailAdress": "j.doe@server.com",
+                            "roles": [
+                                "editor",
+                                "guest"
+                            ],
+                            "phoneNumber": "06 12425475",
+                            "city": "",
+                            "street": ""
+                        },
+                        "participants": [
+                            {
+                                "id": 3,
+                                "firstName": "Herman",
+                                "lastName": "Huizinga",
+                                "isActive": true,
+                                "emailAdress": "h.huizinga@server.nl",
+                                "phoneNumber": "06-12345678",
+                                "roles": ["editor","guest"],
+                                "street": "",
+                                "city": ""
+                            },
+                            {
+                                "id": 4,
+                                "firstName": "Marieke",
+                                "lastName": "Van Dam",
+                                "isActive": false,
+                                "emailAdress": "m.vandam@server.nl",
+                                "phoneNumber": "06-12345678",
+                                "roles": ["editor","guest"],
+                                "street": "",
+                                "city": ""
+                            }
+                        ]
+                    },
+                    {
+                        "id": 4,
+                        "isActive": true,
+                        "isVega": false,
+                        "isVegan": false,
+                        "isToTakeHome": false,
+                        "dateTime": "2022-03-26T21:22:26.000Z",
+                        "maxAmountOfParticipants": 4,
+                        "price": "4.00",
+                        "imageUrl": "https://static.ah.nl/static/recepten/img_063387_890x594_JPG.jpg",
+                        "createDate": "2022-03-06T21:23:45.419Z",
+                        "updateDate": "2022-03-12T19:51:57.000Z",
+                        "name": "Zuurkool met spekjes",
+                        "description": "Heerlijke zuurkoolschotel, dé winterkost bij uitstek. ",
+                        "allergenes": [""],
+                        "cook": {
+                            "id": 3,
+                            "firstName": "Herman",
+                            "lastName": "Huizinga",
+                            "isActive": true,
+                            "emailAdress": "h.huizinga@server.nl",
+                            "roles": [
+                                "editor",
+                                "guest"
+                            ],
+                            "phoneNumber": "06-12345678",
+                            "city": "",
+                            "street": ""
+                        },
+                        "participants": [
+                            {
+                                "id": 2,
+                                "firstName": "John",
+                                "lastName": "Doe",
+                                "isActive": true,
+                                "emailAdress": "j.doe@server.com",
+                                "phoneNumber": "06 12425475",
+                                "roles": ["editor","guest"],
+                                "street": "",
+                                "city": ""
+                            }
+                        ]
+                    },
+                    {
+                        "id": 5,
+                        "isActive": true,
+                        "isVega": true,
+                        "isVegan": false,
+                        "isToTakeHome": true,
+                        "dateTime": "2022-03-26T21:24:46.000Z",
+                        "maxAmountOfParticipants": 6,
+                        "price": "6.75",
+                        "imageUrl": "https://www.kikkoman.nl/fileadmin/_processed_/5/7/csm_WEB_Bonte_groenteschotel_6851203953.jpg",
+                        "createDate": "2022-03-06T21:26:33.048Z",
+                        "updateDate": "2022-03-12T19:50:13.000Z",
+                        "name": "Groentenschotel uit de oven",
+                        "description": "Misschien wel de lekkerste schotel uit de oven! En vol vitaminen! Dat wordt smikkelen. Als je van groenten houdt ben je van harte welkom. Wel eerst even aanmelden.",
+                        "allergenes": [""],
+                        "cook": {
+                            "id": 3,
+                            "firstName": "Herman",
+                            "lastName": "Huizinga",
+                            "isActive": true,
+                            "emailAdress": "h.huizinga@server.nl",
+                            "roles": [
+                                "editor",
+                                "guest"
+                            ],
+                            "phoneNumber": "06-12345678",
+                            "city": "",
+                            "street": ""
+                        },
+                        "participants": [
+                            {
+                                "id": 4,
+                                "firstName": "Marieke",
+                                "lastName": "Van Dam",
+                                "isActive": false,
+                                "emailAdress": "m.vandam@server.nl",
+                                "phoneNumber": "06-12345678",
+                                "roles": ["editor","guest"],
+                                "street": "",
+                                "city": ""
+                            }
+                        ]
+                    }
+                ]
+                )
+                done();
+            })
+    })
+})
 describe('UC-302 update meal, PUT /api/meal/:mealId', (done) => {
 
     it('TC-302-1 Required fields (image url as example) are empty', (done) => {
@@ -267,298 +545,14 @@ describe('UC-302 update meal, PUT /api/meal/:mealId', (done) => {
         DB.getConnection((error, con) => {
             con.query('UPDATE meal SET name = "Spaghetti met tapenadekip uit de oven en frisse salade", updateDate = "2022-03-15T14:10:19.000Z" WHERE id = 3;', (error, result) => {
                 con.release();
-            })
-        })
-        done();
-    })
-
-})
-
-describe('UC-303 get all meals GET /api/meal/', (done) => {
-    before((done) => {
-        done();
-    })
-
-    it('TC-303 get list of users', (done) => {
-        chai.request(server)
-            .get('/api/meal')
-            .end((req, res) => {
-                res.should.be.a('object');
-                let { status, result } = res.body;
-                status.should.be.equals(200);
-                assert.deepEqual(result, [
-                    {
-                        "id": 1,
-                        "isActive": true,
-                        "isVega": false,
-                        "isVegan": false,
-                        "isToTakeHome": true,
-                        "dateTime": "2022-03-22T17:35:00.000Z",
-                        "maxAmountOfParticipants": 4,
-                        "price": "12.75",
-                        "imageUrl": "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
-                        "createDate": "2022-02-26T18:12:40.048Z",
-                        "updateDate": "2022-04-26T12:33:51.000Z",
-                        "name": "Pasta Bolognese met tomaat, spekjes en kaas",
-                        "description": "Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!",
-                        "allergenes": [
-                            "gluten",
-                            "lactose"
-                        ],
-                        "cook": {
-                            "id": 1,
-                            "firstName": "Mariëtte",
-                            "lastName": "van den Dullemen",
-                            "isActive": true,
-                            "emailAdress": "m.vandullemen@server.nl",
-                            "roles": [
-                                ""
-                            ],
-                            "phoneNumber": "",
-                            "city": "",
-                            "street": ""
-                        },
-                        "participants": [
-                            {
-                                "id": 2,
-                                "firstName": "John",
-                                "lastName": "Doe",
-                                "isActive": true,
-                                "emailAdress": "j.doe@server.com",
-                                "phoneNumber": "06 12425475",
-                                "roles": "editor,guest",
-                                "street": "",
-                                "city": ""
-                            },
-                            {
-                                "id": 3,
-                                "firstName": "Herman",
-                                "lastName": "Huizinga",
-                                "isActive": true,
-                                "emailAdress": "h.huizinga@server.nl",
-                                "phoneNumber": "06-12345678",
-                                "roles": "editor,guest",
-                                "street": "",
-                                "city": ""
-                            },
-                            {
-                                "id": 5,
-                                "firstName": "Henk",
-                                "lastName": "Tank",
-                                "isActive": true,
-                                "emailAdress": "h.tank@server.com",
-                                "phoneNumber": "06 12425495",
-                                "roles": "editor,guest",
-                                "street": "",
-                                "city": ""
-                            }
-                        ]
-                    },
-                    {
-                        "id": 2,
-                        "isActive": true,
-                        "isVega": true,
-                        "isVegan": false,
-                        "isToTakeHome": false,
-                        "dateTime": "2022-05-22T13:35:00.000Z",
-                        "maxAmountOfParticipants": 4,
-                        "price": "12.75",
-                        "imageUrl": "https://static.ah.nl/static/recepten/img_RAM_PRD159322_1024x748_JPG.jpg",
-                        "createDate": "2022-02-26T18:12:40.048Z",
-                        "updateDate": "2022-04-25T12:56:05.000Z",
-                        "name": "Aubergine uit de oven met feta, muntrijst en tomatensaus",
-                        "description": "Door aubergines in de oven te roosteren worden ze heerlijk zacht. De balsamico maakt ze heerlijk zoet.",
-                        "allergenes": [
-                            "noten"
-                        ],
-                        "cook": {
-                            "id": 2,
-                            "firstName": "John",
-                            "lastName": "Doe",
-                            "isActive": true,
-                            "emailAdress": "j.doe@server.com",
-                            "roles": [
-                                "editor",
-                                "guest"
-                            ],
-                            "phoneNumber": "06 12425475",
-                            "city": "",
-                            "street": ""
-                        },
-                        "participants": [
-                            {
-                                "id": 4,
-                                "firstName": "Marieke",
-                                "lastName": "Van Dam",
-                                "isActive": false,
-                                "emailAdress": "m.vandam@server.nl",
-                                "phoneNumber": "06-12345678",
-                                "roles": "editor,guest",
-                                "street": "",
-                                "city": ""
-                            }
-                        ]
-                    },
-                    {
-                        "id": 3,
-                        "isActive": true,
-                        "isVega": false,
-                        "isVegan": false,
-                        "isToTakeHome": true,
-                        "dateTime": "2022-05-22T17:30:00.000Z",
-                        "maxAmountOfParticipants": 4,
-                        "price": "10.75",
-                        "imageUrl": "https://static.ah.nl/static/recepten/img_099918_1024x748_JPG.jpg",
-                        "createDate": "2022-02-26T18:12:40.048Z",
-                        updateDate: "2022-03-15T14:10:19.000Z",
-                        "name": "Spaghetti met tapenadekip uit de oven en frisse salade",
-                        "description": "Perfect voor doordeweeks, maar ook voor gasten tijdens een feestelijk avondje.",
-                        "allergenes": [
-                            "gluten",
-                            "lactose"
-                        ],
-                        "cook": {
-                            "id": 2,
-                            "firstName": "John",
-                            "lastName": "Doe",
-                            "isActive": true,
-                            "emailAdress": "j.doe@server.com",
-                            "roles": [
-                                "editor",
-                                "guest"
-                            ],
-                            "phoneNumber": "06 12425475",
-                            "city": "",
-                            "street": ""
-                        },
-                        "participants": [
-                            {
-                                "id": 3,
-                                "firstName": "Herman",
-                                "lastName": "Huizinga",
-                                "isActive": true,
-                                "emailAdress": "h.huizinga@server.nl",
-                                "phoneNumber": "06-12345678",
-                                "roles": "editor,guest",
-                                "street": "",
-                                "city": ""
-                            },
-                            {
-                                "id": 4,
-                                "firstName": "Marieke",
-                                "lastName": "Van Dam",
-                                "isActive": false,
-                                "emailAdress": "m.vandam@server.nl",
-                                "phoneNumber": "06-12345678",
-                                "roles": "editor,guest",
-                                "street": "",
-                                "city": ""
-                            }
-                        ]
-                    },
-                    {
-                        "id": 4,
-                        "isActive": true,
-                        "isVega": false,
-                        "isVegan": false,
-                        "isToTakeHome": false,
-                        "dateTime": "2022-03-26T21:22:26.000Z",
-                        "maxAmountOfParticipants": 4,
-                        "price": "4.00",
-                        "imageUrl": "https://static.ah.nl/static/recepten/img_063387_890x594_JPG.jpg",
-                        "createDate": "2022-03-06T21:23:45.419Z",
-                        "updateDate": "2022-03-12T19:51:57.000Z",
-                        "name": "Zuurkool met spekjes",
-                        "description": "Heerlijke zuurkoolschotel, dé winterkost bij uitstek. ",
-                        "allergenes": "",
-                        "cook": {
-                            "id": 3,
-                            "firstName": "Herman",
-                            "lastName": "Huizinga",
-                            "isActive": true,
-                            "emailAdress": "h.huizinga@server.nl",
-                            "roles": [
-                                "editor",
-                                "guest"
-                            ],
-                            "phoneNumber": "06-12345678",
-                            "city": "",
-                            "street": ""
-                        },
-                        "participants": [
-                            {
-                                "id": 2,
-                                "firstName": "John",
-                                "lastName": "Doe",
-                                "isActive": true,
-                                "emailAdress": "j.doe@server.com",
-                                "phoneNumber": "06 12425475",
-                                "roles": "editor,guest",
-                                "street": "",
-                                "city": ""
-                            }
-                        ]
-                    },
-                    {
-                        "id": 5,
-                        "isActive": true,
-                        "isVega": true,
-                        "isVegan": false,
-                        "isToTakeHome": true,
-                        "dateTime": "2022-03-26T21:24:46.000Z",
-                        "maxAmountOfParticipants": 6,
-                        "price": "6.75",
-                        "imageUrl": "https://www.kikkoman.nl/fileadmin/_processed_/5/7/csm_WEB_Bonte_groenteschotel_6851203953.jpg",
-                        "createDate": "2022-03-06T21:26:33.048Z",
-                        "updateDate": "2022-03-12T19:50:13.000Z",
-                        "name": "Groentenschotel uit de oven",
-                        "description": "Misschien wel de lekkerste schotel uit de oven! En vol vitaminen! Dat wordt smikkelen. Als je van groenten houdt ben je van harte welkom. Wel eerst even aanmelden.",
-                        "allergenes": "",
-                        "cook": {
-                            "id": 3,
-                            "firstName": "Herman",
-                            "lastName": "Huizinga",
-                            "isActive": true,
-                            "emailAdress": "h.huizinga@server.nl",
-                            "roles": [
-                                "editor",
-                                "guest"
-                            ],
-                            "phoneNumber": "06-12345678",
-                            "city": "",
-                            "street": ""
-                        },
-                        "participants": [
-                            {
-                                "id": 4,
-                                "firstName": "Marieke",
-                                "lastName": "Van Dam",
-                                "isActive": false,
-                                "emailAdress": "m.vandam@server.nl",
-                                "phoneNumber": "06-12345678",
-                                "roles": "editor,guest",
-                                "street": "",
-                                "city": ""
-                            }
-                        ]
-                    }
-                ]
-                )
                 done();
             })
+        })
     })
 
-    after((done) => {
-        // DB.getConnection((error, con) => {
-        //     con.query('DELETE FROM meal WHERE id >= 6', (error, result) => {
-        //         con.query('UPDATE meal SET name = "Spaghetti met tapenadekip uit de oven en frisse sa..." WHERE id = 3', (err, res, field) => {
-        //             con.release();
-        //         })
-        //     })
-        // })
-        done();
-    })
 })
+
+
 
 describe('UC-304 get meal details.', (done) => {
     it('TC-304-1 Meal does not exist', (done) => {
