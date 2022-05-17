@@ -103,177 +103,6 @@ describe('UC-301 add meal to database POST /api/meal', (done) => {
         done();
     })
 })
-
-describe('UC-302 update meal, PUT /api/meal/:mealId', (done) => {
-
-    it('TC-302-1 Required fields (image url as example) are empty', (done) => {
-        let id = 99;
-        chai.request(server)
-            .put('/api/meal/' + id)
-            .auth(tokens.Marieke, { type: 'bearer' })
-            .send({
-                id: 0,
-                name: 'Pudding',
-                description: "Een desert.",
-                isActive: true,
-                isVega: true,
-                isVegan: true,
-                isToTakeHome: false,
-                dateTime: "2022-04-27T15:38:30.394Z",
-                allergenes: ["gluten", "noten"],
-                maxAmountOfParticipants: 2,
-                price: 2.99,
-                createDate: "2022-04-27T15:44:19.615Z",
-                updateDate: "2022-04-27T15:44:19.615Z",
-            }).end((req, res) => {
-                let { status, message } = res.body;
-                status.should.be.equal(400);
-                message.should.be.equal('Must have a image url');
-                done();
-            })
-    })
-    it('TC-302-2 not logged in', (done) => {
-        chai.request(server)
-            .put('/api/meal/99')
-            .send(
-                {
-                    id: 99,
-                    name: "Patat",
-                    description: "Gefrituurde aardappelen, gesneden in dunne kleine stukken.",
-                    isActive: true,
-                    isVega: true,
-                    isVegan: true,
-                    isToTakeHome: false,
-                    dateTime: "2022-04-27T15:38:30.394Z",
-                    imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
-                    allergenes: ["gluten", "noten", "lactose"],
-                    maxAmountOfParticipants: 6,
-                    price: 6.75,
-                    cook: 2,
-                    createDate: "2022-04-27T15:44:19.615Z",
-                    updateDate: "2022-04-27T15:44:19.615Z",
-                }
-            ).end((req, res) => {
-                let a = res;
-                res.should.be.a('object');
-                let { status, message } = res.body;
-                assert.equal(status, 401);
-                message.should.be.a('string').equals('Not logged in');
-                done();
-            })
-    })
-
-    it('TC-302-3 not the owner of the meal', (done) => {
-        let id = 3;
-        chai.request(server)
-            .put('/api/meal/' + id)
-            .auth(tokens.Mariete, { type: 'bearer' })
-            .send({
-                name: 'Pudding',
-                description: "Een desert.",
-                isActive: true,
-                isVega: true,
-                isVegan: true,
-                isToTakeHome: false,
-                dateTime: "2022-04-27T15:38:30.394Z",
-                imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
-                allergenes: ["gluten", "noten"],
-                maxAmountOfParticipants: 2,
-                price: 2.99,
-                createDate: "2022-04-27T15:44:19.615Z",
-                updateDate: "2022-04-27T15:44:19.615Z"
-            }).end((req, res) => {
-                let { status, message } = res.body;
-                status.should.be.equal(401);
-                message.should.be.equal('The user did not own this meal');
-                done();
-            })
-    })
-
-    it('TC-302-4 Meal does not exist', (done) => {
-        let id = 99999;
-        chai.request(server)
-            .put('/api/meal/' + id)
-            .auth(tokens.Mariete, { type: 'bearer' })
-            .send({
-                id: 0,
-                name: "Patat",
-                description: "Gefrituurde aardappelen, gesneden in dunne kleine stukken.",
-                isActive: true,
-                isVega: true,
-                isVegan: true,
-                isToTakeHome: false,
-                dateTime: "2022-04-27T15:38:30.394Z",
-                imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
-                allergenes: ["gluten", "noten", "lactose"],
-                maxAmountOfParticipants: 6,
-                price: 6.75,
-                cook: 2,
-                createDate: "2022-04-27T15:44:19.615Z",
-                updateDate: "2022-04-27T15:44:19.615Z",
-            }).end((req, res) => {
-                let { status, message } = res.body;
-                status.should.be.equal(404);
-                message.should.be.equal('Meal does not exist');
-                done();
-            })
-    })
-
-    it('TC-302-5 Succesful update', (done) => {
-        let id = 3;
-        chai.request(server)
-            .put('/api/meal/' + id)
-            .auth(tokens.John, { type: 'bearer' })
-            .send({
-                id: 3,
-                name: "Italiaanse Ramen",
-                description: "Perfect voor doordeweeks, maar ook voor gasten tijdens een feestelijk avondje.",
-                isActive: true,
-                isVega: false,
-                isVegan: false,
-                isToTakeHome: true,
-                dateTime: "2022-05-22 17:30:00",
-                imageUrl: "https://static.ah.nl/static/recepten/img_099918_1024x748_JPG.jpg",
-                allergenes: ["gluten", "lactose"],
-                maxAmountOfParticipants: 4,
-                price: 10.75,
-                cook: 2
-            }).end((err, res) => {
-                let aa = res;
-                res.should.be.a('object');
-                let { status, result } = res.body;
-                assert.equal(status, 200);
-                assert.deepEqual(result, {
-                    id: 3,
-                    isActive: true,
-                    isVega: false,
-                    isVegan: false,
-                    isToTakeHome: true,
-                    dateTime: "2022-05-22T17:30:00.000Z",
-                    maxAmountOfParticipants: 4,
-                    price: "10.75",
-                    imageUrl: "https://static.ah.nl/static/recepten/img_099918_1024x748_JPG.jpg",
-                    cookId: 2,
-                    createDate: "2022-02-26T18:12:40.048Z",
-                    updateDate: result.updateDate,
-                    name: "'Italiaanse Ramen'",
-                    description: "Perfect voor doordeweeks, maar ook voor gasten tijdens een feestelijk avondje.",
-                    allergenes: ["gluten","lactose"],
-                })
-                done();
-            })
-    })
-    after((done) => {
-        DB.getConnection((error, con) => {
-            con.query('UPDATE meal SET name = "Spaghetti met tapenadekip uit de oven en frisse salade", updateDate = "2022-03-15T14:10:19.000Z" WHERE id = 3;', (error, result) => {
-                con.release();
-                done();
-            })
-        })
-    })
-
-})
-
 describe('UC-303 get all meals GET /api/meal/', (done) => {
     before((done) => {
         DB.getConnection((error, con) => {
@@ -553,6 +382,177 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
             })
     })
 })
+describe('UC-302 update meal, PUT /api/meal/:mealId', (done) => {
+
+    it('TC-302-1 Required fields (image url as example) are empty', (done) => {
+        let id = 99;
+        chai.request(server)
+            .put('/api/meal/' + id)
+            .auth(tokens.Marieke, { type: 'bearer' })
+            .send({
+                id: 0,
+                name: 'Pudding',
+                description: "Een desert.",
+                isActive: true,
+                isVega: true,
+                isVegan: true,
+                isToTakeHome: false,
+                dateTime: "2022-04-27T15:38:30.394Z",
+                allergenes: ["gluten", "noten"],
+                maxAmountOfParticipants: 2,
+                price: 2.99,
+                createDate: "2022-04-27T15:44:19.615Z",
+                updateDate: "2022-04-27T15:44:19.615Z",
+            }).end((req, res) => {
+                let { status, message } = res.body;
+                status.should.be.equal(400);
+                message.should.be.equal('Must have a image url');
+                done();
+            })
+    })
+    it('TC-302-2 not logged in', (done) => {
+        chai.request(server)
+            .put('/api/meal/99')
+            .send(
+                {
+                    id: 99,
+                    name: "Patat",
+                    description: "Gefrituurde aardappelen, gesneden in dunne kleine stukken.",
+                    isActive: true,
+                    isVega: true,
+                    isVegan: true,
+                    isToTakeHome: false,
+                    dateTime: "2022-04-27T15:38:30.394Z",
+                    imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
+                    allergenes: ["gluten", "noten", "lactose"],
+                    maxAmountOfParticipants: 6,
+                    price: 6.75,
+                    cook: 2,
+                    createDate: "2022-04-27T15:44:19.615Z",
+                    updateDate: "2022-04-27T15:44:19.615Z",
+                }
+            ).end((req, res) => {
+                let a = res;
+                res.should.be.a('object');
+                let { status, message } = res.body;
+                assert.equal(status, 401);
+                message.should.be.a('string').equals('Not logged in');
+                done();
+            })
+    })
+
+    it('TC-302-3 not the owner of the meal', (done) => {
+        let id = 3;
+        chai.request(server)
+            .put('/api/meal/' + id)
+            .auth(tokens.Mariete, { type: 'bearer' })
+            .send({
+                name: 'Pudding',
+                description: "Een desert.",
+                isActive: true,
+                isVega: true,
+                isVegan: true,
+                isToTakeHome: false,
+                dateTime: "2022-04-27T15:38:30.394Z",
+                imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
+                allergenes: ["gluten", "noten"],
+                maxAmountOfParticipants: 2,
+                price: 2.99,
+                createDate: "2022-04-27T15:44:19.615Z",
+                updateDate: "2022-04-27T15:44:19.615Z"
+            }).end((req, res) => {
+                let { status, message } = res.body;
+                status.should.be.equal(401);
+                message.should.be.equal('The user did not own this meal');
+                done();
+            })
+    })
+
+    it('TC-302-4 Meal does not exist', (done) => {
+        let id = 99999;
+        chai.request(server)
+            .put('/api/meal/' + id)
+            .auth(tokens.Mariete, { type: 'bearer' })
+            .send({
+                id: 0,
+                name: "Patat",
+                description: "Gefrituurde aardappelen, gesneden in dunne kleine stukken.",
+                isActive: true,
+                isVega: true,
+                isVegan: true,
+                isToTakeHome: false,
+                dateTime: "2022-04-27T15:38:30.394Z",
+                imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
+                allergenes: ["gluten", "noten", "lactose"],
+                maxAmountOfParticipants: 6,
+                price: 6.75,
+                cook: 2,
+                createDate: "2022-04-27T15:44:19.615Z",
+                updateDate: "2022-04-27T15:44:19.615Z",
+            }).end((req, res) => {
+                let { status, message } = res.body;
+                status.should.be.equal(404);
+                message.should.be.equal('Meal does not exist');
+                done();
+            })
+    })
+
+    it('TC-302-5 Succesful update', (done) => {
+        let id = 3;
+        chai.request(server)
+            .put('/api/meal/' + id)
+            .auth(tokens.John, { type: 'bearer' })
+            .send({
+                id: 3,
+                name: "Italiaanse Ramen",
+                description: "Perfect voor doordeweeks, maar ook voor gasten tijdens een feestelijk avondje.",
+                isActive: true,
+                isVega: false,
+                isVegan: false,
+                isToTakeHome: true,
+                dateTime: "2022-05-22 17:30:00",
+                imageUrl: "https://static.ah.nl/static/recepten/img_099918_1024x748_JPG.jpg",
+                allergenes: ["gluten", "lactose"],
+                maxAmountOfParticipants: 4,
+                price: 10.75,
+                cook: 2
+            }).end((err, res) => {
+                let aa = res;
+                res.should.be.a('object');
+                let { status, result } = res.body;
+                assert.equal(status, 200);
+                assert.deepEqual(result, {
+                    id: 3,
+                    isActive: true,
+                    isVega: false,
+                    isVegan: false,
+                    isToTakeHome: true,
+                    dateTime: "2022-05-22T17:30:00.000Z",
+                    maxAmountOfParticipants: 4,
+                    price: "10.75",
+                    imageUrl: "https://static.ah.nl/static/recepten/img_099918_1024x748_JPG.jpg",
+                    cookId: 2,
+                    createDate: "2022-02-26T18:12:40.048Z",
+                    updateDate: result.updateDate,
+                    name: "'Italiaanse Ramen'",
+                    description: "Perfect voor doordeweeks, maar ook voor gasten tijdens een feestelijk avondje.",
+                    allergenes: ["gluten","lactose"],
+                })
+                done();
+            })
+    })
+    after((done) => {
+        DB.getConnection((error, con) => {
+            con.query('UPDATE meal SET name = "Spaghetti met tapenadekip uit de oven en frisse salade", updateDate = "2022-03-15T14:10:19.000Z" WHERE id = 3;', (error, result) => {
+                con.release();
+                done();
+            })
+        })
+    })
+
+})
+
+
 
 describe('UC-304 get meal details.', (done) => {
     it('TC-304-1 Meal does not exist', (done) => {
