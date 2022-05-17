@@ -106,7 +106,7 @@ describe('UC-301 add meal to database POST /api/meal', (done) => {
 describe('UC-303 get all meals GET /api/meal/', (done) => {
     before((done) => {
         DB.getConnection((error, con) => {
-            con.query('UPDATE meal SET name = "Spaghetti met tapenadekip uit de oven en frisse salade", updateDate = "2022-03-15T14:10:19.000Z" WHERE id = 3;', (error, result) => {
+            con.query('UPDATE meal SET name = "Spaghetti met tapenadekip uit de oven en frisse salade", updateDate = "2022-03-15T14:10:19.000Z" WHERE id = 3; DELETE FROM meal WHERE id = 36;', (error, result) => {
                 con.release();
                 done();
             })
