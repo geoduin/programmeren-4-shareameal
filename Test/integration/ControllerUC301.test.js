@@ -410,7 +410,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                         "price": "10.75",
                         "imageUrl": "https://static.ah.nl/static/recepten/img_099918_1024x748_JPG.jpg",
                         "createDate": "2022-02-26T18:12:40.048Z",
-                        updateDate: "2022-03-15T14:10:19.000Z",
+                        "updateDate": "2022-03-15T14:10:19.000Z",
                         "name": "Spaghetti met tapenadekip uit de oven en frisse salade",
                         "description": "Perfect voor doordeweeks, maar ook voor gasten tijdens een feestelijk avondje.",
                         "allergenes": [
@@ -546,17 +546,6 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                 )
                 done();
             })
-    })
-
-    after((done) => {
-        // DB.getConnection((error, con) => {
-        //     con.query('DELETE FROM meal WHERE id >= 6', (error, result) => {
-        //         con.query('UPDATE meal SET name = "Spaghetti met tapenadekip uit de oven en frisse sa..." WHERE id = 3', (err, res, field) => {
-        //             con.release();
-        //         })
-        //     })
-        // })
-        done();
     })
 })
 
