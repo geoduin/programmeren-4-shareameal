@@ -101,7 +101,9 @@ let controller = {
 
         DBConnection.getConnection((err, con) => {
             if (err) { throw err };
-            con.query('SELECT mealId, COUNT(*) AS participants, maxAmountOfParticipants FROM meal_participants_user JOIN meal on meal.id = meal_participants_user.mealId WHERE mealId = ?;',
+            con.query('SELECT id, maxAmountOfParticipants, COUNT(mealId) as participants'+
+            ' FROM (SELECT id, maxAmountOfParticipants FROM meal)AS meals'+
+            ' LEFT JOIN meal_participants_user ON meal_participants_user.mealId = meals.id GROUP BY id having id = ?;',
                 [mealId], (errors, result) => {
                     if (errors) { throw errors };
                     //Amount of participants;
