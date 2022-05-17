@@ -44,6 +44,7 @@ let controller = {
             load = jwt.decode(token);
             expireDate = load.exp;
             currentDate = new Date().getTime() / 1000;
+            logr.trace(`Id: ${load.id} has been retrieved`)
         }
 
 
@@ -53,6 +54,7 @@ let controller = {
             assert(currentDate < expireDate, 'Token has expired');
             next();
         } catch (error) {
+            logr.trace(`Token is not valid`)
             const err = {
                 status: 401,
                 message: error.message

@@ -119,7 +119,7 @@ let controller = {
                                     const err2 = {
                                         status: 400,
                                         message: 'Already signed up',
-                                        currentlyParticipating: true,
+                                        error: error
                                     }
                                     next(err2)
                                 } else {
