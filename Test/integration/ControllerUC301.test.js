@@ -267,9 +267,9 @@ describe('UC-302 update meal, PUT /api/meal/:mealId', (done) => {
         DB.getConnection((error, con) => {
             con.query('UPDATE meal SET name = "Spaghetti met tapenadekip uit de oven en frisse salade", updateDate = "2022-03-15T14:10:19.000Z" WHERE id = 3;', (error, result) => {
                 con.release();
+                done();
             })
         })
-        done();
     })
 
 })
