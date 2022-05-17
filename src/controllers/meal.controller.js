@@ -93,7 +93,7 @@ let controller = {
         //Decodes token to a readable object {id:(id), emailAdress:(emailAdress)}
         const encodedLoad = jwt.decode(token);
         let cookId = encodedLoad.id;
-
+        logr.trace(`ID of user is ${cookId}?`);
         logr.trace(`newMeal is ----------------------------------------------`);
         logr.trace(newMeal);
         logr.trace(`cookId is ${cookId}`);
@@ -111,8 +111,15 @@ let controller = {
                 [newMeal.name, newMeal.description, newMeal.isVega, newMeal.isVegan,
                 newMeal.isToTakeHome, newMeal.dateTime, newMeal.imageUrl, newMeal.allergenes,
                 newMeal.maxAmountOfParticipants, newMeal.price, cookId], (error, results, fields) => {
+                    if (error) {
+                        logr.trace("INSERT ging niet goed");
+                        next({ status: 499, error: error.message })
+                    };
+                    logr.trace("Results of the insert");
+                    logr.trace(results);
+                    logr.trace("Fields");
+                    logr.trace(fields);
                     connection.query('SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;', (err, result, field) => {
-                        if(err){next({status: 499, error: err.message})};
                         connection.release();
                         let meal = result[0];
                         logr.trace("INSERT HAS COMPLETED. Meal has been retrieved");
@@ -149,7 +156,7 @@ let controller = {
         isVegan = convertBooleanToInt(isVegan);
         isToTakeHome = convertBooleanToInt(isToTakeHome);
         logr.trace("Meal ready to be updated");
-        
+
         allergenes = allergenes.join();
         //Search for current meal
         DB.getConnection((error, connection) => {
@@ -205,8 +212,8 @@ let controller = {
                     meal.isVega = intToBoolean(meal.isVega);
                     meal.isVegan = intToBoolean(meal.isVegan);
                     meal.allergenes = meal.allergenes.split(",");
-                    for (const cook of cookList){
-                        if(cook.id == meal.cookId){
+                    for (const cook of cookList) {
+                        if (cook.id == meal.cookId) {
                             meal.cook = cook;
                             break;
                         }
