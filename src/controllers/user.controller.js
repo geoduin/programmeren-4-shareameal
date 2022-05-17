@@ -164,7 +164,9 @@ let controller = {
             con.promise()
                 .query('SELECT COUNT(*) AS amount FROM user WHERE emailAdress = ?;', [userEmail])
                 .then(([result]) => {
+                    logr.trace(result[0]);
                     if (result[0].amount == 0) {
+                        logr.trace("Clean, go to insert method");
                         next();
                     } else {
                         const err = {
@@ -188,7 +190,8 @@ let controller = {
         let phoneNumberValid = phoneRegex.test(phoneNumber);
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
-        console.log('Check inputvalidation');
+        logr.trace(User);
+        logr.trace("Check input validation")
         try {
             assert(typeof firstName == 'string', 'Title must be a string');
             assert(typeof lastName == 'string', 'LastName must be a string');
@@ -245,6 +248,7 @@ let controller = {
         console.log('UC-201 User creation');
         let user = req.body;
         logr.trace(user);
+        logr.trace("User input has started");
         DBConnection.getConnection((err, connect) => {
             connect.promise()
                 .query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
@@ -270,6 +274,7 @@ let controller = {
                         })
                     })
                 ).catch(err => {
+                    logr.error(`User already exist`);
                     res.status(409).json({
                         status: 409,
                         message: "Email has been taken"
@@ -283,7 +288,7 @@ let controller = {
     //amount=? query parameters
     //active or inactive query parameters
     getAllUsers: (req, res) => {
-        console.log('UC-202 Retrieval users');
+        logr.info('UC-202 Retrieval users');
         const active = req.query.isActive;
         const searchTerm = req.query.searchTerm;
         const limit = parseInt(req.query.limit);

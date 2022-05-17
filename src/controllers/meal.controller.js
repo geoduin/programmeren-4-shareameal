@@ -8,6 +8,7 @@ let controller = {
 
     //Inputvalidation
     validateMealCreation: (req, res, next) => {
+        logr.debug("Arrived at meal input validation");
         const meal = req.body;
         let name = meal.name;
         let description = meal.description;
@@ -32,8 +33,11 @@ let controller = {
             //assert(typeof allergenes == '')
             assert(typeof maxAmountOfParticipants == 'number', 'Maximum amount of participants required');
             assert(typeof price == 'number', 'Price is required');
+            logr.debug("Validation complete");
             next();
         } catch (error) {
+            logr.debug(error.message);
+            logr.debug("Validation failed");
             const err = {
                 status: 400,
                 message: error.message
@@ -99,7 +103,6 @@ let controller = {
         newMeal.isVegan = convertBooleanToInt(newMeal.isVegan);
         newMeal.isToTakeHome = convertBooleanToInt(newMeal.isToTakeHome);
         logr.trace(`newMeal after convertion ----------------------------------------------`);
-        newMeal.allergenes = newMeal.allergenes.join();
         logr.trace(newMeal);
 
         DB.getConnection((error, connection) => {
@@ -111,7 +114,7 @@ let controller = {
                     connection.query('SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;', (err, result, field) => {
                         connection.release();
                         let meal = result[0];
-
+                        logr.trace("INSERT HAS COMPLETED. Meal has been retrieved");
                         meal.isVega = intToBoolean(meal.isVega);
                         meal.isVegan = intToBoolean(meal.isVegan);
                         meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
@@ -144,6 +147,8 @@ let controller = {
         isVega = convertBooleanToInt(isVega);
         isVegan = convertBooleanToInt(isVegan);
         isToTakeHome = convertBooleanToInt(isToTakeHome);
+        logr.trace("Meal ready to be updated");
+        
         allergenes = allergenes.join();
         //Search for current meal
         DB.getConnection((error, connection) => {
@@ -152,6 +157,7 @@ let controller = {
                 (err, result, fields) => {
                     connection.query('SELECT * FROM meal WHERE id = ?;', [currentId], (error, meal, fields) => {
                         connection.release();
+                        logr.trace("UPDATE has succeeded.");
                         if (err) { throw err };
                         let Meal = meal[0];
                         Meal.isActive = intToBoolean(Meal.isActive);
@@ -178,7 +184,7 @@ let controller = {
         const selectCook = 'SELECT * FROM user WHERE id IN (SELECT cookId FROM meal);'
         const selectParticipants = 'SELECT * FROM user JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);';
         const ExecuteTaskQuery = selectMeals + selectCook + selectParticipants;
-
+        logr.debug("Retrieve all meals")
         DB.getConnection((error, connect) => {
             connect.query(ExecuteTaskQuery, (err, results) => {
                 connect.release();
@@ -205,7 +211,6 @@ let controller = {
                         }
                     }
                     for (const participant of participantsList) {
-                        logr.trace(`Participant = ${participant.mealId} AND Current Meal is id ${meal.id}`);
                         if (participant.mealId == meal.id) {
                             logr.trace(`Participant  ${participant.mealId} Pushed to Current Meal is id ${meal.id}`);
                             delete participant.password;
@@ -219,6 +224,7 @@ let controller = {
                     delete meal.cookId;
                     meal.participants = participants;
                 });
+                logr.debug("Retrieval succeeded");
                 res.status(200).json({
                     status: 200,
                     amount: meals.length,
@@ -235,6 +241,7 @@ let controller = {
         let participants = null;
         let cook = null;
         let hasMeals = null;
+        logr.trace("Retrieve meal by Id started")
         DB.getConnection((err, connect) => {
             connect.promise()
                 .query('SELECT * FROM user WHERE id IN (SELECT userId FROM meal_participants_user WHERE mealId = ?);', [currentId])
@@ -249,6 +256,7 @@ let controller = {
                     .then(([mealResult]) => {
                         //Assign meal object to meal
                         logr.trace('Meal=')
+                        logr.trace("Retrieval cook has started")
                         meal = mealResult[0];
                         hasMeals = (mealResult.length > 0);
                     }).then(connect
@@ -259,6 +267,7 @@ let controller = {
                             logr.trace(cookResult[0])
                             cook = cookResult[0];
                             if (hasMeals) {
+                                logr.trace('Meal found');
                                 meal.isActive = (meal.isActive == 1);
                                 meal.isVega = (meal.isVega == 1);
                                 meal.isVegan = (meal.isVegan == 1);
@@ -276,6 +285,7 @@ let controller = {
                                     user.isActive = (user.isActive == 1);
                                     delete user.password;
                                 })
+                                logr.trace('Retrieval succeeeded');
                                 res.status(200).json({
                                     status: 200,
                                     result: meal
@@ -304,6 +314,7 @@ let controller = {
                 connect.release();
                 if (result.affectedRows != 0) {
                     //Delete code
+                    logr.trace('Deletion succeeded.');
                     res.status(200).json({
                         status: 200,
                         message: 'Meal removed'
