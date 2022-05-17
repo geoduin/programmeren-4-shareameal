@@ -48,11 +48,23 @@ let controller = {
     ,
     testDateDB: (req, res, next) => {
         //Generate token functionality
-
-        res.status(200).json({
-            status: 200,
-            result: "HelloSir"
+        const selectMeals = 'SELECT * FROM meal;'
+        const selectCook = 'SELECT * FROM user WHERE id IN (SELECT cookId FROM meal);'
+        const selectParticipants = 'SELECT * FROM user JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);';
+        const ExecuteTaskQuery = selectMeals + selectCook + selectParticipants;
+        DBConnection.getConnection((error, connect) => {
+            connect.query(ExecuteTaskQuery, (error, result) => {
+                connect.release();
+                logr.debug(result[2]);
+                res.status(200).json({
+                    status: 200,
+                    amount: result[0].length,
+                    result: result[2]
+                })
+            })
         })
+
+
         //     })  
         // })
     }

@@ -326,7 +326,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": true,
                                 "emailAdress": "j.doe@server.com",
                                 "phoneNumber": "06 12425475",
-                                "roles": "editor,guest",
+                                "roles": ["editor","guest"],
                                 "street": "",
                                 "city": ""
                             },
@@ -337,7 +337,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": true,
                                 "emailAdress": "h.huizinga@server.nl",
                                 "phoneNumber": "06-12345678",
-                                "roles": "editor,guest",
+                                "roles": ["editor","guest"],
                                 "street": "",
                                 "city": ""
                             },
@@ -348,7 +348,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": true,
                                 "emailAdress": "h.tank@server.com",
                                 "phoneNumber": "06 12425495",
-                                "roles": "editor,guest",
+                                "roles": ["editor","guest"],
                                 "street": "",
                                 "city": ""
                             }
@@ -393,7 +393,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": false,
                                 "emailAdress": "m.vandam@server.nl",
                                 "phoneNumber": "06-12345678",
-                                "roles": "editor,guest",
+                                "roles": ["editor","guest"],
                                 "street": "",
                                 "city": ""
                             }
@@ -439,7 +439,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": true,
                                 "emailAdress": "h.huizinga@server.nl",
                                 "phoneNumber": "06-12345678",
-                                "roles": "editor,guest",
+                                "roles": ["editor","guest"],
                                 "street": "",
                                 "city": ""
                             },
@@ -450,7 +450,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": false,
                                 "emailAdress": "m.vandam@server.nl",
                                 "phoneNumber": "06-12345678",
-                                "roles": "editor,guest",
+                                "roles": ["editor","guest"],
                                 "street": "",
                                 "city": ""
                             }
@@ -470,7 +470,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                         "updateDate": "2022-03-12T19:51:57.000Z",
                         "name": "Zuurkool met spekjes",
                         "description": "Heerlijke zuurkoolschotel, dé winterkost bij uitstek. ",
-                        "allergenes": "",
+                        "allergenes": [""],
                         "cook": {
                             "id": 3,
                             "firstName": "Herman",
@@ -493,7 +493,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": true,
                                 "emailAdress": "j.doe@server.com",
                                 "phoneNumber": "06 12425475",
-                                "roles": "editor,guest",
+                                "roles": ["editor","guest"],
                                 "street": "",
                                 "city": ""
                             }
@@ -513,7 +513,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                         "updateDate": "2022-03-12T19:50:13.000Z",
                         "name": "Groentenschotel uit de oven",
                         "description": "Misschien wel de lekkerste schotel uit de oven! En vol vitaminen! Dat wordt smikkelen. Als je van groenten houdt ben je van harte welkom. Wel eerst even aanmelden.",
-                        "allergenes": "",
+                        "allergenes": [""],
                         "cook": {
                             "id": 3,
                             "firstName": "Herman",
@@ -536,7 +536,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": false,
                                 "emailAdress": "m.vandam@server.nl",
                                 "phoneNumber": "06-12345678",
-                                "roles": "editor,guest",
+                                "roles": ["editor","guest"],
                                 "street": "",
                                 "city": ""
                             }

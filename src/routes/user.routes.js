@@ -48,6 +48,6 @@ UserController.deleteUser);
 //Test
 
 //UserRouter.put('/api/test/:mealId', UserController.testDateDB);
-UserRouter.post('/api/test', UserController.checkToken);
+UserRouter.post('/api/test', UserController.testDateDB);
 UserRouter.post('/api/test/login', tokenAuthController.validateToken);
 module.exports = UserRouter;
