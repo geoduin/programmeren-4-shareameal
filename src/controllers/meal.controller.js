@@ -248,6 +248,7 @@ let controller = {
                     delete meal.cookId;
                     meal.participants = participants;
                 });
+                logr.debug(meals);
                 logr.debug("Retrieval succeeded");
                 res.status(200).json({
                     status: 200,
