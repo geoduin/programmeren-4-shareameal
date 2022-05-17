@@ -92,11 +92,11 @@ let controller = {
     ,
     //UC-401 - params {mealId, userId}
     joinMeal: (req, res, next) => {
-        const UserID = parseInt(req.params.mealId);
+        
         const auth = req.headers.authorization;
-        const token = auth.substring(7, auth.length);
-        const mealId = jwt.decode(token).id;
-
+        const load = decodeToken(auth);
+        const mealId = parseInt(req.params.mealId);
+    	const UserID = load.id;
         logr.trace(`JOIN MEAL: UserID is = ${UserID}, and MealID = ${mealId}!`);
 
         DBConnection.getConnection((err, con) => {
