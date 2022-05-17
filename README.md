@@ -252,7 +252,7 @@ let body =
                     isToTakeHome:           "boolean",
                     dateTime:               "Jaar-maand-dagTuur:minuten:seconden",
                     imageUrl:               "https://afbeelding.jpg",
-                    allergenes:              allergenen,
+                    allergenes:              allergenen(Array uit noten, gluten en of lactose),
                     maxAmountOfParticipants: nummer,
                     price:                   prijs
                 }
