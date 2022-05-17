@@ -79,7 +79,7 @@ describe('UC-301 add meal to database POST /api/meal', (done) => {
                 isVega: true,
                 isVegan: true,
                 isToTakeHome: false,
-                dateTime: "2030-01-01T00:00:00.394Z",
+                dateTime: "2030-01-01 00:00:00",
                 imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
                 allergenes: ["gluten", "Olijven", "lactose"],
                 maxAmountOfParticipants: 18,
