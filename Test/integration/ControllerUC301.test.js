@@ -81,7 +81,7 @@ describe('UC-301 add meal to database POST /api/meal', (done) => {
                 isToTakeHome: false,
                 dateTime: "2030-01-01 00:00:00",
                 imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
-                allergenes: ["gluten", "Olijven", "lactose"],
+                allergenes: ["gluten", "noten", "lactose"],
                 maxAmountOfParticipants: 18,
                 price: 6.75
             }).end((req, res) => {
