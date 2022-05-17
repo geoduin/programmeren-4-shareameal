@@ -109,13 +109,13 @@ let controller = {
 
         DB.getConnection((error, connection) => {
             if (error) { throw error }
-            connection.query('INSERT INTO meal '+
-            '(name, description, isVega, isVegan, isToTakeHome, dateTime, imageUrl, allergenes, maxAmountOfParticipants, price, cookId) '+
-            'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [newMeal.name, newMeal.description,  newMeal.isVega, newMeal.isVegan,
-                newMeal.isToTakeHome, newMeal.dateTime, newMeal.imageUrl, newMeal.allergenes, 
+            connection.query('INSERT INTO meal ' +
+                '(name, description, isVega, isVegan, isToTakeHome, dateTime, imageUrl, allergenes, maxAmountOfParticipants, price, cookId) ' +
+                'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [newMeal.name, newMeal.description, newMeal.isVega, newMeal.isVegan,
+                newMeal.isToTakeHome, newMeal.dateTime, newMeal.imageUrl, newMeal.allergenes,
                 newMeal.maxAmountOfParticipants, newMeal.price, cookId
-            ], (error, results, fields) => {
+                ], (error, results, fields) => {
                     if (error) {
                         logr.error("INSERT ging niet goed");
                         logr.error(error);
@@ -141,7 +141,7 @@ let controller = {
                             })
                         });
                     };
-                    
+
 
 
                 });
@@ -166,15 +166,21 @@ let controller = {
         logr.trace("Meal ready to be updated");
 
         allergenes = allergenes.join();
+        logr.debug(name)
+
+        let inserts = [name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl, allergenes, maxAmountOfParticipants, price, currentId];
+        let querY = "UPDATE meal SET name = ? ,description = ?, isActive = ?,isVega = ?,isVegan = ?,isToTakeHome = ?,dateTime = ?,imageUrl = ?,allergenes = ?,maxAmountOfParticipants = ?, price = ? WHERE id = ?;";
+
         //Search for current meal
         DB.getConnection((error, connection) => {
-            connection.query('UPDATE meal SET name = ? ,description = ?, isActive = ?,isVega = ?,isVegan = ?,isToTakeHome = ?,dateTime = ?,imageUrl = ?,allergenes = ?,maxAmountOfParticipants = ?, price = ? WHERE id = ?;',
-                [name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl, allergenes, maxAmountOfParticipants, price, currentId],
-                (err, result, fields) => {
-                    connection.query('SELECT * FROM meal WHERE id = ?;', [currentId], (error, meal, fields) => {
-                        connection.release();
-                        logr.trace("UPDATE has succeeded.");
-                        if (err) { next({status: 500, error: err})};
+            connection.query(querY, inserts, (err, result, fields) => {
+                connection.query('SELECT * FROM meal WHERE id = ?;', [currentId], (error, meal, fields) => {
+                    connection.release();
+                    logr.trace("UPDATE has succeeded.");
+                    if (err) {
+                        logr.debug(err);
+                        next({ status: 500, error: err })
+                    } else {
                         let Meal = meal[0];
                         Meal.isActive = intToBoolean(Meal.isActive);
                         Meal.isToTakeHome = intToBoolean(Meal.isToTakeHome);
@@ -187,8 +193,10 @@ let controller = {
                             status: 200,
                             result: meal[0]
                         })
-                    })
-                });
+                    }
+
+                })
+            });
         });
     }
     ,

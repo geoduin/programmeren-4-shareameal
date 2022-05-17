@@ -534,7 +534,7 @@ describe('UC-302 update meal, PUT /api/meal/:mealId', (done) => {
                     cookId: 2,
                     createDate: "2022-02-26T18:12:40.048Z",
                     updateDate: result.updateDate,
-                    name: "'Italiaanse Ramen'",
+                    name: "Italiaanse Ramen",
                     description: "Perfect voor doordeweeks, maar ook voor gasten tijdens een feestelijk avondje.",
                     allergenes: ["gluten","lactose"],
                 })
