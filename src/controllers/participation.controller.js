@@ -121,7 +121,7 @@ let controller = {
                                     const err2 = {
                                         status: 400,
                                         message: 'Already signed up',
-                                        error: error
+                                        currentlyParticipating: true
                                     }
                                     next(err2)
                                 } else {
