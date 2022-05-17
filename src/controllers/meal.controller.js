@@ -118,6 +118,7 @@ let controller = {
             ], (error, results, fields) => {
                     if (error) {
                         logr.error("INSERT ging niet goed");
+                        logr.error(error);
                         next({ status: 499, error: error })
                     } else {
                         logr.trace("Results of the insert");
