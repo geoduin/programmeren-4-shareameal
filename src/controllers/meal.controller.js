@@ -21,6 +21,7 @@ let controller = {
         //Allergene list is in process
         let maxAmountOfParticipants = meal.maxAmountOfParticipants;
         let price = meal.price;
+        logr.debug(meal);
         try {
             assert(typeof name == 'string', 'Name must be filled in or a string');
             assert(typeof description == 'string', 'Description must be filled in or a string');
@@ -107,33 +108,38 @@ let controller = {
 
         DB.getConnection((error, connection) => {
             if (error) { throw error }
-            connection.query('INSERT INTO meal (name, description, isVega, isVegan, isToTakeHome, dateTime, imageUrl, allergenes, maxAmountOfParticipants, price, cookId) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [newMeal.name, newMeal.description, newMeal.isVega, newMeal.isVegan,
-                newMeal.isToTakeHome, newMeal.dateTime, newMeal.imageUrl, newMeal.allergenes,
-                newMeal.maxAmountOfParticipants, newMeal.price, cookId], (error, results, fields) => {
+            connection.query('INSERT INTO meal '+
+            '(name, description, isVega, isVegan, isToTakeHome, dateTime, imageUrl, allergenes, maxAmountOfParticipants, price, cookId) '+
+            'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [newMeal.name, newMeal.description,  newMeal.isVega, newMeal.isVegan,
+                newMeal.isToTakeHome, newMeal.dateTime, newMeal.imageUrl, newMeal.allergenes, 
+                newMeal.maxAmountOfParticipants, newMeal.price, cookId
+            ], (error, results, fields) => {
                     if (error) {
-                        logr.trace("INSERT ging niet goed");
-                        next({ status: 499, error: error.message })
+                        logr.error("INSERT ging niet goed");
+                        next({ status: 499, error: error })
+                    } else {
+                        logr.trace("Results of the insert");
+                        logr.trace(results);
+                        logr.trace("Fields");
+                        logr.trace(fields);
+                        connection.query('SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;', (err, result, field) => {
+                            connection.release();
+                            let meal = result[0];
+                            logr.trace("INSERT HAS COMPLETED. Meal has been retrieved");
+                            meal.isVega = intToBoolean(meal.isVega);
+                            meal.isVegan = intToBoolean(meal.isVegan);
+                            meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
+                            meal.isActive = intToBoolean(meal.isActive);
+                            meal.allergenes = meal.allergenes.split(",");
+                            logr.trace('Insert has succeeded');
+                            res.status(201).json({
+                                status: 201,
+                                result: meal,
+                            })
+                        });
                     };
-                    logr.trace("Results of the insert");
-                    logr.trace(results);
-                    logr.trace("Fields");
-                    logr.trace(fields);
-                    connection.query('SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;', (err, result, field) => {
-                        connection.release();
-                        let meal = result[0];
-                        logr.trace("INSERT HAS COMPLETED. Meal has been retrieved");
-                        meal.isVega = intToBoolean(meal.isVega);
-                        meal.isVegan = intToBoolean(meal.isVegan);
-                        meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
-                        meal.isActive = intToBoolean(meal.isActive);
-                        meal.allergenes = meal.allergenes.split(",");
-                        logr.trace('Insert has succeeded');
-                        res.status(201).json({
-                            status: 201,
-                            result: meal,
-                        })
-                    });
+                    
 
 
                 });
