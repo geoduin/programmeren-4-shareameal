@@ -1,8 +1,3 @@
-
-//Dit moet ook in de integratie testen.
-//Bij het testen, moet het niet praten tegen de productie database, maar een testdatabase
-//Bij de assesments een testdatabase
-//Robin zal een echte/testdatabase schrijven.
 const mysql = require('mysql2');
 require('dotenv').config();
 const logr = require('../config/config').logger;

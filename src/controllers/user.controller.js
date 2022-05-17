@@ -215,7 +215,7 @@ let controller = {
             assert(phoneValid, 'Invalid phonenumber')
             assert(emailValid, 'Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
             assert(passwordValid, 'at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
-            
+
             next();
         } catch (err) {
             const error = {
@@ -229,43 +229,38 @@ let controller = {
     createUser: (req, res) => {
         let user = req.body;
         logr.trace(user);
-        BCrypt.hash(user.password, 10)
-            .then((hash) => {
-                DBConnection.getConnection((err, connect) => {
-                    connect.promise()
-                        .query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
-                            [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.emailAdress, hash])
-                        .then(connect.promise()
-                            .query('SELECT * FROM user WHERE emailAdress = ?;', [user.emailAdress])
-                            .then(([results]) => {
-                                logr.trace(`User with ${user.emailAdress} has been found.`);
-                                //Token generation in development
-                                logr.trace(results[0]);
-                                let { password, ...User } = results[0]
-                                const payLoad = { id: User.id };
-                                jwt.sign(payLoad, secretKey, { expiresIn: '31d' }, (err, token) => {
-                                    connect.release();
-                                    User = { ...User, token };
-                                    User.roles = User.roles.split(",");
-                                    logr.trace(User);
-                                    res.status(201).json({
-                                        status: 201,
-                                        message: `User has been registered.`,
-                                        result: User
-                                    })
-                                })
-                            })
-                        ).catch(err => {
-                            res.status(409).json({
-                                status: 409,
-                                message: "Email has been taken"
-                            })
+        DBConnection.getConnection((err, connect) => {
+            connect.promise()
+                .query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
+                    [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.emailAdress, user.password])
+                .then(connect.promise()
+                    .query('SELECT * FROM user WHERE emailAdress = ?;', [user.emailAdress])
+                    .then(([results]) => {
+                        logr.trace(`User with ${user.emailAdress} has been found.`);
+                        //Token generation in development
+                        logr.trace(results[0]);
+                        let { password, ...User } = results[0]
+                        const payLoad = { id: User.id };
+                        jwt.sign(payLoad, secretKey, { expiresIn: '31d' }, (err, token) => {
                             connect.release();
+                            User = { ...User, token };
+                            User.roles = User.roles.split(",");
+                            logr.trace(User);
+                            res.status(201).json({
+                                status: 201,
+                                message: `User has been registered.`,
+                                result: User
+                            })
                         })
+                    })
+                ).catch(err => {
+                    res.status(409).json({
+                        status: 409,
+                        message: "Email has been taken"
+                    })
+                    connect.release();
                 })
-            })
-
-
+        })
     }
     ,
     //UC-202 Retrieves all users
@@ -414,36 +409,34 @@ let controller = {
             activeValue = 1;
         }
 
-        BCrypt.hash(newUser.password, 10).then((hash) => {
-            logr.trace(`UserID of ${newUser.firstName} is ${id}.`)
-            DBConnection.getConnection((error, connection) => {
-                connection.promise()
-                    .query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
-                        [newUser.firstName, newUser.lastName, newUser.city, newUser.street, hash, newUser.emailAdress, activeValue, newUser.phoneNumber, id])
-                    .then(([result]) => {
-                        logr.trace(`Affected rows UPDATE: ${result.affectedRows}`);
-                        if (result.affectedRows == 0) {
-                            res.status(400).json({
-                                status: 400,
-                                message: `Update has failed. Id: ${id} does not exist.`
+        logr.trace(`UserID of ${newUser.firstName} is ${id}.`)
+        DBConnection.getConnection((error, connection) => {
+            connection.promise()
+                .query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
+                    [newUser.firstName, newUser.lastName, newUser.city, newUser.street, newUser.password, newUser.emailAdress, activeValue, newUser.phoneNumber, id])
+                .then(([result]) => {
+                    logr.trace(`Affected rows UPDATE: ${result.affectedRows}`);
+                    if (result.affectedRows == 0) {
+                        res.status(400).json({
+                            status: 400,
+                            message: `Update has failed. Id: ${id} does not exist.`
+                        })
+                    } else {
+                        connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
+                            if (err4) { throw err4 }
+                            logr.trace(result2);
+                            result2[0].isActive = (result2[0].isActive == 1);
+                            result2[0].roles = result2[0].roles.split(",")
+                            res.status(200).json({
+                                status: 200,
+                                message: "Succesful transaction",
+                                result: result2[0]
                             })
-                        } else {
-                            connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
-                                if (err4) { throw err4 }
-                                logr.trace(result2);
-                                result2[0].isActive = (result2[0].isActive == 1);
-                                result2[0].roles = result2[0].roles.split(",")
-                                res.status(200).json({
-                                    status: 200,
-                                    message: "Succesful transaction",
-                                    result: result2[0]
-                                })
-                            })
-                        }
-                    }).finally(() => {
-                        connection.release();
-                    })
-            })
+                        })
+                    }
+                }).finally(() => {
+                    connection.release();
+                })
         })
 
     }

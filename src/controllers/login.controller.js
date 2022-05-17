@@ -55,36 +55,35 @@ let controller = {
                     next(err);
                 } else {
                     logr.debug(User.password);
-                    BCrypt.compare(userPassWord, User.password).then((correct) => {
-                        if (correct) {
-                            logr.debug('Login has succeeded');
-                            jwt.sign({ id: User.id, emailAdress: User.emailAdress },
-                                jwtSecretKey, { expiresIn: '50d' },
-                                function (err, token) {
-                                    if (err) {
-                                        logr.trace(err)
-                                    } else {
-                                        User = { ...User, token }
-                                        User.isActive = convertIntToBoolean(User.isActive);
-                                        User.roles = User.roles.split(",");
-                                        delete User.password;
-                                        logr.debug(User);
-                                        res.status(200).json({
-                                            status: 200,
-                                            result: User
-                                        })
-                                    }
+                    if (User.password == userPassWord) {
+                        logr.debug('Login has succeeded');
+                        jwt.sign({ id: User.id, emailAdress: User.emailAdress },
+                            jwtSecretKey, { expiresIn: '50d' },
+                            function (err, token) {
+                                if (err) {
+                                    logr.trace(err)
+                                } else {
+                                    User = { ...User, token }
+                                    User.isActive = convertIntToBoolean(User.isActive);
+                                    User.roles = User.roles.split(",");
+                                    delete User.password;
+                                    logr.debug(User);
+                                    res.status(200).json({
+                                        status: 200,
+                                        result: User
+                                    })
                                 }
-                            );
-                        } else {
-                            logr.debug('Incorrect password')
-                            err = {
-                                status: 400,
-                                result: "Not the right password of this email"
                             }
-                            next(err);
+                        );
+                    } else {
+                        logr.debug('Incorrect password')
+                        err = {
+                            status: 400,
+                            result: "Not the right password of this email"
                         }
-                    })
+                        next(err);
+                    }
+
                 }
                 //Hash incomming password
                 //Compare input password with the hash
