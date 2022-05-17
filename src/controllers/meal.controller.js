@@ -82,7 +82,7 @@ let controller = {
     }
     ,
     //UC-301
-    createMeal: (req, res) => {
+    createMeal: (req, res, next) => {
         //newMeal attributes name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl,  
         //allergenes, maxAmountOfParticpants, price
         let newMeal = req.body;
@@ -112,6 +112,7 @@ let controller = {
                 newMeal.isToTakeHome, newMeal.dateTime, newMeal.imageUrl, newMeal.allergenes,
                 newMeal.maxAmountOfParticipants, newMeal.price, cookId], (error, results, fields) => {
                     connection.query('SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;', (err, result, field) => {
+                        if(err){next({status: 499, error: err.message})};
                         connection.release();
                         let meal = result[0];
                         logr.trace("INSERT HAS COMPLETED. Meal has been retrieved");
@@ -119,7 +120,7 @@ let controller = {
                         meal.isVegan = intToBoolean(meal.isVegan);
                         meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
                         meal.isActive = intToBoolean(meal.isActive);
-
+                        meal.allergenes = meal.allergenes.split(",");
                         logr.trace('Insert has succeeded');
                         res.status(201).json({
                             status: 201,
