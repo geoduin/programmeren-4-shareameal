@@ -188,7 +188,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 lastName: "Almada",
                 city: "Buenos Aires",
                 street: "Pluebo district uno",
-                phoneNumber: "31 123456789",
+                phoneNumber: "31 612345676",
                 emailAdress: "m.vandullemen@server.nl",
                 password: "Erika!23Opa",
             }).end((err, res) => {
@@ -206,7 +206,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 lastName: "Almada",
                 city: "Buenos Aires",
                 street: "Pluebo district uno",
-                phoneNumber: "31 123456789",
+                phoneNumber: "31 612345676",
                 emailAdress: "ArezoStanistan@outlook.com",
                 password: "Erika!23Opa",
             }).end((err, res) => {
@@ -225,7 +225,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                     lastName: "Almada",
                     isActive: 1,
                     emailAdress: "ArezoStanistan@outlook.com",
-                    phoneNumber: "31 123456789",
+                    phoneNumber: "31 612345676",
                     roles: ["editor","guest"],
                     street: "Pluebo district uno",
                     city: "Buenos Aires",
@@ -678,7 +678,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                 emailAdress: "Moomoo@gmail.com",
                 password: "Password#@@#s!111",
                 isActive: true,
-                phoneNumber: "31 123456789"
+                phoneNumber: "31 612345676"
             })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -702,7 +702,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                 emailAdress: "Xin20Wang@outlook.com",
                 password: "Password111",
                 isActive: true,
-                phoneNumber: "06 123456789"
+                phoneNumber: "31 612345676"
             })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -727,7 +727,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     emailAdress: "Moomoo@gmail.com",
                     password: "Password!!111",
                     isActive: true,
-                    phoneNumber: "31 123456789"
+                    phoneNumber: "31 612345676"
             })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -745,7 +745,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     password: result.password,
                     isActive: true,
                     roles: ["editor", "guest"],
-                    phoneNumber: "31 123456789"
+                    phoneNumber: "31 612345676"
                 })
                 done();
             })
