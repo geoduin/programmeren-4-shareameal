@@ -55,7 +55,7 @@ De API biedt de mogelijkheid om:
 |GET| /api/user/profile |
 |PUT| /api/user/{id} |
 |DELETE| /api/user/{id} |
-|POST| /api/meal/{id}/signUp |
+|POST| /api/meal/{id}/participate |
 |PUT| /api/meal/{id}/signOff |
 ### POST /api/auth/login, Login van gebruiker
 Request:    POST
@@ -357,12 +357,11 @@ Vereisten:
 
 ### Deelname aan maaltijd
 
-#### POST /api/meal/{mealId}/signup, Aanmelding maaltijd
+#### POST /api/meal/{mealId}/participate, Aanmelding maaltijd
 
 Request:    POST
 
-Route:      /api/meal/{mealId}/signup
-
+Route:      /api/meal/{mealId}/participate
 Vereisten: 
 
 -Token is vereist

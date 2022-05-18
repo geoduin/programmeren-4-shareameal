@@ -4,7 +4,7 @@ const controller = require('../controllers/participation.controller');
 const authorizationController = require('../controllers/auth.controller');
 
 //UC-401 join meal - params -> userId, mealId
-ParticipationRouter.post('/api/meal/:mealId/signup', 
+ParticipationRouter.post('/api/meal/:mealId/participate', 
 authorizationController.validateTokenLogin,
 controller.checkExistenceMeal, 
 controller.joinMeal);

@@ -17,7 +17,7 @@ describe('UC-401 sign on participation', (done) => {
 
     it('TC-401-1 Not logged in system', (done) => {
         chai.request(server)
-            .post('/api/meal/2/signup')
+            .post('/api/meal/2/participate')
             .end((err, res) => {
                 res.body.status.should.be.equal(401);
                 res.body.message.should.be.equal('Not logged in')
@@ -27,7 +27,7 @@ describe('UC-401 sign on participation', (done) => {
 
     it('TC-401-2 Meal does not exist', (done) => {
         chai.request(server)
-            .post('/api/meal/99999/signup')
+            .post('/api/meal/99999/participate')
             .auth(tokens.Henk, { type: 'bearer' })
             .end((err, res) => {
                 res.body.status.should.be.equal(404);
@@ -38,7 +38,7 @@ describe('UC-401 sign on participation', (done) => {
 
     it('TC-401-3 Successfully particpated in meal', (done) => {
         chai.request(server)
-            .post('/api/meal/2/signup')
+            .post('/api/meal/2/participate')
             //John {id: 2}
             .auth(tokens.John, { type: 'bearer' })
             .end((err, res) => {
