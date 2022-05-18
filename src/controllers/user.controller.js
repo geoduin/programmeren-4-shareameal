@@ -11,7 +11,7 @@ let id = 2;
 //Regex for email
 const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 //Regex for phones - every phonenumber must start with 06 or 31 and has either a space sign, - or nothing in between, and then 9 digits
-const phoneRegex = /(06)(\s|\-|)\d{8}|31(\s6|\-6|-\s6)\d{8}/;
+const phoneRegex = /(06)(\s|\-|)\d{8}|31(\s6|\-6|6)\d{8}/;
 //Regex for passwords - at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
 
@@ -236,6 +236,7 @@ let controller = {
                             connect.release();
                             User = { ...User, token };
                             User.roles = User.roles.split(",");
+                            User.isActive = intToBoolean(User.isActive);
                             logr.trace(User);
                             res.status(201).json({
                                 status: 201,

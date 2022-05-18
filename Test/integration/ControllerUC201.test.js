@@ -223,7 +223,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                     id: result.id,
                     firstName: "James",
                     lastName: "Almada",
-                    isActive: 1,
+                    isActive: true,
                     emailAdress: "ArezoStanistan@outlook.com",
                     phoneNumber: "31 612345676",
                     roles: ["editor","guest"],
