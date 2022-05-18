@@ -70,7 +70,7 @@ describe('UC-402 sign off participation', (done) => {
 
     it('TC-402-1 Not logged in system', (done) => {
         chai.request(server)
-            .put('/api/meal/2/signOff')
+            .delete('/api/meal/2/participate')
             .end((err, res) => {
                 res.body.status.should.be.equal(401);
                 res.body.message.should.be.equal('Not logged in')
@@ -80,7 +80,7 @@ describe('UC-402 sign off participation', (done) => {
 
     it('TC-402-2 meal does not exist', (done) => {
         chai.request(server)
-            .put('/api/meal/100000/signOff')
+            .delete('/api/meal/100000/participate')
             .auth(tokens.Marieke, { type: 'bearer' })
             .end((err, res) => {
                 res.body.message.should.be.equal('Meal does not exist!')
@@ -93,7 +93,7 @@ describe('UC-402 sign off participation', (done) => {
         let userId = 99;
         let mealId = 66;
         chai.request(server)
-            .put('/api/meal/' + mealId + '/signOff')
+            .delete('/api/meal/' + mealId + '/participate')
             .set(
                 'authorization',
                 'Bearer ' + jwt.sign({ id: userId }, jwtSecretKey, {expiresIn:'99d'})
@@ -110,7 +110,7 @@ describe('UC-402 sign off participation', (done) => {
         let userId = 1;
         let mealId = 1;
         chai.request(server)
-            .put('/api/meal/' + mealId + '/signOff')
+            .delete('/api/meal/' + mealId + '/participate')
             //Id {id:1};
             .auth(tokens.Mariete, {type:'bearer'})
             .end((err, res) => {

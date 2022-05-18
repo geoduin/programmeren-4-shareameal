@@ -56,7 +56,7 @@ De API biedt de mogelijkheid om:
 |PUT| /api/user/{id} |
 |DELETE| /api/user/{id} |
 |POST| /api/meal/{id}/participate |
-|PUT| /api/meal/{id}/signOff |
+|PUT| /api/meal/{id}/participate |
 ### POST /api/auth/login, Login van gebruiker
 Request:    POST
 
@@ -376,10 +376,10 @@ Vereisten:
 |401| niet ingelogd|
 |404|maaltijd bestaat niet|
 
-#### PUT /api/meal/{mealId}/signOff, Afmelden maaltijd
+#### PUT /api/meal/{mealId}/participate, Afmelden maaltijd
 Request:    PUT
 
-Route:      /api/meal/{mealId}/signOff
+Route:      /api/meal/{mealId}/participate
 
 Vereisten: 
 
