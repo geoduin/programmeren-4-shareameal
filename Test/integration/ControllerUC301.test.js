@@ -97,10 +97,10 @@ describe('UC-301 add meal to database POST /api/meal', (done) => {
             con.query('DELETE FROM meal WHERE id >= 6', (error, result) => {
                 con.query('ALTER TABLE meal AUTO_INCREMENT = 6', (err, res, field) => {
                     con.release();
+                    done();
                 })
             })
         })
-        done();
     })
 })
 describe('UC-303 get all meals GET /api/meal/', (done) => {

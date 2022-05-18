@@ -261,12 +261,13 @@ let controller = {
     ,
     //UC-304
     getMealById: (req, res, next) => {
-        const currentId = parseInt(req.params.mealId);
+        logr.debug("Get meal by id")
+        const currentId = req.params.mealId;
         let meal = null;
         let participants = null;
         let cook = null;
         let hasMeals = null;
-        logr.trace("Retrieve meal by Id started")
+        logr.trace(`Retrieve meal by Id started ${currentId}`)
         DB.getConnection((err, connect) => {
             connect.promise()
                 .query('SELECT * FROM user WHERE id IN (SELECT userId FROM meal_participants_user WHERE mealId = ?);', [currentId])
@@ -327,7 +328,6 @@ let controller = {
                             logr.info('Einde')
                         })))
         })
-
     }
     ,
     //UC-305 Delete meal from database
