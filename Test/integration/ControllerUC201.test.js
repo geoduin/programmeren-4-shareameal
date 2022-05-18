@@ -16,7 +16,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
             done();
         });
 
-        it('TC-201-1 When required input is missing, a valid error should be returned', (done) => {
+        it('TC-201-1 When firstname is missing, a valid error should be returned', (done) => {
             chai.request(server).post('/api/user').send({
                 //FirstName ontbreekt
                 lastName: "Arezo",
@@ -30,7 +30,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 res.should.be.an('object');
                 let { status, message } = res.body;
                 status.should.be.equals(400);
-                message.should.be.a('string').that.equals('Title must be a string');
+                message.should.be.a('string').that.equals('Firstname must be filled in.');
                 done();
             })
         })
@@ -49,7 +49,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 res.should.be.an('object');
                 let { status, message } = res.body;
                 status.should.be.equals(400);
-                message.should.be.a('string').that.equals('LastName must be a string');
+                message.should.be.a('string').that.equals('LastName must filled in.');
                 done();
             })
         })
@@ -67,7 +67,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 res.should.be.an('object');
                 let { status, message } = res.body;
                 status.should.be.equals(400);
-                message.should.be.a('string').that.equals('City must be a string');
+                message.should.be.a('string').that.equals('City must be filled in');
                 done();
             })
         })
@@ -85,12 +85,12 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 res.should.be.an('object');
                 let { status, message } = res.body;
                 status.should.be.equals(400);
-                message.should.be.a('string').that.equals('Street must be a string');
+                message.should.be.a('string').that.equals('Street must be filled in');
                 done();
             })
         })
 
-        it('TC-201-1 When email is missing, a valid error should be returned', (done) => {
+        it('TC-201-1 When emailadress is missing, a valid error should be returned', (done) => {
             chai.request(server).post('/api/user').send({
                 firstName: "Matias",
                 lastName: "Arezo",
@@ -103,7 +103,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 res.should.be.an('object');
                 let { status, message } = res.body;
                 status.should.be.equals(400);
-                message.should.be.a('string').that.equals('email must be a string');
+                message.should.be.a('string').that.equals('emailadress must be filled in');
                 done();
             })
         })
@@ -120,7 +120,7 @@ describe('UC-201 Create new User POST /api/user', (done) => {
                 res.should.be.an('object');
                 let { status, message } = res.body;
                 status.should.be.equals(400);
-                message.should.be.a('string').that.equals('password must be a string');
+                message.should.be.a('string').that.equals('password must be filled in');
                 done();
             })
         })
@@ -484,7 +484,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
 });
 
 describe('UC-203 Token GET  /api/user/profile', (done) => {
-    it('TC-203-1 Invalid token', (done) => {
+    it('TC-203-0 Expired token', (done) => {
         chai.request(server)
             .get('/api/user/profile')
             .auth(tokens.MarieteInvalidDate, { type: 'bearer' })
@@ -495,6 +495,18 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
                 done();
             })
     })
+    it('TC-203-1 Invalid token', (done) => {
+        chai.request(server)
+            .get('/api/user/profile')
+            .auth("Invalid", { type: 'bearer' })
+            .end((req, res) => {
+                let { message, status } = res.body;
+                status.should.be.equal(401);
+                message.should.be.equal('Token is invalid');
+                done();
+            })
+    })
+
     it('TC-203-2 valid token and existing users', (done) => {
         chai.request(server)
             .get('/api/user/profile')
@@ -621,7 +633,7 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                 res.should.be.a('object');
                 let { status, message } = res.body;
                 status.should.be.equal(400);
-                message.should.be.equal('password must be a string');
+                message.should.be.equal('password must be filled in');
                 done();
             })
     })

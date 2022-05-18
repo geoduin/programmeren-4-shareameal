@@ -56,6 +56,10 @@ let id = 2;
 app.all("*", (req, res, next) => {
   const method = req.method;
   logr.trace(`Method ${method} is aangeroepen`);
+  logr.trace('Body ==>');
+  logr.trace(req.body);
+  logr.trace('Headers ==>');
+  logr.trace(req.headers);
   next();
 });
 //Test command.
@@ -93,7 +97,7 @@ app.all("*", (req, res) => {
 });
 //Miscellaneous code
 app.listen(port, () => {
-  logr.trace(`Example app listening on port ${port}`);
+  logr.info(`Example app listening on port ${port}`);
 });
 
 

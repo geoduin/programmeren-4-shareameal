@@ -16,24 +16,6 @@ const phoneRegex = /(06|31)(\s|\-|)\d{9}/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
 
 let controller = {
-    //As placeholder for the token, will the object with the id function as the Id, Object{id:(id)}/
-    checkToken: (req, res, next) => {
-        console.log('Token checker');
-        const userObject = req.body.id;
-
-        try {
-            assert(typeof userObject == 'number', 'Invalid token')
-            next();
-        } catch (error) {
-            const err = {
-                status: 404,
-                message: error.message,
-                note: 'Token implementation has not been implemented. It is in process'
-            }
-            next(err);
-        }
-    }
-    ,
     testRegex: (req, res) => {
         let value = phoneRegex.test(req.params.input);
         let value2 = passwordRegex.test(req.params.input2);
@@ -70,20 +52,6 @@ let controller = {
         // })
     }
     ,
-    checkLogin: (req, res, next) => {
-        console.log('Check login');
-        const userObject = req.body.id;
-        try {
-            assert(typeof userObject == 'number', 'User has not been logged in')
-            next();
-        } catch (error) {
-            const err = {
-                status: 401,
-                message: error.message
-            }
-            next(err);
-        }
-    },
 
     //Assists UC-205, 
     checkUserExistenceAndOwnership: (req, res, next) => {
@@ -193,17 +161,19 @@ let controller = {
         logr.trace(User);
         logr.trace("Check input validation")
         try {
-            assert(typeof firstName == 'string', 'Title must be a string');
-            assert(typeof lastName == 'string', 'LastName must be a string');
-            assert(typeof city == 'string', 'City must be a string');
-            assert(typeof street == 'string', 'Street must be a string');
-            assert(typeof emailAdress == 'string', 'email must be a string');
-            assert(typeof password == 'string', 'password must be a string');
+            assert(typeof firstName == 'string', 'Firstname must be filled in.');
+            assert(typeof lastName == 'string', 'LastName must filled in.');
+            assert(typeof city == 'string', 'City must be filled in');
+            assert(typeof street == 'string', 'Street must be filled in');
+            assert(typeof emailAdress == 'string', 'emailadress must be filled in');
+            assert(typeof password == 'string', 'password must be filled in');
             assert(emailValid, 'Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
             assert(passwordValid, 'at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
             assert(phoneNumberValid, 'Invalid phonenumber')
+            logr.info("Input is valid");
             next();
         } catch (err) {
+            logr.error(`${err.message}`);
             const error = {
                 status: 400,
                 message: err.message
@@ -219,36 +189,37 @@ let controller = {
         let phoneValid = phoneRegex.test(phoneNumber);
         let emailValid = emailRegex.test(emailAdress);
         let passwordValid = passwordRegex.test(password);
-
+        logr.debug(`Phone: ${phoneValid} email: ${emailValid} password: ${passwordValid}`);
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
         try {
-            assert(typeof firstName == 'string', 'Title must be a string');
-            assert(typeof lastName == 'string', 'LastName must be a string');
-            assert(typeof city == 'string', 'City must be a string');
-            assert(typeof street == 'string', 'Street must be a string');
-            assert(typeof emailAdress == 'string', 'email must be a string');
-            assert(typeof password == 'string', 'password must be a string');
-            assert(typeof phoneNumber == 'string', 'phoneNumber must be a string');
+            assert(typeof firstName == 'string', 'Firstname must be filled in');
+            assert(typeof lastName == 'string', 'LastName must be filled in');
+            assert(typeof city == 'string', 'City must be filled in');
+            assert(typeof street == 'string', 'Street must be filled in');
+            assert(typeof emailAdress == 'string', 'email must be filled in');
+            assert(typeof password == 'string', 'password must be filled in');
+            assert(typeof phoneNumber == 'string', 'phoneNumber must be filled in');
             assert(phoneValid, 'Invalid phonenumber')
             assert(emailValid, 'Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
             assert(passwordValid, 'at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
-
+            logr.info("Input is valid");
             next();
         } catch (err) {
             const error = {
                 status: 400,
                 message: err.message
             };
+            logr.error(error);
             next(error);
         }
     },
     //UC-201 Creates user.s 
     createUser: (req, res) => {
-        console.log('UC-201 User creation');
+       logr.info('UC-201 User creation');
         let user = req.body;
         logr.trace(user);
-        logr.trace("User input has started");
+        logr.info("User input has started");
         DBConnection.getConnection((err, connect) => {
             connect.promise()
                 .query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
@@ -354,6 +325,7 @@ let controller = {
                 .query('SELECT * FROM user WHERE id = ?;', [id])
                 .then(([result]) => {
                     const user = result[0];
+                    logr.debug(user);
                     res.status(200).json({
                         status: 200,
                         result: {

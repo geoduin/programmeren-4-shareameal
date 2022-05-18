@@ -43,11 +43,10 @@ let controller = {
                 connect.release();
                 if (error) {
                     logr.debug("Error?: ----------------");
-                    logr.trace(error)
+                    logr.warn(error)
                 };
                 let User = result[0];
-                logr.trace(`User =`);
-                logr.trace(`Length of user result = ${result.length}`);
+                logr.debug(`Length of user result = ${result.length}`);
                 if (!User) {
                     err = {
                         status: 404,
@@ -55,35 +54,46 @@ let controller = {
                     }
                     next(err);
                 } else {
-                    logr.debug(User.password);
-                    if (User.password == userPassWord) {
-                        logr.debug('Login has succeeded');
-                        jwt.sign({ id: User.id, emailAdress: User.emailAdress },
-                            jwtSecretKey, { expiresIn: '50d' },
-                            function (err, token) {
-                                if (err) {
-                                    logr.trace(err)
-                                } else {
-                                    User = { ...User, token }
-                                    User.isActive = convertIntToBoolean(User.isActive);
-                                    User.roles = User.roles.split(",");
-                                    delete User.password;
-                                    logr.debug(User);
-                                    res.status(200).json({
-                                        status: 200,
-                                        result: User
-                                    })
+                    BCrypt.hash(User.password, 10).then((hashPassword) => {
+                        logr.debug(hashPassword);
+                        BCrypt.compare(userPassWord , hashPassword).then((isCorrect) => {
+                            logr.debug(User.password);
+                            logr.debug(isCorrect);
+                            if (isCorrect) {
+                                logr.info('Login has succeeded');
+                                jwt.sign({ id: User.id, emailAdress: User.emailAdress },
+                                    jwtSecretKey, { expiresIn: '50d' },
+                                    function (err, token) {
+                                        if (err) {
+                                            logr.trace(err)
+                                            next({ status: 400, error: err.message });
+                                        } else {
+                                            User = { ...User, token }
+                                            User.isActive = convertIntToBoolean(User.isActive);
+                                            User.roles = User.roles.split(",");
+                                            delete User.password;
+                                            logr.debug(User);
+                                            res.status(200).json({
+                                                status: 200,
+                                                result: User
+                                            })
+                                        }
+                                    }
+                                );
+                            } else {
+                                logr.error('Incorrect password')
+                                err = {
+                                    status: 400,
+                                    result: "Not the right password of this email"
                                 }
+                                next(err);
                             }
-                        );
-                    } else {
-                        logr.debug('Incorrect password')
-                        err = {
-                            status: 400,
-                            result: "Not the right password of this email"
-                        }
-                        next(err);
-                    }
+                        })
+                    })
+
+
+
+
 
                 }
                 //Hash incomming password
@@ -91,52 +101,7 @@ let controller = {
 
             });
         });
-    },
-    testDateDB: (req, res, next) => {
-        //Generate token functionality
-        let password = req.params.password;
-        BCrypt.hash(password, 10).then((result) => {
-            logr.debug(result);
-            BCrypt.compare(password, result).then(resa => {
-                logr.debug(resa);
-                res.status(200).json({
-                    status: 200,
-                    result: result
-                })
-            })
-
-        })
-
-
-
-        // jwt.sign(
-        //     { UserId: 1 },
-        //     privateKey,
-        //     //Algoritme is verwijdert
-        //     function (err, token) {
-        //         if (err) {
-        //             logr.trace(err)
-        //         } else {
-        //             logr.trace(token);
-        //             token2 = token;
-        //             res.status(200).json({
-        //                 status: 200,
-        //                 result: token2
-        //             })
-        //         }
-
-        //     }
-        // );
-    },
-}
-
-const tryPassword = async (password) => {
-    return BCrypt.try(password);
-}
-
-//Function to generate a token. Has yet to be developed. Currently has a placeholder return value - in process
-function generateToken() {
-    return "YouHaveAccessToken";
+    }
 }
 
 function convertIntToBoolean(int) {

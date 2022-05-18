@@ -8,7 +8,7 @@ let controller = {
 
     //Inputvalidation
     validateMealCreation: (req, res, next) => {
-        logr.debug("Arrived at meal input validation");
+        logr.trace("Arrived at meal input validation");
         const meal = req.body;
         let name = meal.name;
         let description = meal.description;
@@ -34,11 +34,11 @@ let controller = {
             //assert(typeof allergenes == '')
             assert(typeof maxAmountOfParticipants == 'number', 'Maximum amount of participants required');
             assert(typeof price == 'number', 'Price is required');
-            logr.debug("Validation complete");
+            logr.info("Validation complete");
             next();
         } catch (error) {
             logr.debug(error.message);
-            logr.debug("Validation failed");
+            logr.error("Validation failed");
             const err = {
                 status: 400,
                 message: error.message
@@ -96,8 +96,8 @@ let controller = {
         let cookId = encodedLoad.id;
         logr.trace(`ID of user is ${cookId}?`);
         logr.trace(`newMeal is ----------------------------------------------`);
-        logr.trace(newMeal);
-        logr.trace(`cookId is ${cookId}`);
+        logr.debug(newMeal);
+        logr.debug(`cookId is ${cookId}`);
 
         //Convert to SQL attributes
         newMeal.isVega = convertBooleanToInt(newMeal.isVega);
@@ -105,7 +105,7 @@ let controller = {
         newMeal.isToTakeHome = convertBooleanToInt(newMeal.isToTakeHome);
         newMeal.allergenes = newMeal.allergenes.join();
         logr.trace(`newMeal after convertion ----------------------------------------------`);
-        logr.trace(newMeal);
+        logr.debug(newMeal);
 
         DB.getConnection((error, connection) => {
             if (error) { throw error }
@@ -122,9 +122,9 @@ let controller = {
                         next({ status: 499, error: error })
                     } else {
                         logr.trace("Results of the insert");
-                        logr.trace(results);
+                        logr.debug(results);
                         logr.trace("Fields");
-                        logr.trace(fields);
+                        logr.debug(fields);
                         connection.query('SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;', (err, result, field) => {
                             connection.release();
                             let meal = result[0];
@@ -176,7 +176,7 @@ let controller = {
             connection.query(querY, inserts, (err, result, fields) => {
                 connection.query('SELECT * FROM meal WHERE id = ?;', [currentId], (error, meal, fields) => {
                     connection.release();
-                    logr.trace("UPDATE has succeeded.");
+                    logr.info("UPDATE has succeeded.");
                     if (err) {
                         logr.debug(err);
                         next({ status: 500, error: err })
@@ -187,8 +187,8 @@ let controller = {
                         Meal.isVega = intToBoolean(Meal.isVega);
                         Meal.isVegan = intToBoolean(Meal.isVegan);
                         Meal.allergenes = Meal.allergenes.split(",");
-                        logr.trace('Affected rows  ====V====')
-                        logr.trace('Update has succeeded!');
+                        logr.info('Affected rows  ====V====')
+                        logr.info('Update has succeeded!');
                         res.status(200).json({
                             status: 200,
                             result: meal[0]
@@ -236,7 +236,7 @@ let controller = {
                     }
                     for (const participant of participantsList) {
                         if (participant.mealId == meal.id) {
-                            logr.trace(`Participant  ${participant.mealId} Pushed to Current Meal is id ${meal.id}`);
+                            logr.debug(`Participant  ${participant.mealId} Pushed to Current Meal is id ${meal.id}`);
                             delete participant.password;
                             delete participant.mealId;
                             delete participant.userId;
@@ -289,7 +289,7 @@ let controller = {
                         .query('SELECT * FROM user WHERE id IN (SELECT cookId FROM meal WHERE id = ?);', [currentId])
                         .then(([cookResult]) => {
                             logr.trace('Cook==')
-                            logr.trace(cookResult[0])
+                            logr.debug(cookResult[0])
                             cook = cookResult[0];
                             if (hasMeals) {
                                 logr.trace('Meal found');
@@ -310,7 +310,7 @@ let controller = {
                                     user.isActive = (user.isActive == 1);
                                     delete user.password;
                                 })
-                                logr.trace('Retrieval succeeeded');
+                                logr.info('Retrieval succeeeded');
                                 res.status(200).json({
                                     status: 200,
                                     result: meal
@@ -324,7 +324,7 @@ let controller = {
                             }
                         }).finally(() => {
                             connect.release();
-                            logr.trace('Einde')
+                            logr.info('Einde')
                         })))
         })
 
@@ -333,13 +333,13 @@ let controller = {
     //UC-305 Delete meal from database
     deleteMeal: (req, res) => {
         const currentId = req.params.mealId;
-        logr.trace(`Id of meal is ${currentId}`);
+        logr.debug(`Id of meal is ${currentId}`);
         DB.getConnection((error, connect) => {
             connect.query('DELETE FROM meal WHERE id = ?;', [currentId], (err, result) => {
                 connect.release();
                 if (result.affectedRows != 0) {
                     //Delete code
-                    logr.trace('Deletion succeeded.');
+                    logr.info('Deletion succeeded.');
                     res.status(200).json({
                         status: 200,
                         message: 'Meal removed'

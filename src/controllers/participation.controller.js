@@ -14,7 +14,7 @@ let controller = {
             connection.query('SELECT * FROM meal WHERE id = ?;', [mealId], (err, results, fields) => {
                 connection.release();
                 if (results.length > 0) {
-                    logr.trace(`Meal with ID ${mealId} exists!`)
+                    logr.debug(`Meal with ID ${mealId} exists!`)
                     next();
                 } else {
                     const err2 = {
@@ -39,14 +39,14 @@ let controller = {
         }
         //MealId from path parameter
         const mealId = parseInt(req.params.mealId);
-        logr.trace(`SignUpChecker: UserID -> ${userId}, MealId -> ${mealId}.`)
+        logr.debug(`SignUpChecker: UserID -> ${userId}, MealId -> ${mealId}.`)
         DBConnection.getConnection((error, connection) => {
             connection.query('SELECT COUNT(*) AS count FROM meal_participants_user WHERE mealId = ? AND userId = ?;',
                 [mealId, userId], (err, results, fields) => {
                     connection.release();
                     logr.trace(results[0].count);
                     if (results[0].count > 0) {
-                        logr.trace(`User with ID ${userId} does exist in meal with ID ${mealId}.`)
+                        logr.debug(`User with ID ${userId} does exist in meal with ID ${mealId}.`)
                         next();
                     } else {
                         const err2 = {
@@ -73,7 +73,7 @@ let controller = {
             con.query('SELECT COUNT(*) AS value FROM meal WHERE id = ? AND cookId = ?;', [mealId, UserID], (error, result) => {
                 con.release();
                 let aaa = result;
-                logr.trace(`Result of query = ${result[0].value}`);
+                logr.debug(`Result of query = ${result[0].value}`);
                 if (result[0].value == 0) {
                     const err = {
                         status: 400,
@@ -81,7 +81,7 @@ let controller = {
                     }
                     next(err);
                 } else {
-                    logr.trace(`Meal | ${mealId} | is owned by => User: ${UserID} |`)
+                    logr.info(`Meal | ${mealId} | is owned by => User: ${UserID} |`)
                     next();
                 }
             })
@@ -206,7 +206,7 @@ let controller = {
     getParticipantsDetail: (req, res, next) => {
         const userId = parseInt(req.params.userId);
         const mealId = parseInt(req.params.mealId);
-        logr.trace(`Participation details reached ${userId} and mealID ${mealId}`);
+        logr.info(`Participation details reached ${userId} and mealID ${mealId}`);
         DBConnection.getConnection((err, connection) => {
             connection.query('SELECT firstName, lastName, emailAdress, phoneNumber, street, city FROM user WHERE id = ?;', [userId],
                 (error, results, fields) => {
