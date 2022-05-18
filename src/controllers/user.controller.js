@@ -262,7 +262,7 @@ let controller = {
     getAllUsers: (req, res) => {
         logr.info('UC-202 Retrieval users');
         const active = req.query.isActive;
-        const searchTerm = req.query.searchTerm;
+        const searchTerm = req.query.firstName;
         const limit = parseInt(req.query.limit);
         let booleanValue = 0;
         if (active != undefined && active == 'true') {
@@ -275,13 +275,13 @@ let controller = {
         logr.trace(`Active is ${active} + Searchterm is ${searchTerm} + Limit is ${limit}`);
 
         if (active && searchTerm) {
-            query += ` WHERE isActive = ? AND firstName LIKE('%${searchTerm}%') OR lastName LIKE('%${searchTerm}%')`
+            query += ` WHERE isActive = ? AND firstName LIKE('%${searchTerm}%')`
             inserts = [booleanValue];
         } else if (active) {
             query += ` WHERE isActive = ?`
             inserts = [booleanValue];
         } else if (searchTerm) {
-            query += ` WHERE firstName LIKE('%${searchTerm}%') OR lastName LIKE('%${searchTerm}%')`;
+            query += ` WHERE firstName LIKE('%${searchTerm}%')`;
         }
 
         if (limit) {

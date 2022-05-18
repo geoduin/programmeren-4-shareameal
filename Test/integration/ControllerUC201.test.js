@@ -259,7 +259,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
     it('TC-202-1 Empty list', (done) => {
         chai.request(server)
             .get('/api/user')
-            .query({ searchTerm: 'xqk2' })
+            .query({ firstName: 'xqk2' })
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, amount, result } = res.body;
@@ -314,7 +314,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
     it('TC-202-3 Search on non-existent name in the database', (done) => {
         chai.request(server)
             .get('/api/user')
-            .query({ searchTerm: 'xqk2' })
+            .query({ firstName: 'xqk2' })
             .end((req, res) => {
                 res.should.be.a('object');
                 let { status, amount, result } = res.body;
@@ -431,7 +431,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
     it('TC-202-6 show users based on searchTerm', (done) => {
         chai.request(server)
             .get('/api/user')
-            .query({ searchTerm: 'Xin' })
+            .query({ firstName: 'Mariëtte' })
             .end((req, res) => {
                 res.should.be.a('object');
                 res.status.should.be.equal(200);
@@ -445,34 +445,6 @@ describe('UC-202 Get all users Get /api/user', (done) => {
                         "phoneNumber": "",
                         "roles": [
                             ""
-                        ],
-                        "street": "",
-                        "city": ""
-                    },
-                    {
-                        "id": 3,
-                        "firstName": "Herman",
-                        "lastName": "Huizinga",
-                        "isActive": true,
-                        "emailAdress": "h.huizinga@server.nl",
-                        "phoneNumber": "06-12345678",
-                        "roles": [
-                            "editor",
-                            "guest"
-                        ],
-                        "street": "",
-                        "city": ""
-                    },
-                    {
-                        "id": 4,
-                        "firstName": "Marieke",
-                        "lastName": "Van Dam",
-                        "isActive": false,
-                        "emailAdress": "m.vandam@server.nl",
-                        "phoneNumber": "06-12345678",
-                        "roles": [
-                            "editor",
-                            "guest"
                         ],
                         "street": "",
                         "city": ""
