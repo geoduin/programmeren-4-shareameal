@@ -65,7 +65,7 @@ let controller = {
 
         DBConnection.getConnection((error1, Connection) => {
             Connection.query('SELECT id FROM user WHERE id = ?;', [userId], (err1, result, fields) => {
-                if(err1)throw err1;
+                if (err1) throw err1;
                 const userResult = result.length;
                 Connection.release();
                 try {
@@ -216,7 +216,7 @@ let controller = {
     },
     //UC-201 Creates user.s 
     createUser: (req, res) => {
-       logr.info('UC-201 User creation');
+        logr.info('UC-201 User creation');
         let user = req.body;
         logr.trace(user);
         logr.info("User input has started");
@@ -326,20 +326,28 @@ let controller = {
                 .then(([result]) => {
                     const user = result[0];
                     logr.debug(user);
-                    res.status(200).json({
-                        status: 200,
-                        result: {
-                            id: user.id,
-                            firstName: user.firstName,
-                            lastName: user.lastName,
-                            emailAdress: user.emailAdress,
-                            password: user.password,
-                            street: user.street,
-                            city: user.city,
-                            roles: user.roles.split(","),
-                            isActive: (user.isActive == 1)
-                        }
-                    })
+                    if (result.length > 0) {
+                        res.status(200).json({
+                            status: 200,
+                            result: {
+                                id: user.id,
+                                firstName: user.firstName,
+                                lastName: user.lastName,
+                                emailAdress: user.emailAdress,
+                                password: user.password,
+                                street: user.street,
+                                city: user.city,
+                                roles: user.roles.split(","),
+                                isActive: (user.isActive == 1)
+                            }
+                        })
+                    } else{
+                        res.status(400).json({
+                            status: 400,
+                            message: 'Invalid token'
+                        })
+                    }
+
                 }).then(() => {
                     con.release();
                 })

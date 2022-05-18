@@ -107,8 +107,8 @@ let controller = {
                 [mealId], (errors, result) => {
                     if (errors) { throw errors };
                     //Amount of participants;
-                    let amountParticipants = result[0].participants;
                     //The max amount of participants of the meal.
+                    let amountParticipants = result[0].participants;
                     const maxAmountOfParticipants = result[0].maxAmountOfParticipants;
                     logr.trace(`Amount of particpants of mealID ${mealId} is => ${amountParticipants} and the maximum is ${maxAmountOfParticipants}.`)
                     //If the current amount of participants is lower than the limit, it will let the user join the meal
