@@ -3,6 +3,7 @@ const assert = require('assert');
 const DB = require('../data/dbConnection');
 const jwt = require('jsonwebtoken');
 const { query } = require("../data/dbConnection");
+const { format } = require("util");
 const logr = require('../config/config').logger;
 let controller = {
 
@@ -103,6 +104,7 @@ let controller = {
         newMeal.isVega = convertBooleanToInt(newMeal.isVega);
         newMeal.isVegan = convertBooleanToInt(newMeal.isVegan);
         newMeal.isToTakeHome = convertBooleanToInt(newMeal.isToTakeHome);
+        newMeal.dateTime = convertOldDateToMySqlDate(newMeal.dateTime);
         newMeal.allergenes = newMeal.allergenes.join();
         logr.trace(`newMeal after convertion ----------------------------------------------`);
         logr.debug(newMeal);
@@ -163,6 +165,7 @@ let controller = {
         isVega = convertBooleanToInt(isVega);
         isVegan = convertBooleanToInt(isVegan);
         isToTakeHome = convertBooleanToInt(isToTakeHome);
+        dateTime = convertOldDateToMySqlDate(dateTime);
         logr.trace("Meal ready to be updated");
 
         allergenes = allergenes.join();
@@ -359,6 +362,13 @@ function convertBooleanToInt(booleanV) {
         return 1;
     }
     return 0;
+}
+
+function convertOldDateToMySqlDate(pp){
+    let dated = pp;
+    dated = dated.replace("T", " ").substring(0, 19);
+    logr.debug(dated);
+    return dated;
 }
 
 function intToBoolean(int) {

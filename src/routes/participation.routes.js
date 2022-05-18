@@ -10,7 +10,7 @@ controller.checkExistenceMeal,
 controller.joinMeal);
 
 //UC-402 leave meal - params -> mealId 
-ParticipationRouter.delete('/api/meal/:mealId/participate',
+ParticipationRouter.put('/api/meal/:mealId/participate',
 authorizationController.validateTokenLogin, 
 controller.checkExistenceMeal,
 controller.checkSignUp,
