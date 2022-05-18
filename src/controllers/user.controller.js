@@ -336,6 +336,7 @@ let controller = {
                                 lastName: user.lastName,
                                 emailAdress: user.emailAdress,
                                 password: user.password,
+                                phoneNumber : user.phoneNumber,
                                 street: user.street,
                                 city: user.city,
                                 roles: user.roles.split(","),

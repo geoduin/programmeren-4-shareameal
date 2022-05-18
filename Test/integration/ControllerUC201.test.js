@@ -495,7 +495,8 @@ describe('UC-203 Token GET  /api/user/profile', (done) => {
                     street: "",
                     city: "",
                     roles: [""],
-                    isActive: true
+                    isActive: true,
+                    phoneNumber: ""
                 })
                 done();
             })
@@ -713,7 +714,6 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
                     city: "Rotterdam",
                     street: "Maskauplein",
                     emailAdress: "Moomoo@gmail.com",
-                    //Every update, it will create a new hashcode
                     password: result.password,
                     isActive: true,
                     roles: ["editor", "guest"],

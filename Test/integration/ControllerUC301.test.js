@@ -88,6 +88,28 @@ describe('UC-301 add meal to database POST /api/meal', (done) => {
                 res.should.be.a('object');
                 assert.equal(res.body.status, 201);
                 res.body.result.should.be.a('object');
+                assert.deepEqual(res.body.result, {
+                    id: res.body.result.id,
+                    isActive: false,
+                    isVega: true,
+                    isVegan: true,
+                    isToTakeHome: false,
+                    dateTime: "2030-01-01T00:00:00.000Z",
+                    maxAmountOfParticipants: 18,
+                    price: "6.75",
+                    imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
+                    cookId: 4,
+                    //Deze variabelen krijgen bij iedere aanmaak een automatische datum en dus iedere keer een datum tijd, geldt ook voor Id.
+                    createDate: res.body.result.createDate,
+                    updateDate: res.body.result.updateDate,
+                    name: "Olijven",
+                    description: "Test beschrijving",
+                    allergenes: [
+                      "gluten",
+                      "lactose",
+                      "noten",
+                    ],
+                  })
                 done();
             })
     })
