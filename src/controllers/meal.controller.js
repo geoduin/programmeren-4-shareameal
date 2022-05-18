@@ -136,6 +136,7 @@ let controller = {
                             meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
                             meal.isActive = intToBoolean(meal.isActive);
                             meal.allergenes = meal.allergenes.split(",");
+                            meal.price = parseFloat(meal.price);
                             logr.trace('Insert has succeeded');
                             res.status(201).json({
                                 status: 201,
@@ -190,6 +191,7 @@ let controller = {
                         Meal.isVega = intToBoolean(Meal.isVega);
                         Meal.isVegan = intToBoolean(Meal.isVegan);
                         Meal.allergenes = Meal.allergenes.split(",");
+                        Meal.price = parseFloat(Meal.price);
                         logr.info('Affected rows  ====V====')
                         logr.info('Update has succeeded!');
                         res.status(200).json({

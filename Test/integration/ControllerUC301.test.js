@@ -96,7 +96,7 @@ describe('UC-301 add meal to database POST /api/meal', (done) => {
                     isToTakeHome: false,
                     dateTime: "2030-01-01T00:00:00.000Z",
                     maxAmountOfParticipants: 18,
-                    price: "6.75",
+                    price: 6.75,
                     imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
                     cookId: 4,
                     //Deze variabelen krijgen bij iedere aanmaak een automatische datum en dus iedere keer een datum tijd, geldt ook voor Id.
@@ -551,7 +551,7 @@ describe('UC-302 update meal, PUT /api/meal/:mealId', (done) => {
                     isToTakeHome: true,
                     dateTime: "2022-05-22T17:30:00.000Z",
                     maxAmountOfParticipants: 4,
-                    price: "10.75",
+                    price: 10.75,
                     imageUrl: "https://static.ah.nl/static/recepten/img_099918_1024x748_JPG.jpg",
                     cookId: 2,
                     createDate: "2022-02-26T18:12:40.048Z",
