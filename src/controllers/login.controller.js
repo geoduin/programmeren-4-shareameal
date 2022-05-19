@@ -34,7 +34,7 @@ let controller = {
     },
 
     login: (req, res, next) => {
-        logr.info("Login has started")
+        logr.info("Login has started");
         const userEmail = req.body.emailAdress;
         const userPassWord = req.body.password;
         let err = null;
