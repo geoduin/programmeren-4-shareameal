@@ -513,7 +513,7 @@ describe('UC-302 update meal, PUT /api/meal/:mealId', (done) => {
                 updateDate: "2022-04-27T15:44:19.615Z"
             }).end((req, res) => {
                 let { status, message } = res.body;
-                status.should.be.equal(401);
+                status.should.be.equal(403);
                 message.should.be.equal('The user did not own this meal');
                 done();
             })
@@ -701,7 +701,7 @@ describe('UC-305 delete meal test', (done) => {
             .delete('/api/meal/' + id)
             .auth(tokens.Mariete, { type: 'bearer' })
             .end((req, res) => {
-                res.body.status.should.be.equal(401);
+                res.body.status.should.be.equal(403);
                 res.body.message.should.be.equal('The user did not own this meal')
                 done();
             })

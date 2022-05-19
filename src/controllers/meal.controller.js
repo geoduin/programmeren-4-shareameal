@@ -75,7 +75,7 @@ let controller = {
                     if (errr.message == 'Meal does not exist') {
                         err = { status: 404, message: errr.message }
                     } else {
-                        err = { status: 401, message: errr.message }
+                        err = { status: 403, message: errr.message }
                     }
                     next(err);
                 }
