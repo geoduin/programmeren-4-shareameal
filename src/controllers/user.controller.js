@@ -314,7 +314,7 @@ let controller = {
     },
     //UC-203 Retrieve user profile, based on Token and the userId within.
     getProfile: (req, res) => {
-        console.log('UC-203 Profile');
+        logr.info('UC-203 Profile');
         //Token, still empty
         let Token = req.headers.authorization.substring(7, req.headers.authorization.length);
         //Unloads jwt token
@@ -358,7 +358,7 @@ let controller = {
     ,
     //UC-204 Retrieves user, based on userId
     retrieveUserById: (req, res) => {
-        console.log('UC-204 Retrieve user');
+        logr.info('UC-204 Retrieve user');
         const userId = req.params.userId;
         let user = null;
         let results = null;
@@ -407,7 +407,7 @@ let controller = {
     ,
     //UC-205 Edits user.
     updateUser: (req, res) => {
-        console.log('UC-205 Edit user');
+        logr.info('UC-205 Edit user');
         const id = parseInt(req.params.userId);
         //Body with user information
         let newUser = req.body;
@@ -450,7 +450,7 @@ let controller = {
     ,
     //UC-206 Deletes user based on id
     deleteUser: (req, res) => {
-        console.log('UC-206 Remove user');
+        logr.info('UC-206 Remove user');
         const iD = req.params.userId
         DBConnection.getConnection((error, conn) => {
             conn.promise()

@@ -8,7 +8,7 @@ const authorizationController = require('../controllers/auth.controller');
 ParticipationRouter.get('/api/meal/:mealId/participate', 
 authorizationController.validateTokenLogin,
 controller.checkExistenceMeal, 
-controller.joinMeal);
+controller.participateLeaveMeal);
 
 //UC-403 get participants list
 ParticipationRouter.get('/api/meal/:mealId/participants', 

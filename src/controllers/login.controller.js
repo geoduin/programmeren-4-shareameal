@@ -34,9 +34,9 @@ let controller = {
     },
 
     login: (req, res, next) => {
+        logr.info("Login has started")
         const userEmail = req.body.emailAdress;
         const userPassWord = req.body.password;
-        logr.trace(`Email ${userEmail} and input password ${userPassWord}`);
         let err = null;
         DataConnection.getConnection((error, connect) => {
             connect.query('SELECT * FROM user WHERE emailAdress = ?;', [userEmail], (error, result) => {
@@ -55,12 +55,8 @@ let controller = {
                     next(err);
                 } else {
                     BCrypt.hash(User.password, 10).then((hashPassword) => {
-                        logr.debug(hashPassword);
                         BCrypt.compare(userPassWord , hashPassword).then((isCorrect) => {
-                            logr.debug(User.password);
-                            logr.debug(isCorrect);
                             if (isCorrect) {
-                                logr.info('Login has succeeded');
                                 jwt.sign({ id: User.id, emailAdress: User.emailAdress },
                                     jwtSecretKey, { expiresIn: '50d' },
                                     function (err, token) {

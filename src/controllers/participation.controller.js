@@ -90,15 +90,15 @@ let controller = {
 
     }
     ,
-    //UC-401 - params {mealId, userId}
-    joinMeal: (req, res, next) => {
-
+    //UC-401 and UC-402- params {mealId, userId}
+    participateLeaveMeal: (req, res, next) => {
+        logr.info("(de)assign from meal");
         const auth = req.headers.authorization;
         const load = decodeToken(auth);
         const mealId = parseInt(req.params.mealId);
         const UserID = load.id;
-        logr.trace(`JOIN MEAL: UserID is = ${UserID}, and MealID = ${mealId}!`);
-        const amountPartQuery = 'SELECT id, maxAmountOfParticipants, userId FROM (SELECT id, maxAmountOfParticipants FROM meal)AS meals LEFT JOIN meal_participants_user ON meal_participants_user.mealId = meals.id WHERE id = 1;';
+        logr.debug(`JOIN MEAL: UserID is = ${UserID}, and MealID = ${mealId}!`);
+        const amountPartQuery = 'SELECT id, maxAmountOfParticipants, userId FROM (SELECT id, maxAmountOfParticipants FROM meal)AS meals LEFT JOIN meal_participants_user ON meal_participants_user.mealId = meals.id WHERE id = ?;';
         DBConnection.getConnection((err, con) => {
             if (err) { throw err };
             //Checks if amount has been met.
@@ -111,7 +111,9 @@ let controller = {
                 const maxAmountOfParticipants = result[0].maxAmountOfParticipants;
                 logr.trace(`Amount of particpants of mealID ${mealId} is => ${amountParticipants} and the maximum is ${maxAmountOfParticipants}.`)
                 //If the current amount of participants is lower than the limit, it will let the user join the meal
-                if (amountParticipants < maxAmountOfParticipants || participantList.find((user)=> user.userId == UserID)) {
+                logr.debug(`MEAL to (de)assign: UserID is = ${UserID}, and MealID = ${mealId}!`);
+                let ParticipantIsThere = participantList.filter((user)=> user.userId == UserID);
+                if (amountParticipants < maxAmountOfParticipants || ParticipantIsThere.length > 0) {
                     con.query('INSERT INTO meal_participants_user VALUES (?,?);', [mealId, UserID], (error, result, fields) => {
                         //FK/PK error message
                         if (error) {
@@ -149,29 +151,6 @@ let controller = {
                 }
             })
 
-        })
-    }
-    ,
-
-    //UC-402 - params {mealId, userId}
-    signOfMeal: (req, res) => {
-        //Unloads header
-        const TokenLoad = decodeToken(req.headers.authorization);
-        const mealId = parseInt(req.params.mealId);
-        const userId = TokenLoad.id;
-        DBConnection.getConnection((errr, connection) => {
-            connection.query('DELETE FROM meal_participants_user WHERE userId = ? AND mealId = ?;',
-                [userId, mealId], (err, results, fields) => {
-                    connection.release();
-                    res.status(200).json({
-                        status: 200,
-                        result: {
-                            message: `Participation of USERID => ${userId} with MEALID => ${mealId} has been removed.`,
-                            currentlyParticipating: false
-                        }
-
-                    })
-                })
         })
     }
     ,
