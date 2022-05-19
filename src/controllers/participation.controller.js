@@ -117,6 +117,7 @@ let controller = {
                     con.query('INSERT INTO meal_participants_user VALUES (?,?);', [mealId, UserID], (error, result, fields) => {
                         //FK/PK error message
                         if (error) {
+                            logr.info("User exits meal");
                             con.query('DELETE FROM meal_participants_user WHERE mealId = ? AND userId = ?;',
                                 [mealId, UserID], (fail, succes) => {
                                     con.release();
@@ -127,6 +128,7 @@ let controller = {
                                     })
                                 })
                         } else {
+                            logr.info("User enters meal");
                             con.release();
                             amountParticipants++;
                             res.status(200).json({
