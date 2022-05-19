@@ -56,10 +56,10 @@ let id = 2;
 app.all("*", (req, res, next) => {
   const method = req.method;
   logr.trace(`Method ${method} is aangeroepen`);
-  logr.trace('Body ==>');
-  logr.trace(req.body);
-  logr.trace('Headers ==>');
-  logr.trace(req.headers);
+  logr.debug('Body ==>');
+  logr.debug(req.body);
+  logr.debug('Headers ==>');
+  logr.debug(req.headers);
   next();
 });
 //Test command.

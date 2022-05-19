@@ -113,11 +113,12 @@ let controller = {
                 //If the current amount of participants is lower than the limit, it will let the user join the meal
                 logr.debug(`MEAL to (de)assign: UserID is = ${UserID}, and MealID = ${mealId}!`);
                 let ParticipantIsThere = participantList.filter((user)=> user.userId == UserID);
+                logr.debug(`Debug: meal ${mealId}, user ${UserID}. Max ${maxAmountOfParticipants} amountNow ${amountParticipants}`);
                 if (amountParticipants < maxAmountOfParticipants || ParticipantIsThere.length > 0) {
                     con.query('INSERT INTO meal_participants_user VALUES (?,?);', [mealId, UserID], (error, result, fields) => {
                         //FK/PK error message
-                        logr.error(error.message);
                         if (error) {
+                            logr.error(error.message);
                             logr.info("User exits meal");
                             con.query('DELETE FROM meal_participants_user WHERE mealId = ? AND userId = ?;',
                                 [mealId, UserID], (fail, succes) => {
