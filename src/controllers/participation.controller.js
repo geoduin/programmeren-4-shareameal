@@ -112,7 +112,7 @@ let controller = {
                 logr.trace(`Amount of particpants of mealID ${mealId} is => ${amountParticipants} and the maximum is ${maxAmountOfParticipants}.`)
                 //If the current amount of participants is lower than the limit, it will let the user join the meal
                 logr.debug(`MEAL to (de)assign: UserID is = ${UserID}, and MealID = ${mealId}!`);
-                let ParticipantIsThere = participantList.filter((user)=> user.userId == UserID);
+                let ParticipantIsThere = participantList.filter((user) => user.userId == UserID);
                 logr.debug(`Debug: meal ${mealId}, user ${UserID}. Max ${maxAmountOfParticipants} amountNow ${amountParticipants}`);
                 if (amountParticipants < maxAmountOfParticipants || ParticipantIsThere.length > 0) {
                     con.query('INSERT INTO meal_participants_user VALUES (?,?);', [mealId, UserID], (error, result, fields) => {
@@ -125,8 +125,10 @@ let controller = {
                                     con.release();
                                     res.status(200).json({
                                         status: 200,
-                                        message: `Participation of USERID => ${UserID} with MEALID => ${mealId} has been removed.`,
-                                        currentlyParticipating: false
+                                        result: {
+                                            message: `Participation of USERID => ${UserID} with MEALID => ${mealId} has been removed.`,
+                                            currentlyParticipating: false
+                                        }
                                     })
                                 })
                         } else {

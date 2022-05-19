@@ -97,10 +97,10 @@ describe('UC-402 sign off participation', (done) => {
             //Id {id:1};
             .auth(tokens.Mariete, {type:'bearer'})
             .end((err, res) => {
-                let {status, message, currentlyParticipating} =res.body;
-                message.should.be.equal(`Participation of USERID => ${userId} with MEALID => ${mealId} has been removed.`);
+                let {status,result} =res.body;
+                result.message.should.be.equal(`Participation of USERID => ${userId} with MEALID => ${mealId} has been removed.`);
                 status.should.be.equal(200);
-                currentlyParticipating.should.be.equal(false);
+                result.currentlyParticipating.should.be.equal(false);
                 done();
             })
     })
