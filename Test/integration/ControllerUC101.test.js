@@ -55,9 +55,9 @@ describe('UC-101 Inlog functionality testing GET /api/auth/login', (done) => {
                 password: "MontevideoFC"
             }).end((err, res) => {
                 res.should.be.an('object');
-                let { status, result } = res.body;
+                let { status, message } = res.body;
                 status.should.be.equals(400);
-                result.should.be.a('string').that.equals('Not the right password of this email');
+                message.should.be.a('string').that.equals('Not the right password of this email');
                 done();
             })
         })
