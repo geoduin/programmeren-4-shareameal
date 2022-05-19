@@ -55,8 +55,7 @@ De API biedt de mogelijkheid om:
 |GET| /api/user/profile |
 |PUT| /api/user/{id} |
 |DELETE| /api/user/{id} |
-|POST| /api/meal/{id}/participate |
-|PUT| /api/meal/{id}/participate |
+|GET| /api/meal/{id}/participate|
 ### POST /api/auth/login, Login van gebruiker
 Request:    POST
 
@@ -355,11 +354,11 @@ Vereisten:
 |403| niet de eigenaar van de maaltijd|
 |404| maaltijd bestaat niet|
 
-### Deelname aan maaltijd
+### Participatie van maaltijden.
 
-#### POST /api/meal/{mealId}/participate, Aanmelding maaltijd
+#### GET /api/meal/{mealId}/participate, Aanmelding/Afmelding maaltijd
 
-Request:    POST
+Request:    GET
 
 Route:      /api/meal/{mealId}/participate
 Vereisten: 
@@ -372,29 +371,9 @@ Vereisten:
 
 |Status code| |
 |---|---|
-|200| succesvolle aanmelding|
-|401| niet ingelogd|
+|200|succesvolle aanmelding/succesvolle afmelding|
+|401|niet ingelogd|
 |404|maaltijd bestaat niet|
-
-#### PUT /api/meal/{mealId}/participate, Afmelden maaltijd
-Request:    PUT
-
-Route:      /api/meal/{mealId}/participate
-
-Vereisten: 
-
--Token is vereist
-
--Maaltijd moet bestaan
-
--Aanmelding moet bestaan
-
-|Status code| |
-|---|---|
-|200| succesvolle afmelding|
-|401| niet ingelogd|
-|404| maaltijd bestaat niet|
-
 
 ## Technische specificaties
 

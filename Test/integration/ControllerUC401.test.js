@@ -17,7 +17,7 @@ describe('UC-401 sign on participation', (done) => {
 
     it('TC-401-1 Not logged in system', (done) => {
         chai.request(server)
-            .post('/api/meal/2/participate')
+            .get('/api/meal/2/participate')
             .end((err, res) => {
                 res.body.status.should.be.equal(401);
                 res.body.message.should.be.equal('Not logged in')
@@ -27,7 +27,7 @@ describe('UC-401 sign on participation', (done) => {
 
     it('TC-401-2 Meal does not exist', (done) => {
         chai.request(server)
-            .post('/api/meal/99999/participate')
+            .get('/api/meal/99999/participate')
             .auth(tokens.Henk, { type: 'bearer' })
             .end((err, res) => {
                 res.body.status.should.be.equal(404);
@@ -38,7 +38,7 @@ describe('UC-401 sign on participation', (done) => {
 
     it('TC-401-3 Successfully particpated in meal', (done) => {
         chai.request(server)
-            .post('/api/meal/2/participate')
+            .get('/api/meal/2/participate')
             //John {id: 2}
             .auth(tokens.John, { type: 'bearer' })
             .end((err, res) => {
@@ -61,16 +61,16 @@ describe('UC-401 sign on participation', (done) => {
 describe('UC-402 sign off participation', (done) => {
     before((done) => {
         DB.getConnection((error, connect) => {
-            connect.query('INSERT INTO `meal_participants_user` VALUES (1,1);', (err, result) => {
-                connect.release();
-                done();
-            })
+             connect.query('INSERT INTO `meal_participants_user` VALUES (1,1);', (err, result) => {
+                 connect.release();
+                 done();
+             })
         })
     })
 
     it('TC-402-1 Not logged in system', (done) => {
         chai.request(server)
-            .put('/api/meal/2/participate')
+            .get('/api/meal/2/participate')
             .end((err, res) => {
                 res.body.status.should.be.equal(401);
                 res.body.message.should.be.equal('Not logged in')
@@ -80,7 +80,7 @@ describe('UC-402 sign off participation', (done) => {
 
     it('TC-402-2 meal does not exist', (done) => {
         chai.request(server)
-            .put('/api/meal/100000/participate')
+            .get('/api/meal/100000/participate')
             .auth(tokens.Marieke, { type: 'bearer' })
             .end((err, res) => {
                 res.body.message.should.be.equal('Meal does not exist!')
@@ -89,35 +89,18 @@ describe('UC-402 sign off participation', (done) => {
             })
     })
 
-    it('TC-402-3 sign up does not exist', (done) => {
-        let userId = 99;
-        let mealId = 66;
-        chai.request(server)
-            .put('/api/meal/' + mealId + '/participate')
-            .set(
-                'authorization',
-                'Bearer ' + jwt.sign({ id: userId }, jwtSecretKey, {expiresIn:'99d'})
-            )
-            .end((err, res) => {
-                let {status, message} = res.body;
-                message.should.be.equal(`Meal does not exist!`)
-                status.should.be.equal(404);
-                done();
-            })
-    })
-
-    it('TC-402-4 Succesfully signed off participation from a meal', (done) => {
+    it('TC-402-3 Succesfully signed off participation from a meal', (done) => {
         let userId = 1;
         let mealId = 1;
         chai.request(server)
-            .put('/api/meal/' + mealId + '/participate')
+            .get('/api/meal/' + mealId + '/participate')
             //Id {id:1};
             .auth(tokens.Mariete, {type:'bearer'})
             .end((err, res) => {
-                let {status, result } =res.body;
+                let {status, message, currentlyParticipating} =res.body;
+                message.should.be.equal(`Participation of USERID => ${userId} with MEALID => ${mealId} has been removed.`);
                 status.should.be.equal(200);
-                result.message.should.be.equal(`Participation of USERID => ${userId} with MEALID => ${mealId} has been removed.`);
-                result.currentlyParticipating.should.be.equal(false);
+                currentlyParticipating.should.be.equal(false);
                 done();
             })
     })

@@ -34,7 +34,7 @@ let controller = {
         const TokenLoad = decodeToken(req.headers.authorization);
         //UserId
         let userId = TokenLoad.id;
-        if(req.params.userId){
+        if (req.params.userId) {
             userId = req.params.userId;
         }
         //MealId from path parameter
@@ -62,7 +62,7 @@ let controller = {
 
     //Assists UC-403 - params {mealId, userId}
     checkOwnerShipMeal: (req, res, next) => {
-        
+
         const TokenLoad = decodeToken(req.headers.authorization);
         const mealId = parseInt(req.params.mealId);
         const UserID = TokenLoad.id;
@@ -92,63 +92,62 @@ let controller = {
     ,
     //UC-401 - params {mealId, userId}
     joinMeal: (req, res, next) => {
-        
+
         const auth = req.headers.authorization;
         const load = decodeToken(auth);
         const mealId = parseInt(req.params.mealId);
-    	const UserID = load.id;
+        const UserID = load.id;
         logr.trace(`JOIN MEAL: UserID is = ${UserID}, and MealID = ${mealId}!`);
-
+        const amountPartQuery = 'SELECT id, maxAmountOfParticipants, userId FROM (SELECT id, maxAmountOfParticipants FROM meal)AS meals LEFT JOIN meal_participants_user ON meal_participants_user.mealId = meals.id WHERE id = 1;';
         DBConnection.getConnection((err, con) => {
             if (err) { throw err };
-            con.query('SELECT id, maxAmountOfParticipants, COUNT(mealId) as participants'+
-            ' FROM (SELECT id, maxAmountOfParticipants FROM meal)AS meals'+
-            ' LEFT JOIN meal_participants_user ON meal_participants_user.mealId = meals.id GROUP BY id having id = ?;',
-                [mealId], (errors, result) => {
-                    if (errors) { throw errors };
-                    //Amount of participants;
-                    //The max amount of participants of the meal.
-                    let amountParticipants = result[0].participants;
-                    const maxAmountOfParticipants = result[0].maxAmountOfParticipants;
-                    logr.trace(`Amount of particpants of mealID ${mealId} is => ${amountParticipants} and the maximum is ${maxAmountOfParticipants}.`)
-                    //If the current amount of participants is lower than the limit, it will let the user join the meal
-                    if (amountParticipants < maxAmountOfParticipants) {
-                        con.query('INSERT INTO meal_participants_user VALUES (?,?);',
-                            [mealId, UserID], (error, result, fields) => {
-                                //FK/PK error message
-                                if (error) {
+            //Checks if amount has been met.
+            con.query(amountPartQuery, [mealId], (errors, result) => {
+                if (errors) { throw errors };
+                //Amount of participants;
+                //The max amount of participants of the meal.
+                let amountParticipants = result.length;
+                let participantList = result;
+                const maxAmountOfParticipants = result[0].maxAmountOfParticipants;
+                logr.trace(`Amount of particpants of mealID ${mealId} is => ${amountParticipants} and the maximum is ${maxAmountOfParticipants}.`)
+                //If the current amount of participants is lower than the limit, it will let the user join the meal
+                if (amountParticipants < maxAmountOfParticipants || participantList.find((user)=> user.userId == UserID)) {
+                    con.query('INSERT INTO meal_participants_user VALUES (?,?);', [mealId, UserID], (error, result, fields) => {
+                        //FK/PK error message
+                        if (error) {
+                            con.query('DELETE FROM meal_participants_user WHERE mealId = ? AND userId = ?;',
+                                [mealId, UserID], (fail, succes) => {
                                     con.release();
-                                    const err2 = {
-                                        status: 400,
-                                        message: 'Already signed up',
-                                        currentlyParticipating: true
-                                    }
-                                    next(err2)
-                                } else {
-                                    con.release();
-                                    amountParticipants++;
                                     res.status(200).json({
                                         status: 200,
-                                        result: {
-                                            amount: amountParticipants,
-                                            currentlyParticipating: true,
-                                            mealId: mealId,
-                                            userId: UserID
-                                        },
+                                        message: `Participation of USERID => ${UserID} with MEALID => ${mealId} has been removed.`,
+                                        currentlyParticipating: false
                                     })
-
-                                }
+                                })
+                        } else {
+                            con.release();
+                            amountParticipants++;
+                            res.status(200).json({
+                                status: 200,
+                                result: {
+                                    amount: amountParticipants,
+                                    currentlyParticipating: true,
+                                    mealId: mealId,
+                                    userId: UserID
+                                },
                             })
-                    } else {
-                        con.release();
-                        const err2 = {
-                            status: 400,
-                            message: 'Maximum amount of participants has been reached.',
-                            amount: maxAmountOfParticipants
                         }
-                        next(err2)
+                    })
+                } else {
+                    con.release();
+                    const err2 = {
+                        status: 400,
+                        message: 'Maximum amount of participants has been reached.',
+                        amount: maxAmountOfParticipants
                     }
-                })
+                    next(err2)
+                }
+            })
 
         })
     }
