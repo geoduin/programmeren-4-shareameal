@@ -113,7 +113,7 @@ let controller = {
             if (error) { throw error }
             connection.query('INSERT INTO meal ' +
                 '(name, description, isVega, isVegan, isToTakeHome, dateTime, imageUrl, allergenes, maxAmountOfParticipants, price, cookId) ' +
-                'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); SELECT LAST_INSERT_ID() AS id;',
                 [newMeal.name, newMeal.description, newMeal.isVega, newMeal.isVegan,
                 newMeal.isToTakeHome, newMeal.dateTime, newMeal.imageUrl, newMeal.allergenes,
                 newMeal.maxAmountOfParticipants, newMeal.price, cookId
@@ -124,19 +124,30 @@ let controller = {
                         next({ status: 499, error: error })
                     } else {
                         logr.trace("Results of the insert");
-                        logr.debug(results);
-                        logr.trace("Fields");
-                        logr.debug(fields);
-                        connection.query('SELECT * FROM meal ORDER BY createDate DESC LIMIT 1;', (err, result, field) => {
+                        logr.debug(results[1][0].id);
+                        let lastINSERTId = results[1][0].id;
+                        const insertCookParticipant = `INSERT INTO meal_participants_user VALUES(${lastINSERTId},${cookId});`;
+                        const selectMeals2 = `SELECT * FROM meal WHERE id = ${lastINSERTId};`
+                        const selectCook2 = `SELECT * FROM user WHERE id IN (SELECT cookId FROM meal WHERE id = ${lastINSERTId});`
+                        const selectParticipants2 = `SELECT * FROM user JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE meal_participants_user.mealId = ${lastINSERTId};`;
+                        const selectMealCookPart2 = insertCookParticipant + selectMeals2 + selectCook2 + selectParticipants2;
+                        let insertsSelect = [lastINSERTId, cookId, lastINSERTId, lastINSERTId, lastINSERTId];
+                        connection.query(selectMealCookPart2, (err, result, field) => {
                             connection.release();
-                            let meal = result[0];
-                            logr.trace("INSERT HAS COMPLETED. Meal has been retrieved");
-                            meal.isVega = intToBoolean(meal.isVega);
-                            meal.isVegan = intToBoolean(meal.isVegan);
-                            meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
-                            meal.isActive = intToBoolean(meal.isActive);
-                            meal.allergenes = meal.allergenes.split(",");
-                            meal.price = parseFloat(meal.price);
+                            let meal = result[1][0];
+                            let cook = result[2][0];
+                            let participants = result[3];
+                            // logr.trace("INSERT HAS COMPLETED. Meal has been retrieved");
+                            meal = mealCorrectFormat(meal);
+                            cook = userCookCorrectFormat(cook);
+                            participants.forEach(participant => {
+                                delete participant.mealId;
+                                delete participant.userId;
+                                participant = userCookCorrectFormat(participant);
+                            })
+                            meal.cook = cook;
+                            meal.participants = participants;
+                            delete meal.cookId;
                             logr.trace('Insert has succeeded');
                             res.status(201).json({
                                 status: 201,
@@ -186,12 +197,7 @@ let controller = {
                         next({ status: 500, error: err })
                     } else {
                         let Meal = meal[0];
-                        Meal.isActive = intToBoolean(Meal.isActive);
-                        Meal.isToTakeHome = intToBoolean(Meal.isToTakeHome);
-                        Meal.isVega = intToBoolean(Meal.isVega);
-                        Meal.isVegan = intToBoolean(Meal.isVegan);
-                        Meal.allergenes = Meal.allergenes.split(",");
-                        Meal.price = parseFloat(Meal.price);
+                        Meal = mealCorrectFormat(Meal);
                         logr.info('Affected rows  ====V====')
                         logr.info('Update has succeeded!');
                         res.status(200).json({
@@ -366,7 +372,7 @@ function convertBooleanToInt(booleanV) {
     return 0;
 }
 
-function convertOldDateToMySqlDate(pp){
+function convertOldDateToMySqlDate(pp) {
     let dated = pp;
     dated = dated.replace("T", " ").substring(0, 19);
     logr.debug(dated);
@@ -377,4 +383,20 @@ function intToBoolean(int) {
     return (int == 1);
 }
 
+function mealCorrectFormat(meal) {
+    meal.isVega = intToBoolean(meal.isVega);
+    meal.isVegan = intToBoolean(meal.isVegan);
+    meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
+    meal.isActive = intToBoolean(meal.isActive);
+    meal.allergenes = meal.allergenes.split(",");
+    meal.price = parseFloat(meal.price);
+    return meal;
+}
+
+function userCookCorrectFormat(User) {
+    User.isActive = intToBoolean(User.isActive);
+    delete User.password;
+    User.roles = User.roles.split(",");
+    return User;
+}
 module.exports = controller;

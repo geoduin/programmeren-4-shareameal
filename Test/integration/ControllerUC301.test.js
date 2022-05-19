@@ -98,18 +98,47 @@ describe('UC-301 add meal to database POST /api/meal', (done) => {
                     maxAmountOfParticipants: 18,
                     price: 6.75,
                     imageUrl: "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
-                    cookId: 4,
+                    cook: {
+                        "city": "",
+                        "emailAdress": "m.vandam@server.nl",
+                        "firstName": "Marieke",
+                        "id": 4,
+                        "isActive": false,
+                        "lastName": "Van Dam",
+                        "phoneNumber": "06-12345678",
+                        "roles": [
+                            "editor",
+                            "guest"
+                        ],
+                        "street": ""
+                    },
                     //Deze variabelen krijgen bij iedere aanmaak een automatische datum en dus iedere keer een datum tijd, geldt ook voor Id.
                     createDate: res.body.result.createDate,
                     updateDate: res.body.result.updateDate,
                     name: "Olijven",
                     description: "Test beschrijving",
                     allergenes: [
-                      "gluten",
-                      "lactose",
-                      "noten",
+                        "gluten",
+                        "lactose",
+                        "noten",
                     ],
-                  })
+                    participants: [
+                        {
+                            "city": "",
+                            "emailAdress": "m.vandam@server.nl",
+                            "firstName": "Marieke",
+                            "id": 4,
+                            "isActive": false,
+                            "lastName": "Van Dam",
+                            "phoneNumber": "06-12345678",
+                            "roles": [
+                                "editor",
+                                "guest"
+                            ],
+                            "street": ""
+                        }
+                    ]
+                })
                 done();
             })
     })
@@ -182,7 +211,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": true,
                                 "emailAdress": "j.doe@server.com",
                                 "phoneNumber": "06 12425475",
-                                "roles": ["editor","guest"],
+                                "roles": ["editor", "guest"],
                                 "street": "",
                                 "city": ""
                             },
@@ -193,7 +222,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": true,
                                 "emailAdress": "h.huizinga@server.nl",
                                 "phoneNumber": "06-12345678",
-                                "roles": ["editor","guest"],
+                                "roles": ["editor", "guest"],
                                 "street": "",
                                 "city": ""
                             },
@@ -204,7 +233,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": true,
                                 "emailAdress": "h.tank@server.com",
                                 "phoneNumber": "06 12425495",
-                                "roles": ["editor","guest"],
+                                "roles": ["editor", "guest"],
                                 "street": "",
                                 "city": ""
                             }
@@ -249,7 +278,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": false,
                                 "emailAdress": "m.vandam@server.nl",
                                 "phoneNumber": "06-12345678",
-                                "roles": ["editor","guest"],
+                                "roles": ["editor", "guest"],
                                 "street": "",
                                 "city": ""
                             }
@@ -295,7 +324,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": true,
                                 "emailAdress": "h.huizinga@server.nl",
                                 "phoneNumber": "06-12345678",
-                                "roles": ["editor","guest"],
+                                "roles": ["editor", "guest"],
                                 "street": "",
                                 "city": ""
                             },
@@ -306,7 +335,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": false,
                                 "emailAdress": "m.vandam@server.nl",
                                 "phoneNumber": "06-12345678",
-                                "roles": ["editor","guest"],
+                                "roles": ["editor", "guest"],
                                 "street": "",
                                 "city": ""
                             }
@@ -349,7 +378,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": true,
                                 "emailAdress": "j.doe@server.com",
                                 "phoneNumber": "06 12425475",
-                                "roles": ["editor","guest"],
+                                "roles": ["editor", "guest"],
                                 "street": "",
                                 "city": ""
                             }
@@ -392,7 +421,7 @@ describe('UC-303 get all meals GET /api/meal/', (done) => {
                                 "isActive": false,
                                 "emailAdress": "m.vandam@server.nl",
                                 "phoneNumber": "06-12345678",
-                                "roles": ["editor","guest"],
+                                "roles": ["editor", "guest"],
                                 "street": "",
                                 "city": ""
                             }
@@ -558,7 +587,7 @@ describe('UC-302 update meal, PUT /api/meal/:mealId', (done) => {
                     updateDate: result.updateDate,
                     name: "Italiaanse Ramen",
                     description: "Perfect voor doordeweeks, maar ook voor gasten tijdens een feestelijk avondje.",
-                    allergenes: ["gluten","lactose"],
+                    allergenes: ["gluten", "lactose"],
                 })
                 done();
             })
