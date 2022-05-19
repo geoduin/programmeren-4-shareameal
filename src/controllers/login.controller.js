@@ -80,7 +80,7 @@ let controller = {
                                 logr.error('Incorrect password')
                                 err = {
                                     status: 400,
-                                    result: "Not the right password of this email"
+                                    message: "Not the right password of this email"
                                 }
                                 next(err);
                             }
