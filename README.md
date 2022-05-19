@@ -20,8 +20,7 @@ Om de kwaliteit van de applicatie te waarborgen, hebben we integratietesten uitg
 2. Download de zip-bestand uit de repository.
 
 ### Lokaal API uitvoeren
-Hieronder kun je de applicatie lokaal uitvoeren met deze commands.
-
+Hieronder kun je de applicatie lokaal draaien op http://localhost:3030 met deze commands.
 
 ``` 
 npm start
@@ -93,9 +92,11 @@ Vereisten:
 
 Valide email vereist
 
-Wachtwoord minstens 8 charracters en 1 hoofdletter
+Wachtwoord minstens 8 charracters en 1 hoofdletter 1 kleine letter en 1 cijfer
 
-Valide telefoonnummer vereist
+Valide telefoonnummer vereist. 
+
+Format telefoonnummer (06 of 31)(lege karakter, '-' of geen ruimte tussen 06/31 en de andere cijfers)(6 als de telefoonnummer met 31 begint)(8 cijfers)
 
 ```
 Gebruiker aanmaak body = 
