@@ -116,6 +116,7 @@ let controller = {
                 if (amountParticipants < maxAmountOfParticipants || ParticipantIsThere.length > 0) {
                     con.query('INSERT INTO meal_participants_user VALUES (?,?);', [mealId, UserID], (error, result, fields) => {
                         //FK/PK error message
+                        logr.error(error.message);
                         if (error) {
                             logr.info("User exits meal");
                             con.query('DELETE FROM meal_participants_user WHERE mealId = ? AND userId = ?;',
