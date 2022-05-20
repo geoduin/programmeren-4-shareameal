@@ -259,6 +259,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
     it('TC-202-1 Empty list', (done) => {
         chai.request(server)
             .get('/api/user')
+            .auth(tokens.John, {type:'bearer'})
             .query({ firstName: 'xqk2' })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -272,6 +273,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
     it('TC-202-2 show two users', (done) => {
         chai.request(server)
             .get('/api/user')
+            .auth(tokens.John, {type:'bearer'})
             .query({ limit: 2 })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -314,6 +316,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
     it('TC-202-3 Search on non-existent name in the database', (done) => {
         chai.request(server)
             .get('/api/user')
+            .auth(tokens.John, {type:'bearer'})
             .query({ firstName: 'xqk2' })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -327,6 +330,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
     it('TC-202-4 show users with active=false', (done) => {
         chai.request(server)
             .get('/api/user')
+            .auth(tokens.John, {type:'bearer'})
             .query({ isActive: false })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -359,6 +363,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
     it('TC-202-5 show users with active=true', (done) => {
         chai.request(server)
             .get('/api/user')
+            .auth(tokens.John, {type:'bearer'})
             .query({ isActive: true })
             .end((req, res) => {
                 res.should.be.a('object');
@@ -431,6 +436,7 @@ describe('UC-202 Get all users Get /api/user', (done) => {
     it('TC-202-6 show users based on searchTerm', (done) => {
         chai.request(server)
             .get('/api/user')
+            .auth(tokens.John, {type:'bearer'})
             .query({ firstName: 'Mariëtte' })
             .end((req, res) => {
                 res.should.be.a('object');

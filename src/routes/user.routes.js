@@ -20,6 +20,7 @@ UserController.createUser);
 
 //UC-202 Retrieves all users
 UserRouter.get("/api/user", 
+tokenAuthController.validateTokenLogin,
 UserController.getAllUsers);
 
 //UC-203 Retrieve user profile, based on Token and userID
