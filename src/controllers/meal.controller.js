@@ -127,13 +127,14 @@ let controller = {
                         logr.trace("Results of the insert");
                         logr.debug(results[1][0].id);
                         let lastINSERTId = results[1][0].id;
-                        const insertCookParticipant = `INSERT INTO meal_participants_user VALUES(${lastINSERTId},${cookId});`;
-                        const selectMeals2 = `SELECT * FROM meal WHERE id = ${lastINSERTId};`
-                        const selectCook2 = `SELECT * FROM user WHERE id IN (SELECT cookId FROM meal WHERE id = ${lastINSERTId});`
-                        const selectParticipants2 = `SELECT * FROM user JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE meal_participants_user.mealId = ${lastINSERTId};`;
+                        const insertCookParticipant = `INSERT INTO meal_participants_user VALUES(?,?);`;
+                        const selectMeals2 = `SELECT * FROM meal WHERE id = ?;`
+                        const selectCook2 = `SELECT * FROM user WHERE id IN (SELECT cookId FROM meal WHERE id = ?);`
+                        const selectParticipants2 = `SELECT * FROM user JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE meal_participants_user.mealId = ?;`;
                         const selectMealCookPart2 = insertCookParticipant + selectMeals2 + selectCook2 + selectParticipants2;
-                        let insertsSelect = [lastINSERTId, cookId, lastINSERTId, lastINSERTId, lastINSERTId];
-                        connection.query(selectMealCookPart2, (err, result, field) => {
+                        let inserts = [lastINSERTId, cookId, lastINSERTId, lastINSERTId, lastINSERTId];
+                        connection.query(selectMealCookPart2,(inserts), (err, result, field) => {
+                            if(err){ next({status: 499, error: err.message})};
                             connection.release();
                             let meal = result[1][0];
                             let cook = result[2][0];
