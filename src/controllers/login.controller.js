@@ -36,6 +36,7 @@ let controller = {
         logr.info("Login has started");
         const userEmail = req.body.emailAdress;
         const userPassWord = req.body.password;
+        logr.info(`Email: ${userEmail} and password is ${userPassWord}`);
         let err = null;
         DataConnection.getConnection((error, connect) => {
             connect.query('SELECT * FROM user WHERE emailAdress = ?;', [userEmail], (error, result) => {
@@ -45,7 +46,8 @@ let controller = {
                     logr.warn(error)
                 };
                 let User = result[0];
-                logr.debug(`Length of user result = ${result.length}`);
+                logr.info(`Length of user result = ${result.length}`);
+                logr.info(`Hash is ${User.password}`);
                 if (!User) {
                     err = {
                         status: 404,
@@ -54,6 +56,7 @@ let controller = {
                     next(err);
                 } else {
                     BCrypt.compare(userPassWord, User.password).then((isCorrect) => {
+                        logr.info(isCorrect);
                         if (isCorrect) {
                             jwt.sign({ id: User.id, emailAdress: User.emailAdress },
                                 jwtSecretKey, { expiresIn: '50d' },
