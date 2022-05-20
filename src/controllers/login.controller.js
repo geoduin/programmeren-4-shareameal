@@ -47,7 +47,6 @@ let controller = {
                 };
                 let User = result[0];
                 logr.info(`Length of user result = ${result.length}`);
-                logr.info(`Hash is ${User.password}`);
                 if (!User) {
                     err = {
                         status: 404,
