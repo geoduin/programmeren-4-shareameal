@@ -422,11 +422,11 @@ let controller = {
         const iD = req.params.userId
         DBConnection.getConnection((error, conn) => {
             conn.promise()
-                .query('DELETE FROM user  WHERE id = ?;', [iD])
+                .query('DELETE FROM meal WHERE cookId = ?; DELETE FROM user WHERE id = ?;', [iD , iD])
                 .then(([result]) => {
                     logr.trace('Ronde deletion');
                     logr.trace(result.affectedRows);
-                    if (result.affectedRows > 0) {
+                    if (result[1].affectedRows > 0) {
                         res.status(200).json({
                             status: 200,
                             message: `User with user with Id ${iD}, has been removed.`,
