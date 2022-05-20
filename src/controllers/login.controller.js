@@ -23,7 +23,6 @@ let controller = {
             assert(loginData.password.length > 0, 'Password must be filled');
             next();
         } catch (error) {
-            logr.trace(error.message);
             logr.debug(error.message);
             const err = {
                 status: 400,
@@ -54,50 +53,40 @@ let controller = {
                     }
                     next(err);
                 } else {
-                    BCrypt.hash(User.password, 10).then((hashPassword) => {
-                        BCrypt.compare(userPassWord , hashPassword).then((isCorrect) => {
-                            if (isCorrect) {
-                                jwt.sign({ id: User.id, emailAdress: User.emailAdress },
-                                    jwtSecretKey, { expiresIn: '50d' },
-                                    function (err, token) {
-                                        if (err) {
-                                            logr.trace(err)
-                                            next({ status: 400, error: err.message });
-                                        } else {
-                                            User = { ...User, token }
-                                            User.isActive = convertIntToBoolean(User.isActive);
-                                            User.roles = User.roles.split(",");
-                                            delete User.password;
-                                            logr.debug(User);
-                                            res.status(200).json({
-                                                status: 200,
-                                                result: User
-                                            })
-                                        }
+                    BCrypt.compare(userPassWord, User.password).then((isCorrect) => {
+                        if (isCorrect) {
+                            jwt.sign({ id: User.id, emailAdress: User.emailAdress },
+                                jwtSecretKey, { expiresIn: '50d' },
+                                function (err, token) {
+                                    if (err) {
+                                        logr.trace(err)
+                                        next({ status: 400, error: err.message });
+                                    } else {
+                                        User = { ...User, token }
+                                        User.isActive = convertIntToBoolean(User.isActive);
+                                        User.roles = User.roles.split(",");
+                                        delete User.password;
+                                        logr.debug(User);
+                                        res.status(200).json({
+                                            status: 200,
+                                            result: User
+                                        })
                                     }
-                                );
-                            } else {
-                                logr.error('Incorrect password')
-                                err = {
-                                    status: 400,
-                                    message: "Not the right password of this email"
                                 }
-                                next(err);
+                            );
+                        } else {
+                            logr.error('Incorrect password')
+                            err = {
+                                status: 400,
+                                message: "Not the right password of this email"
                             }
-                        })
+                            next(err);
+                        }
                     })
-
-
-
-
-
                 }
-                //Hash incomming password
-                //Compare input password with the hash
-
             });
         });
-    }
+    },
 }
 
 function convertIntToBoolean(int) {

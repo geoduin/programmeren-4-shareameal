@@ -16,43 +16,6 @@ const phoneRegex = /(06)(\s|\-|)\d{8}|31(\s6|\-6|6)\d{8}/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
 
 let controller = {
-    testRegex: (req, res) => {
-        let value = phoneRegex.test(req.params.input);
-        let value2 = passwordRegex.test(req.params.input2);
-        let d = new Date(1443567600000);
-        d.setTime(d.getTime() - new Date().getTimezoneOffset() * 60 * 1000);
-
-        res.status(200).json({
-            status: 200,
-            phoneResult: d,
-            passwordResult: value2
-        })
-    }
-    ,
-    testDateDB: (req, res, next) => {
-        //Generate token functionality
-        const selectMeals = 'SELECT * FROM meal;'
-        const selectCook = 'SELECT * FROM user WHERE id IN (SELECT cookId FROM meal);'
-        const selectParticipants = 'SELECT * FROM user JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);';
-        const ExecuteTaskQuery = selectMeals + selectCook + selectParticipants;
-        DBConnection.getConnection((error, connect) => {
-            connect.query(ExecuteTaskQuery, (error, result) => {
-                connect.release();
-                //logr.debug(result[2]);
-                res.status(200).json({
-                    status: 200,
-                    amount: result[0].length,
-                    result: result[2]
-                })
-            })
-        })
-
-
-        //     })  
-        // })
-    }
-    ,
-
     //Assists UC-205, 
     checkUserExistenceAndOwnership: (req, res, next) => {
         console.log('UC-205 Check ownership and existence');
@@ -61,7 +24,7 @@ let controller = {
         const token = req.headers.authorization;
         let package = jwt.decode(token.substring(7, token.length));
         const ownerUserId = package.id;
-        //logr.trace(`UserId stated in the path parameters: ${userId}, by Current user ID: ${ownerUserId}.`);
+        logr.trace(`UserId stated in the path parameters: ${userId}, by Current user ID: ${ownerUserId}.`);
 
         DBConnection.getConnection((error1, Connection) => {
             Connection.query('SELECT id FROM user WHERE id = ?;', [userId], (err1, result, fields) => {
@@ -91,7 +54,7 @@ let controller = {
         const token = auth.substring(7, auth.length);
         const decoder = jwt.decode(token);
         const currentId = decoder.id;
-        //logr.trace(`ID of user is ${userId}.`);
+        logr.trace(`ID of user is ${userId}.`);
 
         DBConnection.getConnection((err2, Connection) => {
             Connection.query('SELECT * FROM user WHERE id = ?;', [userId], (err3, result) => {
@@ -99,10 +62,10 @@ let controller = {
                 let aa = result.length;
                 //assert(aa != 0, 'User is not found')
                 try {
-                    //logr.trace(aa);
+                    logr.trace(aa);
                     assert(aa > 0, 'User does not exist');
                     let ID = result[0].id;
-                    //logr.trace(currentId);
+                    logr.trace(currentId);
                     assert(ID == currentId, `This user does not own user with ID ${userId}`)
                     next();
                 } catch (error) {
@@ -132,9 +95,9 @@ let controller = {
             con.promise()
                 .query('SELECT COUNT(*) AS amount FROM user WHERE emailAdress = ?;', [userEmail])
                 .then(([result]) => {
-                    //logr.trace(result[0]);
+                    logr.trace(result[0]);
                     if (result[0].amount == 0) {
-                        //logr.trace("Clean, go to insert method");
+                        logr.trace("Clean, go to insert method");
                         next();
                     } else {
                         const err = {
@@ -158,8 +121,8 @@ let controller = {
         let phoneNumberValid = phoneRegex.test(phoneNumber);
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
-        //logr.trace(User);
-        //logr.trace("Check input validation")
+        logr.trace(User);
+        logr.trace("Check input validation")
         try {
             assert(typeof firstName == 'string', 'Firstname must be filled in.');
             assert(typeof lastName == 'string', 'LastName must filled in.');
@@ -170,10 +133,10 @@ let controller = {
             assert(emailValid, 'Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
             assert(passwordValid, 'at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
             assert(phoneNumberValid, 'Invalid phonenumber')
-            //logr.info("Input is valid");
+            logr.info("Input is valid");
             next();
         } catch (err) {
-            //logr.error(`${err.message}`);
+            logr.error(`${err.message}`);
             const error = {
                 status: 400,
                 message: err.message
@@ -184,12 +147,12 @@ let controller = {
     //Assists UC-205
     validateUserPost: (req, res, next) => {
         let User = req.body;
-        //logr.trace(User);
+        logr.trace(User);
         let { firstName, lastName, street, city, isActive, emailAdress, password, phoneNumber } = User;
         let phoneValid = phoneRegex.test(phoneNumber);
         let emailValid = emailRegex.test(emailAdress);
         let passwordValid = passwordRegex.test(password);
-        //logr.debug(`Phone: ${phoneValid} email: ${emailValid} password: ${passwordValid}`);
+        logr.debug(`Phone: ${phoneValid} email: ${emailValid} password: ${passwordValid}`);
         //let {firstName,...other(Mag zelf bedacht worden) } = User;
         //Other in dit geval is het object en de attribuut firstname is weggelaten in het object
         try {
@@ -203,64 +166,64 @@ let controller = {
             assert(phoneValid, 'Invalid phonenumber')
             assert(emailValid, 'Emailadress is invalid. Correct email-format: (at least one character or digit)@(atleast one character or digit).(domain length is either 2 or 3 characters long)');
             assert(passwordValid, 'at least one lowercase character, at least one UPPERCASE character, at least one digit and at least 8 characters long');
-            //logr.info("Input is valid");
+            logr.info("Input is valid");
             next();
         } catch (err) {
             const error = {
                 status: 400,
                 message: err.message
             };
-            //logr.error(error);
+            logr.error(error);
             next(error);
         }
     },
     //UC-201 Creates user.s 
     createUser: (req, res) => {
-        //logr.info('UC-201 User creation');
+        logr.info('UC-201 User creation');
         let user = req.body;
-        //logr.trace(user);
-        //logr.info("User input has started");
-        DBConnection.getConnection((err, connect) => {
-            connect.promise()
-                .query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
-                    [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.emailAdress, user.password])
-                .then(connect.promise()
-                    .query('SELECT * FROM user WHERE emailAdress = ?;', [user.emailAdress])
-                    .then(([results]) => {
-                        //logr.trace(`User with ${user.emailAdress} has been found.`);
-                        //Token generation in development
-                        //logr.trace(results[0]);
-                        let { password, ...User } = results[0]
-                        const payLoad = { id: User.id };
-                        jwt.sign(payLoad, secretKey, { expiresIn: '31d' }, (err, token) => {
-                            connect.release();
-                            User = { ...User, token };
-                            User.roles = User.roles.split(",");
-                            User.isActive = intToBoolean(User.isActive);
-                            //logr.trace(User);
-                            res.status(201).json({
-                                status: 201,
-                                message: `User has been registered.`,
-                                result: User
+        logr.info("User input has started");
+        BCrypt.hash(user.password, 9).then((hashedPassword) => {
+            DBConnection.getConnection((err, connect) => {
+                connect.promise().query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
+                    [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.emailAdress, hashedPassword])
+                    .then(connect.promise()
+                        .query('SELECT * FROM user WHERE emailAdress = ?;', [user.emailAdress])
+                        .then(([results]) => {
+                            logr.trace(`User with ${user.emailAdress} has been found.`);
+                            logr.trace(results[0]);
+                            let { password, ...User } = results[0]
+                            const payLoad = { id: User.id };
+                            jwt.sign(payLoad, secretKey, { expiresIn: '31d' }, (err, token) => {
+                                connect.release();
+                                User = { ...User, token };
+                                User.roles = User.roles.split(",");
+                                User.isActive = intToBoolean(User.isActive);
+                                logr.trace(User);
+                                res.status(201).json({
+                                    status: 201,
+                                    message: `User has been registered.`,
+                                    result: User
+                                })
                             })
                         })
+                    ).catch(err => {
+                        logr.error(`User already exist`);
+                        res.status(409).json({
+                            status: 409,
+                            message: "Email has been taken"
+                        })
+                        connect.release();
                     })
-                ).catch(err => {
-                    //logr.error(`User already exist`);
-                    res.status(409).json({
-                        status: 409,
-                        message: "Email has been taken"
-                    })
-                    connect.release();
-                })
+            })
         })
+
     }
     ,
     //UC-202 Retrieves all users
     //amount=? query parameters
     //active or inactive query parameters
     getAllUsers: (req, res) => {
-        //logr.info('UC-202 Retrieval users');
+        logr.info('UC-202 Retrieval users');
         const active = req.query.isActive;
         const searchTerm = req.query.firstName;
         const limit = parseInt(req.query.limit);
@@ -268,11 +231,11 @@ let controller = {
         if (active != undefined && active == 'true') {
             booleanValue = 1;
         }
-        //logr.trace(booleanValue)
+        logr.trace(booleanValue)
 
         let query = "SELECT * FROM user";
         let inserts = [];
-        //logr.trace(`Active is ${active} + Searchterm is ${searchTerm} + Limit is ${limit}`);
+        logr.trace(`Active is ${active} + Searchterm is ${searchTerm} + Limit is ${limit}`);
 
         if (active && searchTerm) {
             query += ` WHERE isActive = ? AND firstName LIKE('%${searchTerm}%')`
@@ -289,7 +252,7 @@ let controller = {
             inserts.push(limit);
         }
         query += ';'
-        //logr.debug(query);
+        logr.debug(query);
         DBConnection.getConnection((error, connection) => {
             connection
                 .promise()
@@ -314,7 +277,7 @@ let controller = {
     },
     //UC-203 Retrieve user profile, based on Token and the userId within.
     getProfile: (req, res) => {
-        //logr.info('UC-203 Profile');
+        logr.info('UC-203 Profile');
         //Token, still empty
         let Token = req.headers.authorization.substring(7, req.headers.authorization.length);
         //Unloads jwt token
@@ -326,7 +289,7 @@ let controller = {
                 .query('SELECT * FROM user WHERE id = ?;', [id])
                 .then(([result]) => {
                     const user = result[0];
-                    //logr.debug(user);
+                    logr.debug(user);
                     if (result.length > 0) {
                         res.status(200).json({
                             status: 200,
@@ -336,14 +299,14 @@ let controller = {
                                 lastName: user.lastName,
                                 emailAdress: user.emailAdress,
                                 password: user.password,
-                                phoneNumber : user.phoneNumber,
+                                phoneNumber: user.phoneNumber,
                                 street: user.street,
                                 city: user.city,
                                 roles: user.roles.split(","),
                                 isActive: (user.isActive == 1)
                             }
                         })
-                    } else{
+                    } else {
                         res.status(400).json({
                             status: 400,
                             message: 'Invalid token'
@@ -358,15 +321,15 @@ let controller = {
     ,
     //UC-204 Retrieves user, based on userId
     retrieveUserById: (req, res) => {
-        //logr.info('UC-204 Retrieve user');
+        logr.info('UC-204 Retrieve user');
         const userId = req.params.userId;
         let user = null;
         let results = null;
         DBConnection.getConnection((error, connect) => {
             connect.promise().query('SELECT * FROM user WHERE id = ?;', [userId])
                 .then(([result, fields]) => {
-                    //logr.trace(`Length of result is ${result.length}`);
-                    //logr.trace(result[0]);
+                    logr.trace(`Length of result is ${result.length}`);
+                    logr.trace(result[0]);
                     results = result;
                 }).then(connect.promise()
                     .query('SELECT * FROM meal WHERE cookId = ?;', [userId])
@@ -384,7 +347,7 @@ let controller = {
                                 meal.allergenes = meal.allergenes.split(",");
                             });
                             user.Own_meals = meal;
-                            //logr.trace(user);
+                            logr.trace(user);
                             res.status(200).json({
                                 status: 200,
                                 message: `User with id: ${userId} found`,
@@ -407,7 +370,7 @@ let controller = {
     ,
     //UC-205 Edits user.
     updateUser: (req, res) => {
-        //logr.info('UC-205 Edit user');
+        logr.info('UC-205 Edit user');
         const id = parseInt(req.params.userId);
         //Body with user information
         let newUser = req.body;
@@ -415,49 +378,54 @@ let controller = {
         if (newUser.isActive) {
             activeValue = 1;
         }
-
-        //logr.trace(`UserID of ${newUser.firstName} is ${id}.`)
-        DBConnection.getConnection((error, connection) => {
-            connection.promise()
-                .query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
-                    [newUser.firstName, newUser.lastName, newUser.city, newUser.street, newUser.password, newUser.emailAdress, activeValue, newUser.phoneNumber, id])
-                .then(([result]) => {
-                    //logr.trace(`Affected rows UPDATE: ${result.affectedRows}`);
-                    if (result.affectedRows == 0) {
-                        res.status(400).json({
-                            status: 400,
-                            message: `Update has failed. Id: ${id} does not exist.`
-                        })
-                    } else {
-                        connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
-                            if (err4) { throw err4 }
-                            //logr.trace(result2);
-                            result2[0].isActive = (result2[0].isActive == 1);
-                            result2[0].roles = result2[0].roles.split(",")
-                            res.status(200).json({
-                                status: 200,
-                                message: "Succesful transaction",
-                                result: result2[0]
+        //NOTE: is assumes the user will put in a new password. 
+        //If the user updates the user information without changing the password, 
+        //it will hash the old hash and the new password of that user is the hash string.
+        logr.trace(`UserID of ${newUser.firstName} is ${id}.`)
+        BCrypt.hash(newUser.password, 9).then((updatedHashpassword) => {
+            DBConnection.getConnection((error, connection) => {
+                connection.promise()
+                    .query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
+                        [newUser.firstName, newUser.lastName, newUser.city, newUser.street, updatedHashpassword, newUser.emailAdress, activeValue, newUser.phoneNumber, id])
+                    .then(([result]) => {
+                        logr.trace(`Affected rows UPDATE: ${result.affectedRows}`);
+                        if (result.affectedRows == 0) {
+                            res.status(400).json({
+                                status: 400,
+                                message: `Update has failed. Id: ${id} does not exist.`
                             })
-                        })
-                    }
-                }).finally(() => {
-                    connection.release();
-                })
+                        } else {
+                            connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
+                                if (err4) { throw err4 }
+                                logr.trace(result2);
+                                result2[0].isActive = (result2[0].isActive == 1);
+                                result2[0].roles = result2[0].roles.split(",")
+                                res.status(200).json({
+                                    status: 200,
+                                    message: "Succesful transaction",
+                                    result: result2[0]
+                                })
+                            })
+                        }
+                    }).finally(() => {
+                        connection.release();
+                    })
+            })
         })
+
 
     }
     ,
     //UC-206 Deletes user based on id
     deleteUser: (req, res) => {
-        //logr.info('UC-206 Remove user');
+        logr.info('UC-206 Remove user');
         const iD = req.params.userId
         DBConnection.getConnection((error, conn) => {
             conn.promise()
                 .query('DELETE FROM user  WHERE id = ?;', [iD])
                 .then(([result]) => {
-                    //logr.trace('Ronde deletion');
-                    //logr.trace(result.affectedRows);
+                    logr.trace('Ronde deletion');
+                    logr.trace(result.affectedRows);
                     if (result.affectedRows > 0) {
                         res.status(200).json({
                             status: 200,

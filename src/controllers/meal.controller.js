@@ -9,7 +9,7 @@ let controller = {
 
     //Inputvalidation
     validateMealCreation: (req, res, next) => {
-        //logr.trace("Arrived at meal input validation");
+        logr.trace("Arrived at meal input validation");
         const meal = req.body;
         let name = meal.name;
         let description = meal.description;
@@ -22,7 +22,7 @@ let controller = {
         //Allergene list is in process
         let maxAmountOfParticipants = meal.maxAmountOfParticipants;
         let price = meal.price;
-        //logr.debug(meal);
+        logr.debug(meal);
         try {
             assert(typeof name == 'string', 'Name must be filled in or a string');
             assert(typeof description == 'string', 'Description must be filled in or a string');
@@ -35,11 +35,11 @@ let controller = {
             //assert(typeof allergenes == '')
             assert(typeof maxAmountOfParticipants == 'number', 'Maximum amount of participants required');
             assert(typeof price == 'number', 'Price is required');
-            //logr.info("Validation complete");
+            logr.info("Validation complete");
             next();
         } catch (error) {
-            //logr.debug(error.message);
-            //logr.error("Validation failed");
+            logr.debug(error.message);
+            logr.error("Validation failed");
             const err = {
                 status: 400,
                 message: error.message
@@ -51,20 +51,20 @@ let controller = {
     //Assists UC-302 and UC-305 Ownership checking
     checkMealStatus: (req, res, next) => {
         //Receives id from parameter
-        //logr.trace(req.params.mealId);
+        logr.trace(req.params.mealId);
         let MealId = parseInt(req.params.mealId);
 
         //Unloads token 
         const auth = req.headers.authorization;
         const token = auth.substring(7, auth.length);
         const userId = jwt.decode(token).id;
-        //logr.trace(`Meal ID to be deleted is ${MealId}.`)
+        logr.trace(`Meal ID to be deleted is ${MealId}.`)
         DB.getConnection((err, con) => {
             if (err) { throw err };
             //Search for cookId, based on mealId
             con.query('SELECT cookId FROM meal WHERE id = ?;', [MealId], (error, result, field) => {
-                //logr.trace('Result is:')
-                //logr.trace(result);
+                logr.trace('Result is:')
+                logr.trace(result);
                 try {
                     //Checks if the meal has been found. length = 0, nothing found. Id !=  
                     assert(result.length != 0, 'Meal does not exist');
@@ -85,7 +85,7 @@ let controller = {
     ,
     //UC-301
     createMeal: (req, res, next) => {
-        //logr.info("Create meal has started");
+        logr.info("Create meal has started");
         //newMeal attributes name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl,  
         //allergenes, maxAmountOfParticpants, price
         let newMeal = req.body;
@@ -96,10 +96,10 @@ let controller = {
         //Decodes token to a readable object {id:(id), emailAdress:(emailAdress)}
         const encodedLoad = jwt.decode(token);
         let cookId = encodedLoad.id;
-        //logr.trace(`ID of user is ${cookId}?`);
-        //logr.trace(`newMeal is ----------------------------------------------`);
-        //logr.debug(newMeal);
-        //logr.debug(`cookId is ${cookId}`);
+        logr.trace(`ID of user is ${cookId}?`);
+        logr.trace(`newMeal is ----------------------------------------------`);
+        logr.debug(newMeal);
+        logr.debug(`cookId is ${cookId}`);
 
         //Convert to SQL attributes
         newMeal.isVega = convertBooleanToInt(newMeal.isVega);
@@ -107,8 +107,8 @@ let controller = {
         newMeal.isToTakeHome = convertBooleanToInt(newMeal.isToTakeHome);
         newMeal.dateTime = convertOldDateToMySqlDate(newMeal.dateTime);
         newMeal.allergenes = newMeal.allergenes.join();
-        //logr.trace(`newMeal after convertion ----------------------------------------------`);
-        //logr.debug(newMeal);
+        logr.trace(`newMeal after convertion ----------------------------------------------`);
+        logr.debug(newMeal);
 
         DB.getConnection((error, connection) => {
             if (error) { throw error }
@@ -120,12 +120,12 @@ let controller = {
                 newMeal.maxAmountOfParticipants, newMeal.price, cookId
                 ], (error, results, fields) => {
                     if (error) {
-                        //logr.error("INSERT ging niet goed");
-                        //logr.error(error);
+                        logr.error("INSERT ging niet goed");
+                        logr.error(error);
                         next({ status: 499, error: error })
                     } else {
-                        //logr.trace("Results of the insert");
-                        //logr.debug(results[1][0].id);
+                        logr.trace("Results of the insert");
+                        logr.debug(results[1][0].id);
                         let lastINSERTId = results[1][0].id;
                         const insertCookParticipant = `INSERT INTO meal_participants_user VALUES(${lastINSERTId},${cookId});`;
                         const selectMeals2 = `SELECT * FROM meal WHERE id = ${lastINSERTId};`
@@ -149,7 +149,7 @@ let controller = {
                             meal.cook = cook;
                             meal.participants = participants;
                             delete meal.cookId;
-                            //logr.trace('Insert has succeeded');
+                            logr.trace('Insert has succeeded');
                             res.status(201).json({
                                 status: 201,
                                 result: meal,
@@ -166,7 +166,7 @@ let controller = {
 
     //UC-302 Receives a user and meal object
     updateMealById: (req, res, next) => {
-        //logr.trace('Update meal has started')
+        logr.trace('Update meal has started')
         //Datetime will be automaticly generated by java code or de database.
         let updatedMeal = req.body;
         let { name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl,
@@ -179,10 +179,10 @@ let controller = {
         isVegan = convertBooleanToInt(isVegan);
         isToTakeHome = convertBooleanToInt(isToTakeHome);
         dateTime = convertOldDateToMySqlDate(dateTime);
-        //logr.trace("Meal ready to be updated");
+        logr.trace("Meal ready to be updated");
 
         allergenes = allergenes.join();
-        //logr.debug(name)
+        logr.debug(name)
 
         let inserts = [name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl, allergenes, maxAmountOfParticipants, price, currentId];
         let querY = "UPDATE meal SET name = ? ,description = ?, isActive = ?,isVega = ?,isVegan = ?,isToTakeHome = ?,dateTime = ?,imageUrl = ?,allergenes = ?,maxAmountOfParticipants = ?, price = ? WHERE id = ?;";
@@ -192,15 +192,15 @@ let controller = {
             connection.query(querY, inserts, (err, result, fields) => {
                 connection.query('SELECT * FROM meal WHERE id = ?;', [currentId], (error, meal, fields) => {
                     connection.release();
-                    //logr.info("UPDATE has succeeded.");
+                    logr.info("UPDATE has succeeded.");
                     if (err) {
-                        //logr.debug(err);
+                        logr.debug(err);
                         next({ status: 500, error: err })
                     } else {
                         let Meal = meal[0];
                         Meal = mealCorrectFormat(Meal);
-                        //logr.info('Affected rows  ====V====')
-                        //logr.info('Update has succeeded!');
+                        logr.info('Affected rows  ====V====')
+                        logr.info('Update has succeeded!');
                         res.status(200).json({
                             status: 200,
                             result: meal[0]
@@ -215,13 +215,13 @@ let controller = {
     //UC-303
     getAllMeals: (req, res) => {
         //Query to collect all meals from database.
-        //logr.info("Retrieve all meals has started");
+        logr.info("Retrieve all meals has started");
         let mealOne = null;
         const selectMeals = 'SELECT * FROM meal;'
         const selectCook = 'SELECT * FROM user WHERE id IN (SELECT cookId FROM meal);'
         const selectParticipants = 'SELECT * FROM user JOIN meal_participants_user ON user.id = meal_participants_user.userId WHERE id IN (SELECT userId FROM meal_participants_user);';
         const ExecuteTaskQuery = selectMeals + selectCook + selectParticipants;
-        //logr.debug("Retrieve all meals")
+        logr.debug("Retrieve all meals")
         DB.getConnection((error, connect) => {
             connect.query(ExecuteTaskQuery, (err, results) => {
                 connect.release();
@@ -232,7 +232,7 @@ let controller = {
                     cook = userCookCorrectFormat(cook);
                 }
                 meals.forEach(meal => {
-                    //logr.trace(`Current Meal is id ${meal.id}`);
+                    logr.trace(`Current Meal is id ${meal.id}`);
                     let participants = [];
                     meal = mealCorrectFormat(meal);
                     for (const cook of cookList) {
@@ -243,7 +243,7 @@ let controller = {
                     }
                     for (let participant of participantsList) {
                         if (participant.mealId == meal.id) {
-                            //logr.debug(`Participant  ${participant.mealId} Pushed to Current Meal is id ${meal.id}`);
+                            logr.debug(`Participant  ${participant.mealId} Pushed to Current Meal is id ${meal.id}`);
                             delete participant.mealId;
                             delete participant.userId;
                             participant = userCookCorrectFormat(participant);
@@ -253,8 +253,8 @@ let controller = {
                     delete meal.cookId;
                     meal.participants = participants;
                 });
-                //logr.debug(meals);
-                //logr.debug("Retrieval succeeded");
+                logr.debug(meals);
+                logr.debug("Retrieval succeeded");
                 res.status(200).json({
                     status: 200,
                     amount: meals.length,
@@ -266,19 +266,19 @@ let controller = {
     ,
     //UC-304
     getMealById: (req, res, next) => {
-        //logr.info("Meal by Id has started");
+        logr.info("Meal by Id has started");
         const currentId = req.params.mealId;
         let meal = null;
         let participants = null;
         let cook = null;
         let hasMeals = null;
-        //logr.trace(`Retrieve meal by Id started ${currentId}`)
+        logr.trace(`Retrieve meal by Id started ${currentId}`)
         DB.getConnection((err, connect) => {
             connect.promise()
                 .query('SELECT * FROM user WHERE id IN (SELECT userId FROM meal_participants_user WHERE mealId = ?);', [currentId])
                 .then(([ParticipantResults]) => {
-                    //logr.trace('Participants')
-                    //logr.trace(ParticipantResults);
+                    logr.trace('Participants')
+                    logr.trace(ParticipantResults);
                     //Assign participants to participant attribute
                     participants = ParticipantResults;
                 }).then(connect
@@ -286,19 +286,19 @@ let controller = {
                     .query('SELECT * FROM meal WHERE id = ?;', [currentId])
                     .then(([mealResult]) => {
                         //Assign meal object to meal
-                        //logr.trace('Meal=')
-                        //logr.trace("Retrieval cook has started")
+                        logr.trace('Meal=')
+                        logr.trace("Retrieval cook has started")
                         meal = mealResult[0];
                         hasMeals = (mealResult.length > 0);
                     }).then(connect
                         .promise()
                         .query('SELECT * FROM user WHERE id IN (SELECT cookId FROM meal WHERE id = ?);', [currentId])
                         .then(([cookResult]) => {
-                            //logr.trace('Cook==')
-                            //logr.debug(cookResult[0])
+                            logr.trace('Cook==')
+                            logr.debug(cookResult[0])
                             cook = cookResult[0];
                             if (hasMeals) {
-                                //logr.trace('Meal found');
+                                logr.trace('Meal found');
                                 meal.isActive = (meal.isActive == 1);
                                 meal.isVega = (meal.isVega == 1);
                                 meal.isVegan = (meal.isVegan == 1);
@@ -316,7 +316,7 @@ let controller = {
                                     user.isActive = (user.isActive == 1);
                                     delete user.password;
                                 })
-                                //logr.info('Retrieval succeeeded');
+                                logr.info('Retrieval succeeeded');
                                 res.status(200).json({
                                     status: 200,
                                     result: meal
@@ -330,21 +330,21 @@ let controller = {
                             }
                         }).finally(() => {
                             connect.release();
-                            //logr.info('Einde')
+                            logr.info('Einde')
                         })))
         })
     }
     ,
     //UC-305 Delete meal from database
     deleteMeal: (req, res) => {
-        //logr.info(`Meal deletion has started`);
+        logr.info(`Meal deletion has started`);
         const currentId = req.params.mealId;
         DB.getConnection((error, connect) => {
             connect.query('DELETE FROM meal WHERE id = ?;', [currentId], (err, result) => {
                 connect.release();
                 if (result.affectedRows != 0) {
                     //Delete code
-                    //logr.info('Deletion succeeded.');
+                    logr.info('Deletion succeeded.');
                     res.status(200).json({
                         status: 200,
                         message: 'Meal removed'
@@ -369,7 +369,7 @@ function convertBooleanToInt(booleanV) {
 function convertOldDateToMySqlDate(pp) {
     let dated = pp;
     dated = dated.replace("T", " ").substring(0, 19);
-    //logr.debug(dated);
+    logr.debug(dated);
     return dated;
 }
 

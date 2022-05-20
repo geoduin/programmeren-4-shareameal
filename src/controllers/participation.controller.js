@@ -28,7 +28,7 @@ let controller = {
     }
     ,
 
-    //Assists UC-402 and UC-404 - params {mealId, userId}
+    //Assists UC-404 - params {mealId, userId}
     checkSignUp: (req, res, next) => {
         //Unloads header
         const TokenLoad = decodeToken(req.headers.authorization);
@@ -67,13 +67,13 @@ let controller = {
         const mealId = parseInt(req.params.mealId);
         const UserID = TokenLoad.id;
 
-        //logr.trace(mealId);
-        //logr.trace(UserID);
+        logr.trace(mealId);
+        logr.trace(UserID);
         DBConnection.getConnection((err, con) => {
             con.query('SELECT COUNT(*) AS value FROM meal WHERE id = ? AND cookId = ?;', [mealId, UserID], (error, result) => {
                 con.release();
                 let aaa = result;
-                //logr.debug(`Result of query = ${result[0].value}`);
+                logr.debug(`Result of query = ${result[0].value}`);
                 if (result[0].value == 0) {
                     const err = {
                         status: 400,
@@ -81,7 +81,7 @@ let controller = {
                     }
                     next(err);
                 } else {
-                    //logr.info(`Meal | ${mealId} | is owned by => User: ${UserID} |`)
+                    logr.info(`Meal | ${mealId} | is owned by => User: ${UserID} |`)
                     next();
                 }
             })
@@ -163,9 +163,9 @@ let controller = {
     //UC-403 - params {mealId} And body(object send) {id:(userId)}
     getAllParticipants: (req, res) => {
         const mealId = parseInt(req.params.mealId);
-        //logr.trace(`Meal ID => ${mealId}`);
+        logr.trace(`Meal ID => ${mealId}`);
         const userId = req.body.id;
-        //logr.trace(`User ID => ${userId}`);
+        logr.trace(`User ID => ${userId}`);
 
         DBConnection.getConnection((err, con) => {
             con.query('SELECT firstName, lastName, emailAdress, phoneNumber, street, city, roles FROM user WHERE user.id IN (SELECT userId FROM meal_participants_user WHERE meal_participants_user.mealId = ?);',
@@ -190,7 +190,7 @@ let controller = {
     getParticipantsDetail: (req, res, next) => {
         const userId = parseInt(req.params.userId);
         const mealId = parseInt(req.params.mealId);
-        //logr.info(`Participation details reached ${userId} and mealID ${mealId}`);
+        logr.info(`Participation details reached ${userId} and mealID ${mealId}`);
         DBConnection.getConnection((err, connection) => {
             connection.query('SELECT firstName, lastName, emailAdress, phoneNumber, street, city FROM user WHERE id = ?;', [userId],
                 (error, results, fields) => {
