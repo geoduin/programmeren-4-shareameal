@@ -3,10 +3,9 @@ process.env.DB_DATABASE = process.env.DB_DATABASE || 'share-a-meal-testdb'
 const { assert } = require('chai');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+chai.use(chaiHttp);
 const { it } = require('mocha');
 const server = require('../../index');
-const jwt = require('jsonwebtoken');
-const { jwtSecretKey } = require('../../src/config/config');
 const DB = require('../../src/data/dbConnection')
 const tokens = require('../../src/tokens/UserTokens.token');
 

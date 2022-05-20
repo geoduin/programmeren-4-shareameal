@@ -1,15 +1,11 @@
-const req = require("express/lib/request");
 const assert = require('assert');
 const DataConnection = require('../data/dbConnection');
 const jwt = require('jsonwebtoken');
 const { jwtSecretKey } = require("../config/config");
 const logr = require('../config/config').logger;
-const { callbackify } = require("util");
-const { promise } = require("../data/dbConnection");
+const util = require('./general.controller');
 //Regex for email
 const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
-
 const BCrypt = require('bcrypt');
 
 let controller = {
@@ -59,15 +55,13 @@ let controller = {
                         if (isCorrect) {
                             jwt.sign({ id: User.id, emailAdress: User.emailAdress },
                                 jwtSecretKey, { expiresIn: '50d' },
-                                function (err, token) {
+                                (err, token) => {
                                     if (err) {
                                         logr.trace(err)
                                         next({ status: 400, error: err.message });
                                     } else {
+                                        User = util.userCookCorrectFormat(User);
                                         User = { ...User, token }
-                                        User.isActive = convertIntToBoolean(User.isActive);
-                                        User.roles = User.roles.split(",");
-                                        delete User.password;
                                         logr.debug(User);
                                         res.status(200).json({
                                             status: 200,
@@ -89,9 +83,5 @@ let controller = {
             });
         });
     },
-}
-
-function convertIntToBoolean(int) {
-    return (int == 1);
 }
 module.exports = controller;

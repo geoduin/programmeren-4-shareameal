@@ -1,9 +1,5 @@
-const req = require("express/lib/request");
 const assert = require('assert');
-const DataConnection = require('../data/dbConnection');
 const jwt = require('jsonwebtoken');
-const { text } = require("express");
-const { stringify } = require("querystring");
 const logr = require('../config/config').logger;
 
 let controller = {
@@ -32,7 +28,6 @@ let controller = {
             }
         }
 
-
         try {
             assert(typeof token == 'string', 'Not logged in');
             assert(isValid, 'Token is invalid');
@@ -46,25 +41,6 @@ let controller = {
             }
             next(err);
         }
-    }
-    ,
-    validateToken: (req, res, next) => {
-        jwt.sign(
-            { id: 999 },
-            process.env.JWT_SECRET, { expiresIn: '50d' },
-            //Algoritme is verwijdert
-            function (err, token) {
-                if (err) { logr.trace(err) } else {
-                    logr.trace(token);
-                    res.status(200).json({
-                        status: 200,
-                        result: token
-                    })
-                }
-            }
-        );
-
-
     }
 }
 module.exports = controller;

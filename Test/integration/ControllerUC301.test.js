@@ -3,10 +3,9 @@ process.env.DB_DATABASE = process.env.DB_DATABASE || 'share-a-meal-testdb'
 const { assert } = require('chai');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const jwt = require('jsonwebtoken');
+chai.use(chaiHttp);
 const { it } = require('mocha');
 const server = require('../../index');
-const { jwtSecretKey, logger } = require('../../src/config/config');
 const DB = require('../../src/data/dbConnection')
 const tokens = require('../../src/tokens/UserTokens.token');
 
@@ -632,7 +631,7 @@ describe('UC-304 get meal details.', (done) => {
                     isToTakeHome: true,
                     dateTime: "2022-03-26T21:24:46.000Z",
                     maxAmountOfParticipants: 6,
-                    price: '6.75',
+                    price: 6.75,
                     imageUrl: 'https://www.kikkoman.nl/fileadmin/_processed_/5/7/csm_WEB_Bonte_groenteschotel_6851203953.jpg',
                     createDate: "2022-03-06T21:26:33.048Z",
                     updateDate: "2022-03-12T19:50:13.000Z",

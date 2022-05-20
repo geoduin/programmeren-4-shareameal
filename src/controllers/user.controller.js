@@ -1,13 +1,11 @@
-const req = require("express/lib/request");
 const assert = require('assert');
 const DBConnection = require("../data/dbConnection");
 const jwt = require('jsonwebtoken');
 const secretKey = require('../config/config').jwtSecretKey;
 const logr = require('../config/config').logger;
 const BCrypt = require('bcrypt');
-
-//Note: Due to the dummydata present within the in-memory database(in case of testing), the id will start at 2 instead of 0. 
-let id = 2;
+const DQuery = require('../data/queryList');
+const utill = require('./general.controller');
 //Regex for email
 const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 //Regex for phones - every phonenumber must start with 06 or 31 and has either a space sign, - or nothing in between, and then 9 digits
@@ -57,7 +55,7 @@ let controller = {
         logr.trace(`ID of user is ${userId}.`);
 
         DBConnection.getConnection((err2, Connection) => {
-            Connection.query('SELECT * FROM user WHERE id = ?;', [userId], (err3, result) => {
+            Connection.query(DQuery.selectUserId, [userId], (err3, result) => {
                 Connection.release();
                 let aa = result.length;
                 //assert(aa != 0, 'User is not found')
@@ -93,7 +91,7 @@ let controller = {
         const userEmail = req.body.emailAdress;
         DBConnection.getConnection((err, con) => {
             con.promise()
-                .query('SELECT COUNT(*) AS amount FROM user WHERE emailAdress = ?;', [userEmail])
+                .query(DQuery.selectEmailCount, [userEmail])
                 .then(([result]) => {
                     logr.trace(result[0]);
                     if (result[0].amount == 0) {
@@ -184,21 +182,21 @@ let controller = {
         logr.info("User input has started");
         BCrypt.hash(user.password, 9).then((hashedPassword) => {
             DBConnection.getConnection((err, connect) => {
-                connect.promise().query('INSERT INTO user (firstName, lastName, street, city, phoneNumber, emailAdress, password) VALUES(?, ?, ?, ?, ?, ?, ?);',
-                    [user.firstName, user.lastName, user.street, user.city, user.phoneNumber, user.emailAdress, hashedPassword])
+                connect.promise().query(DQuery.insertNewUser,
+                    [user.firstName, user.lastName, user.street, user.city, 
+                        user.phoneNumber, user.emailAdress, hashedPassword])
                     .then(connect.promise()
-                        .query('SELECT * FROM user WHERE emailAdress = ?;', [user.emailAdress])
+                        .query(DQuery.selectUserEmail, [user.emailAdress])
                         .then(([results]) => {
                             logr.trace(`User with ${user.emailAdress} has been found.`);
                             logr.trace(results[0]);
-                            let { password, ...User } = results[0]
+                            let User = results[0];
                             const payLoad = { id: User.id };
                             jwt.sign(payLoad, secretKey, { expiresIn: '31d' }, (err, token) => {
                                 connect.release();
                                 User = { ...User, token };
-                                User.roles = User.roles.split(",");
-                                User.isActive = intToBoolean(User.isActive);
-                                logr.trace(User);
+                                User = utill.userCookCorrectFormat(User);
+                                logr.trace("User registered");
                                 res.status(201).json({
                                     status: 201,
                                     message: `User has been registered.`,
@@ -260,10 +258,7 @@ let controller = {
                 .then(([result, fields]) => {
                     let roles = [];
                     result.forEach(user => {
-                        roles = user.roles.split(",");
-                        user.roles = roles;
-                        user.isActive = (user.isActive == 1);
-                        delete user.password
+                        utill.userCookCorrectFormat(user);
                     });
                     res.status(200).json({
                         status: 200,
@@ -278,15 +273,13 @@ let controller = {
     //UC-203 Retrieve user profile, based on Token and the userId within.
     getProfile: (req, res) => {
         logr.info('UC-203 Profile');
-        //Token, still empty
-        let Token = req.headers.authorization.substring(7, req.headers.authorization.length);
-        //Unloads jwt token
-        let package = jwt.decode(Token);
+        //Decodes jwt token
+        let package = utill.decodeToken(req.headers.authorization);
         //ID of token.
         let id = package.id;
         DBConnection.getConnection((err, con) => {
             con.promise()
-                .query('SELECT * FROM user WHERE id = ?;', [id])
+                .query(DQuery.selectUserId, [id])
                 .then(([result]) => {
                     const user = result[0];
                     logr.debug(user);
@@ -326,25 +319,18 @@ let controller = {
         let user = null;
         let results = null;
         DBConnection.getConnection((error, connect) => {
-            connect.promise().query('SELECT * FROM user WHERE id = ?;', [userId])
+            connect.promise().query(DQuery.selectUserId, [userId])
                 .then(([result, fields]) => {
                     logr.trace(`Length of result is ${result.length}`);
                     logr.trace(result[0]);
                     results = result;
                 }).then(connect.promise()
-                    .query('SELECT * FROM meal WHERE cookId = ?;', [userId])
+                    .query(DQuery.selectMealCook, [userId])
                     .then(([meal]) => {
                         if (results.length > 0) {
-                            user = results[0];
-                            user.isActive = intToBoolean(user.isActive);
-                            user.roles = user.roles.split(",");
-                            delete user.password;
+                            user = utill.userCookCorrectFormat(results[0]);
                             meal.forEach(meal => {
-                                meal.isActive = intToBoolean(meal.isActive);
-                                meal.isToTakeHome = intToBoolean(meal.isToTakeHome);
-                                meal.isVega = intToBoolean(meal.isVega);
-                                meal.isVegan = intToBoolean(meal.isVegan);
-                                meal.allergenes = meal.allergenes.split(",");
+                                utill.mealCorrectFormat(meal);
                             });
                             user.Own_meals = meal;
                             logr.trace(user);
@@ -385,8 +371,10 @@ let controller = {
         BCrypt.hash(newUser.password, 9).then((updatedHashpassword) => {
             DBConnection.getConnection((error, connection) => {
                 connection.promise()
-                    .query('UPDATE user SET firstName = ?, lastName = ?, city = ?, street = ?, password = ?, emailAdress = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
-                        [newUser.firstName, newUser.lastName, newUser.city, newUser.street, updatedHashpassword, newUser.emailAdress, activeValue, newUser.phoneNumber, id])
+                    .query(DQuery.updateUser,
+                        [newUser.firstName, newUser.lastName, newUser.city,
+                        newUser.street, updatedHashpassword, newUser.emailAdress,
+                            activeValue, newUser.phoneNumber, id])
                     .then(([result]) => {
                         logr.trace(`Affected rows UPDATE: ${result.affectedRows}`);
                         if (result.affectedRows == 0) {
@@ -395,7 +383,7 @@ let controller = {
                                 message: `Update has failed. Id: ${id} does not exist.`
                             })
                         } else {
-                            connection.query('SELECT * FROM user WHERE id =?;', [id], (err4, result2) => {
+                            connection.query(DQuery.selectUserId, [id], (err4, result2) => {
                                 if (err4) { throw err4 }
                                 logr.trace(result2);
                                 result2[0].isActive = (result2[0].isActive == 1);
@@ -422,7 +410,7 @@ let controller = {
         const iD = req.params.userId
         DBConnection.getConnection((error, conn) => {
             conn.promise()
-                .query('DELETE FROM meal WHERE cookId = ?; DELETE FROM user WHERE id = ?;', [iD , iD])
+                .query(DQuery.deleteUserAndRelated, [iD, iD])
                 .then(([result]) => {
                     logr.trace('Ronde deletion');
                     logr.trace(result.affectedRows);
@@ -444,7 +432,4 @@ let controller = {
     }
 }
 
-function intToBoolean(int) {
-    return (int == 1);
-}
 module.exports = controller;

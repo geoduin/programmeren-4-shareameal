@@ -1,8 +1,9 @@
 process.env.DB_DATABASE = process.env.DB_DATABASE || 'share-a-meal-testdb'
 
-const { assert, use } = require('chai');
+const { assert } = require('chai');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+chai.use(chaiHttp);
 const { it } = require('mocha');
 const server = require('../../index');
 const DB = require('../../src/data/dbConnection');
@@ -566,7 +567,7 @@ describe('UC-204 User details checker', (done) => {
                             isToTakeHome: true,
                             dateTime: "2022-03-22T17:35:00.000Z",
                             maxAmountOfParticipants: 4,
-                            price: '12.75',
+                            price: 12.75,
                             imageUrl: 'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
                             cookId: 1,
                             createDate: "2022-02-26T18:12:40.048Z",

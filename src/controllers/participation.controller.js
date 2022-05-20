@@ -1,8 +1,7 @@
-const req = require("express/lib/request");
-const assert = require('assert');
 const DBConnection = require("../data/dbConnection");
-const jwt = require('jsonwebtoken');
 const logr = require('../config/config').logger;
+const DQuery = require('../data/queryList');
+const util = require('./general.controller');
 
 let controller = {
     //Assists UC-401, UC-402, UC-403 - params {mealId}
@@ -11,7 +10,7 @@ let controller = {
         logr.trace(`MealID to search existence of === ${mealId} ===`);
         DBConnection.getConnection((error, connection) => {
             if (error) { throw error };
-            connection.query('SELECT * FROM meal WHERE id = ?;', [mealId], (err, results, fields) => {
+            connection.query(DQuery.selectMeal, [mealId], (err, results, fields) => {
                 connection.release();
                 if (results.length > 0) {
                     logr.debug(`Meal with ID ${mealId} exists!`)
@@ -31,17 +30,15 @@ let controller = {
     //Assists UC-404 - params {mealId, userId}
     checkSignUp: (req, res, next) => {
         //Unloads header
-        const TokenLoad = decodeToken(req.headers.authorization);
+        const TokenLoad = util.decodeToken(req.headers.authorization);
         //UserId
         let userId = TokenLoad.id;
-        if (req.params.userId) {
-            userId = req.params.userId;
-        }
+        if (req.params.userId) { userId = req.params.userId;}
         //MealId from path parameter
         const mealId = parseInt(req.params.mealId);
         logr.debug(`SignUpChecker: UserID -> ${userId}, MealId -> ${mealId}.`)
         DBConnection.getConnection((error, connection) => {
-            connection.query('SELECT COUNT(*) AS count FROM meal_participants_user WHERE mealId = ? AND userId = ?;',
+            connection.query(DQuery.selectSignUp,
                 [mealId, userId], (err, results, fields) => {
                     connection.release();
                     logr.trace(results[0].count);
@@ -62,14 +59,11 @@ let controller = {
 
     //Assists UC-403 - params {mealId, userId}
     checkOwnerShipMeal: (req, res, next) => {
-
-        const TokenLoad = decodeToken(req.headers.authorization);
+        const TokenLoad = util.decodeToken(req.headers.authorization);
         const mealId = parseInt(req.params.mealId);
         const UserID = TokenLoad.id;
-
-        logr.trace(mealId);
-        logr.trace(UserID);
         DBConnection.getConnection((err, con) => {
+            if(err){next({status: 499, error: err.message})};
             con.query('SELECT COUNT(*) AS value FROM meal WHERE id = ? AND cookId = ?;', [mealId, UserID], (error, result) => {
                 con.release();
                 let aaa = result;
@@ -93,44 +87,38 @@ let controller = {
     //UC-401 and UC-402- params {mealId, userId}
     participateLeaveMeal: (req, res, next) => {
         logr.info("(de)assign from meal");
-        const auth = req.headers.authorization;
-        const load = decodeToken(auth);
+        const load = util.decodeToken(req.headers.authorization);
         const mealId = parseInt(req.params.mealId);
         const UserID = load.id;
         logr.debug(`JOIN MEAL: UserID is = ${UserID}, and MealID = ${mealId}!`);
-        const amountPartQuery = 'SELECT id, maxAmountOfParticipants, userId FROM (SELECT id, maxAmountOfParticipants FROM meal)AS meals LEFT JOIN meal_participants_user ON meal_participants_user.mealId = meals.id WHERE id = ?;';
+        const amountPartQuery = DQuery.selectAmountOfParticipantsOfMeal;
         DBConnection.getConnection((err, con) => {
             if (err) { throw err };
             //Checks if amount has been met.
             con.query(amountPartQuery, [mealId], (errors, result) => {
                 if (errors) { throw errors };
-                //Amount of participants;
-                //The max amount of participants of the meal.
                 let amountParticipants = result.length;
                 let participantList = result;
                 const maxAmountOfParticipants = result[0].maxAmountOfParticipants;
                 logr.trace(`Amount of particpants of mealID ${mealId} is => ${amountParticipants} and the maximum is ${maxAmountOfParticipants}.`)
                 //If the current amount of participants is lower than the limit, it will let the user join the meal
-                logr.debug(`MEAL to (de)assign: UserID is = ${UserID}, and MealID = ${mealId}!`);
                 let ParticipantIsThere = participantList.filter((user) => user.userId == UserID);
-                logr.debug(`Debug: meal ${mealId}, user ${UserID}. Max ${maxAmountOfParticipants} amountNow ${amountParticipants}`);
                 if (amountParticipants < maxAmountOfParticipants || ParticipantIsThere.length > 0) {
-                    con.query('INSERT INTO meal_participants_user VALUES (?,?);', [mealId, UserID], (error, result, fields) => {
+                    con.query(DQuery.insertParticipation, [mealId, UserID], (error, result, fields) => {
                         //FK/PK error message
                         if (error) {
                             logr.error(error.message);
                             logr.info("User exits meal");
-                            con.query('DELETE FROM meal_participants_user WHERE mealId = ? AND userId = ?;',
-                                [mealId, UserID], (fail, succes) => {
-                                    con.release();
-                                    res.status(200).json({
-                                        status: 200,
-                                        result: {
-                                            message: `Participation of USERID => ${UserID} with MEALID => ${mealId} has been removed.`,
-                                            currentlyParticipating: false
-                                        }
-                                    })
+                            con.query(DQuery.deleteParticipation, [mealId, UserID], (fail, succes) => {
+                                con.release();
+                                res.status(200).json({
+                                    status: 200,
+                                    result: {
+                                        message: `Participation of USERID => ${UserID} with MEALID => ${mealId} has been removed.`,
+                                        currentlyParticipating: false
+                                    }
                                 })
+                            })
                         } else {
                             logr.info("User enters meal");
                             con.release();
@@ -205,11 +193,6 @@ let controller = {
 
 
     }
-}
-
-function decodeToken(headerBearer) {
-    const token = headerBearer.substring(7, headerBearer.length);
-    return jwt.decode(token);
 }
 
 module.exports = controller;

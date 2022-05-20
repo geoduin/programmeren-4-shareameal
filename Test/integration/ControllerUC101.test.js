@@ -5,7 +5,6 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const { it } = require('mocha');
 const server = require('../../index');
-const tokens = require('../../src/tokens/UserTokens.token');
 
 chai.should();
 chai.use(chaiHttp);

@@ -24,7 +24,11 @@ Hieronder kun je de applicatie lokaal draaien op http://localhost:3030 met deze 
 
 ``` 
 npm start
+```
+
 //Of
+
+```
 nodemon index.js
 ```
 
@@ -68,7 +72,7 @@ Benodigde body
 
 
 ```
-let Login = {
+{
     emailAdress: "emailAdress"
     password: "password"
 }
@@ -98,16 +102,15 @@ Valide telefoonnummer vereist.
 
 Format telefoonnummer (06 of 31)(lege karakter, '-' of geen ruimte tussen 06/31 en de andere cijfers)(6 als de telefoonnummer met 31 begint)(8 cijfers)
 
-```
-Gebruiker aanmaak body = 
-        {
-            name:       "naam",
-            password:   "password",
-            emailAdress:"email",
-            phoneNumber:"phonenumber",
-            city:       "City",
-            street:     "street"
-        }
+``` 
+{
+    name:       "naam",
+    password:   "password",
+    emailAdress:"email",
+    phoneNumber:"phonenumber",
+    city:       "City",
+    street:     "street"
+}
 ```
 
 |Status code| |
@@ -123,14 +126,14 @@ Route: /api/user
 
 Vereisten:
 
-Niet van toepassing
+Moet ingelogd zijn
 
 
 Beschikbare query parameters:
 
 - limit => om de maximale hoeveelheid gezochte gebruikers op te vragen
 
-- searchTerm => op basis van een zoekterm naar gebruikers zoeken die ongeveer voldoet aan de zoekterm.
+- firstName => op basis van een zoekterm gebruikers opzoeken, als het voornaam op de zoekterm lijkt.
 
 - isActive => Zoekt op gebruikers die actief of inactief zijn. Waarden: true/false
 
@@ -186,17 +189,16 @@ Vereisten:
 
 
 ```
-let body = 
-        {
-            firstName:      "voornaam",
-            lastName:       "achternaame",
-            city:           "stad",
-            street:         "straat",
-            emailAdress:    "Email",
-            password:       "Wachtwoord",
-            isActive:       "isactive",
-            phoneNumber:    "Telefoon"
-        }
+    {
+        firstName:      "voornaam",
+        lastName:       "achternaame",
+        city:           "stad",
+        street:         "straat",
+        emailAdress:    "Email",
+        password:       "Wachtwoord",
+        isActive:       "isactive",
+        phoneNumber:    "Telefoon"
+    }
 ```
 |status| |
 |---|---|
@@ -242,20 +244,19 @@ Vereisten:
 -Alle velden zijn verplicht
 
 ```
-let body = 
-                {
-                    name:                   "naam",
-                    description:            "Beschrijving",
-                    isActive:               "boolean",
-                    isVega:                 "boolean",
-                    isVegan:                "boolean",
-                    isToTakeHome:           "boolean",
-                    dateTime:               "Jaar-maand-dagTuur:minuten:seconden",
-                    imageUrl:               "https://afbeelding.jpg",
-                    allergenes:              allergenen(Array uit noten, gluten en of lactose),
-                    maxAmountOfParticipants: nummer,
-                    price:                   prijs
-                }
+{
+    name:                   "naam",
+    description:            "Beschrijving",
+    isActive:               "boolean",
+    isVega:                 "boolean",
+    isVegan:                "boolean",
+    isToTakeHome:           "boolean",
+    dateTime:               "Jaar-maand-dagTuur:minuten:seconden",
+    imageUrl:               "https://afbeelding.jpg",
+    allergenes:              allergenenArray(Array uit noten, gluten en of lactose),
+    maxAmountOfParticipants: nummer,
+    price:                   prijs(float waarde)
+}
 ```
 
 |Status code| |
@@ -283,20 +284,19 @@ Vereisten:
 
 
 ```
-let body = 
-                {
-                    name:                   "naam",
-                    description:            "Beschrijving",
-                    isActive:               "boolean",
-                    isVega:                 "boolean",
-                    isVegan:                "boolean",
-                    isToTakeHome:           "boolean",
-                    dateTime:               "Jaar-maand-dagTuur:minuten:seconden",
-                    imageUrl:               "https://afbeelding.jpg",
-                    allergenes:              allergenen,
-                    maxAmountOfParticipants: nummer,
-                    price:                   prijs
-                }
+{
+    name:                   "naam",
+    description:            "Beschrijving",
+    isActive:               "boolean",
+    isVega:                 "boolean",
+    isVegan:                "boolean",
+    isToTakeHome:           "boolean",
+    dateTime:               "Jaar-maand-dagTuur:minuten:seconden",
+    imageUrl:               "https://afbeelding.jpg",
+    allergenes:              allergenen,
+    maxAmountOfParticipants: nummer,
+    price:                   prijs
+}
 ```
 |Status code| |
 |---|---|
