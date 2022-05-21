@@ -192,7 +192,7 @@ let controller = {
                             logr.trace(results[0]);
                             let User = results[0];
                             const payLoad = { id: User.id };
-                            jwt.sign(payLoad, secretKey, { expiresIn: '31d' }, (err, token) => {
+                            jwt.sign(payLoad, secretKey, { expiresIn: '3d' }, (err, token) => {
                                 connect.release();
                                 User = { ...User, token };
                                 User = utill.userCookCorrectFormat(User);
@@ -206,15 +206,14 @@ let controller = {
                         })
                     ).catch(err => {
                         logr.error(`User already exist`);
+                        connect.release();
                         res.status(409).json({
                             status: 409,
                             message: "Email has been taken"
                         })
-                        connect.release();
                     })
             })
         })
-
     }
     ,
     //UC-202 Retrieves all users
