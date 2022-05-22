@@ -678,6 +678,7 @@ describe('UC-305 delete meal test', (done) => {
             conn.query('INSERT INTO meal VALUES(999,1,0,0,1,"2022-03-22 17:35:00",4,12.75,"https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",1,"2022-02-26 18:12:40.048998","2022-04-26 12:33:51.000000","Pasta Bolognese met tomaat, spekjes en kaas","Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!","gluten,lactose");',
                 (err, rslt) => {
                     if (err) { throw err };
+                    conn.release();
                     done();
                 })
         })

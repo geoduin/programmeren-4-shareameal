@@ -204,9 +204,9 @@ describe('UC-404 get detail of the participant at that meal', (done) => {
             con.query('DELETE FROM user WHERE emailAdress = "Xino@gmail.com";', (err, result) => {
                 con.query('ALTER TABLE user AUTO_INCREMENT = 6;', (err, result) => {
                     con.release();
+                    done();
                 });
             })
         })
-        done();
     })
 });

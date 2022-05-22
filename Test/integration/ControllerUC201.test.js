@@ -734,10 +734,10 @@ describe('UC-205 Update User PUT /api/user/:userId', (done) => {
             con.query('DELETE FROM user WHERE emailAdress = "Moomoo@gmail.com";', (err, result) => {
                 con.query('ALTER TABLE user AUTO_INCREMENT = 6;', (err, result) => {
                     con.release();
+                    done();
                 });
             })
         })
-        done();
     })
 });
 
@@ -746,9 +746,10 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
         DB.getConnection((err, con) => {
             con.query('INSERT INTO user VALUES(200, "Jessie", "Kessier", 0, "Jessie@hotmail.com", "Secrid", "0612345678", "editor,guest", "La ", "Marseille");', (err, result) => {
                 con.release();
+                done();
             })
         })
-        done();
+        
     })
 
 
@@ -803,9 +804,11 @@ describe('UC-206 Delete user DELETE /api/user/:userId', (done) => {
     after((done) => {
         DB.getConnection((err, con) => {
             con.query('DELETE FROM user WHERE id = 200;', (err, result) => {
-                con.query('ALTER TABLE user AUTO_INCREMENT = 8');
+                con.query('ALTER TABLE user AUTO_INCREMENT = 8',(error, res)=>{
+                    con.release();
+                    done();
+                })
             })
         })
-        done();
     })
 })
